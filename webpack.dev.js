@@ -1,7 +1,12 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./template.html"
+});
+
+const lintPlugin = new ESLintPlugin({
+    extensions: ['ts', 'tsx']
 });
 
 const config = {
@@ -21,7 +26,7 @@ const config = {
     devServer: {
         port: 3000
     },
-    plugins: [htmlPlugin]
+    plugins: [htmlPlugin, lintPlugin]
 }
 
 module.exports = config;
