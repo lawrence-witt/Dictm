@@ -1,4 +1,5 @@
 import React from 'react';
+import { hot } from 'react-hot-loader';
 
 const App: React.FC = (): React.ReactElement => {
     const [count, setCount] = React.useState(0);
@@ -10,10 +11,10 @@ const App: React.FC = (): React.ReactElement => {
 
     return (
         <>
-            <h1>Hello World!</h1>
+            <h1>Hello World! Again!!</h1>
             <button onClick={() => setToggle(!toggle)}>Toggle</button>
         </>
     );
 }
 
-export default App;
+export default hot(module)(App);
