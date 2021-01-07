@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"outDir": "./build/",
+		"noImplicitAny": true,
+		"target": "es5",
+		"lib": ["es5", "es6", "dom"],
+		"module": "ESNext",
+		"jsx": "react",
+        "allowJs": true,
+        "esModuleInterop": true,
+		"moduleResolution": "node",
+		"sourceMap": true
+	}
+}
