@@ -1,7 +1,19 @@
 import React from 'react';
 
 function App() {
-    return <h1>Hello World!</h1>
+    const [count, setCount] = React.useState(0);
+    const [toggle, setToggle] = React.useState(true);
+
+    React.useEffect(() => {
+        setCount(count + 1);
+    }, [toggle]);
+
+    return (
+        <>
+            <h1>Hello World!</h1>
+            <button onClick={() => setToggle(!toggle)}>Toggle</button>
+        </>
+    );
 };
 
 export default App;
