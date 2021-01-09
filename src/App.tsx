@@ -1,20 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { hot } from 'react-hot-loader';
 
 const App: React.FC = (): React.ReactElement => {
-    const [count, setCount] = React.useState(0);
-    const [toggle, setToggle] = React.useState(true);
+    const [bool] = useState(true);
 
-    React.useEffect(() => {
-        setCount(c => c + 1);
-    }, [toggle]);
-
-    return (
-        <>
-            <h1>Hello World! Again!!</h1>
-            <button onClick={() => setToggle(!toggle)}>Toggle</button>
-        </>
-    );
-}
+    return <h1>App</h1>;
+};
 
 export default hot(module)(App);

@@ -2,7 +2,7 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 const htmlPlugin = new HtmlWebPackPlugin({
-  template: "./template.html"
+  template: "./src/index.html"
 });
 
 const lintPlugin = new ESLintPlugin({
@@ -27,6 +27,7 @@ const config = {
     devServer: {
         port: 3000
     },
+    devtool: 'inline-source-map',
     plugins: [htmlPlugin, lintPlugin]
 }
 
