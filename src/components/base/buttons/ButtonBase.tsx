@@ -17,27 +17,13 @@ const ButtonSurface = styled.button`
     display: flex;
     justify-content: center;
     align-items: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 12px;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 200ms;
     z-index: 0;
 
-    &&:before {
-        content: '';
-        position: absolute;
-        display: block;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        background: black;
-        opacity: 0;
-        transition: opacity 200ms;
-        z-index: -1;
-    }
-
-    :hover:before {
-        opacity: 0.12;
+    :hover {
+        background: rgba(0, 0, 0, 0.12);
     }
 `;
 

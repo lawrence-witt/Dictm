@@ -1,19 +1,15 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 
-import AppBar from './components/AppBar';
-import IconButton from './components/buttons/IconButton';
-import MenuIcon from './components/icons/MenuIcon';
-import Text from './components/Typography';
+import CompAppBar from './components/composed/CompAppBar';
+import CompTabBar from './components/composed/CompTapBar';
 
 const App: React.FC = (): React.ReactElement => {
     return (
-        <AppBar>
-            <IconButton>
-                <MenuIcon />
-            </IconButton>
-            <Text tag="h4" shade="light" state="focussed">App</Text>
-        </AppBar>
+        <div style={{height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+            <CompAppBar />
+            <CompTabBar />
+        </div>
     )
 };
 

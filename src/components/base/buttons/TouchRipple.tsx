@@ -26,6 +26,8 @@ const RippleContainer = styled.span`
     display: block;
     width: 100%;
     height: 100%;
+    border-radius: inherit;
+    overflow: hidden;
     position: absolute;
     z-index: -1;
 `;
