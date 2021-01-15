@@ -1,3 +1,11 @@
+// Surfaces
+
+export interface SurfaceProps extends React.HTMLAttributes<HTMLElement> {
+    as?: React.ElementType;
+    forwardedRef?: React.RefObject<HTMLElement>;
+    style?: React.CSSProperties;
+}
+
 // Content
 
 export type ContentShade = 'light' | 'dark';
