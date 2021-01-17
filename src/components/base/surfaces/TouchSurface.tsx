@@ -1,110 +1,103 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { SurfaceProps } from '../styleconfig/styleconfig.d';
+import { AnySurfaceProps, RippleHandle } from '../styleconfig/styleconfig.d';
+import useMergedStyles from '../utilities/hooks/useMergedStyles';
+import useEventCallback from '../utilities/hooks/useEventCallback';
 
 import BaseSurface from './BaseSurface';
-import TouchRipple, { RippleContainer } from './TouchRipple';
+import TouchRipple from './TouchRipple';
 
 // Types
 
-interface RippleObject {
-    id: number;
-    active: boolean;
+interface TouchSurfaceProps extends AnySurfaceProps {
+    centre?: boolean;
 }
 
 // Styled
 
-// Components
+const defaultStyles: React.CSSProperties = {
+    cursor: "pointer",
+    position: "relative",
+    background: 'transparent',
+    border: 0,
+    outline: 0,
+    padding: 0,
+    margin: 0
+}
 
-const TouchSurface: React.FC<SurfaceProps> = ({
-    children, ...props
-}): React.ReactElement => {
+// Component
+
+const TouchSurface = React.forwardRef <
+    HTMLElement, 
+    TouchSurfaceProps
+> (function TouchSurface(props, ref) {
     const {
+        centre,
+        style,
         onClick,
         onFocus,
         onBlur,
         onMouseDown,
         onMouseUp,
         onMouseLeave,
+        onDragLeave,
+        onTouchStart,
+        onTouchMove,
+        onTouchEnd,
+        children,
         ...other
     } = props;
 
-    const nextRippleId = useRef<number>(0);
-    const [ripples, setRipples] = useState<RippleObject[]>([]);
+    const rippleRef = useRef<RippleHandle>();
+    const mergedStyles = useMergedStyles(defaultStyles, style);
 
-    // Ripple Modifiers
+    // Ripple Handlers
 
-    const addRipple = () => {
-        setRipples(rips => [...rips, {
-            id: nextRippleId.current,
-            active: true
-        }]);
-        nextRippleId.current += 1;
-    };
+    function useRippleHandler<T>(
+        rippleAction: string, 
+        eventCallback: (event: T) => void
+    ) {
+        return useEventCallback<T>(event => {
+            if (eventCallback) {
+                eventCallback(event);
+            }
 
-    const fadeRipples = () => {
-        setRipples(rips => rips.map(r => ({...r, active: false})));
-    };
+            rippleRef.current[rippleAction](event);
+        });
+    }
 
-    const removeRipple = useCallback((id: number) => {
-        setRipples(rips => rips.filter(r => r.id !== id));
-    }, []);
-
-    // Event Handlers
-
-    const surfaceFocus = (e: React.FocusEvent, cb: (e: React.FocusEvent) => void) => {
-        // Add a centre ripple in all modes
-
-        cb && cb(e);
-    };
-
-    const surfaceBlur = (e: React.FocusEvent, cb: (e: React.FocusEvent) => void) => {
-        // Fade out all ripples
-        cb && cb(e);
-    };
-
-    const surfaceClick = (e: React.MouseEvent, cb: (e: React.MouseEvent) => void) => {
-        e.preventDefault();
-
-        // Trigger an x/y positioned ripple
-        // Unless we're in 'centre' mode, then position in centre
-        
-        // In regular mode, ripple must completely cover the element
-        // In 'centre' mode, ripple is the size of the longest edge (minus a bit)
-
-        cb && cb(e);
-    };
-
-    const surfaceExit = (e: React.MouseEvent, cb: (e: React.MouseEvent) => void) => {
-        // Fade out all ripples
-        cb && cb(e);
-    };
+    const handleFocus = useRippleHandler<React.FocusEvent>('focus', onFocus);
+    const handleBlur = useRippleHandler<React.FocusEvent>('stop', onBlur);
+    const handleMouseDown = useRippleHandler<React.MouseEvent>('start', onMouseDown);
+    const handleMouseUp = useRippleHandler<React.MouseEvent>('stop', onMouseUp);
+    const handleMouseLeave = useRippleHandler<React.MouseEvent>('stop', onMouseLeave);
+    const handleDragLeave = useRippleHandler<React.DragEvent>('stop', onDragLeave);
+    const handleTouchStart = useRippleHandler<React.TouchEvent>('start', onTouchStart);
+    const handleTouchMove = useRippleHandler<React.TouchEvent>('stop', onTouchMove);
+    const handleTouchEnd = useRippleHandler<React.TouchEvent>('stop', onTouchEnd);
 
     return (
         <BaseSurface
-            onClick={e => onClick && onClick(e)}
-            onFocus={e => surfaceFocus(e, onFocus)}
-            onBlur={e => surfaceBlur(e, onBlur)}
-            onMouseDown={e => surfaceClick(e, onMouseDown)}
-            onMouseUp={e => surfaceExit(e, onMouseUp)}
-            onMouseLeave={e => surfaceExit(e, onMouseLeave)}
             {...other}
+            onClick={onClick}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            onDragLeave={handleDragLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={mergedStyles}
+            ref={ref}
         >
             {children}
-            <RippleContainer>
-                {ripples.map(rip => (
-                    <TouchRipple 
-                        key={rip.id}
-                        id={rip.id}
-                        active={rip.active}
-                        onComplete={removeRipple}
-                    />
-                ))}
-            </RippleContainer>
+            <TouchRipple ref={rippleRef} centre={centre}/>
         </BaseSurface>
-    )
-};
+    );
+});
 
 // Exports
 

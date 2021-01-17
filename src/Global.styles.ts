@@ -24,10 +24,4 @@ export const GlobalStyles = createGlobalStyle`
         max-width: 100%;
         height: auto;
     }
-
-    button {
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
 `;

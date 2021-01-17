@@ -1,13 +1,4 @@
-import { ContentColors, ContentShade, ContentState } from './styleconfig.d';
-
-// Types
-
-interface ContentScheme {
-    color: ContentColors;
-    states: {
-        [key in ContentState]: number;
-    }
-}
+import { ContentShade, ContentState, ContentScheme } from './styleconfig.d';
 
 // Content
 
