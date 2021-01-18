@@ -1,17 +1,20 @@
 import React, { useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { AnySurfaceProps, RippleHandle } from '../styleconfig/styleconfig.d';
+import { SurfaceProps, RippleHandle } from '../styleconfig/styleconfig.d';
 import useMergedStyles from '../utilities/hooks/useMergedStyles';
 import useEventCallback from '../utilities/hooks/useEventCallback';
+import { useTheme } from '../theme';
 
 import BaseSurface from './BaseSurface';
 import TouchRipple from './TouchRipple';
 
 // Types
 
-interface TouchSurfaceProps extends AnySurfaceProps {
+interface TouchSurfaceProps extends SurfaceProps {
     centre?: boolean;
+    shade?: 'light' | 'dark';
+    primary?: string | boolean;
 }
 
 // Styled
@@ -23,17 +26,17 @@ const defaultStyles: React.CSSProperties = {
     border: 0,
     outline: 0,
     padding: 0,
-    margin: 0
+    margin: 0,
+    transition: 'background 200ms'
 }
 
 // Component
 
-const TouchSurface = React.forwardRef <
-    HTMLElement, 
-    TouchSurfaceProps
-> (function TouchSurface(props, ref) {
+const TouchSurface: React.FC<TouchSurfaceProps> = (props) => {
     const {
-        centre,
+        centre = false,
+        shade = 'dark',
+        primary = false,
         style,
         onClick,
         onFocus,
@@ -45,16 +48,19 @@ const TouchSurface = React.forwardRef <
         onTouchStart,
         onTouchMove,
         onTouchEnd,
+        forwardRef,
         children,
         ...other
     } = props;
 
+    const tempRef = useRef<HTMLElement>();
     const rippleRef = useRef<RippleHandle>();
+
     const mergedStyles = useMergedStyles(defaultStyles, style);
 
     // Ripple Handlers
 
-    function useRippleHandler<T>(
+    function useRippleHandler<T extends {type: string}>(
         rippleAction: string, 
         eventCallback: (event: T) => void
     ) {
@@ -66,6 +72,10 @@ const TouchSurface = React.forwardRef <
             rippleRef.current[rippleAction](event);
         });
     }
+
+    const forceBlur = useCallback(() => {
+        tempRef.current.blur();
+    }, []);
 
     const handleFocus = useRippleHandler<React.FocusEvent>('focus', onFocus);
     const handleBlur = useRippleHandler<React.FocusEvent>('stop', onBlur);
@@ -79,7 +89,6 @@ const TouchSurface = React.forwardRef <
 
     return (
         <BaseSurface
-            {...other}
             onClick={onClick}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -91,13 +100,20 @@ const TouchSurface = React.forwardRef <
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             style={mergedStyles}
-            ref={ref}
+            forwardRef={tempRef}
+            {...other}
         >
             {children}
-            <TouchRipple ref={rippleRef} centre={centre}/>
+            <TouchRipple 
+                ref={rippleRef} 
+                centre={centre}
+                shade={shade} 
+                primary={primary}
+                forceBlur={forceBlur}
+            />
         </BaseSurface>
     );
-});
+}
 
 // Exports
 

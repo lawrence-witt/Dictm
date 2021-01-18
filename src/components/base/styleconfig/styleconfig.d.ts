@@ -1,10 +1,15 @@
 // Surfaces
 
-export interface SurfaceProps<T, E> extends React.HTMLProps<E> {
+/* export interface SurfaceProps<T, E> extends React.HTMLProps<E> {
     tag?: T;
 }
 
-export type AnySurfaceProps = SurfaceProps<React.ElementType, HTMLElement>;
+export type AnySurfaceProps = SurfaceProps<React.ElementType, HTMLElement>; */
+
+export interface SurfaceProps extends React.HTMLProps<HTMLElement> {
+    tag?: React.ElementType;
+    forwardRef?: React.RefObject<HTMLElement>;
+}
 
 export interface RippleHandle {
     [key: string]: (event: unknown) => void;

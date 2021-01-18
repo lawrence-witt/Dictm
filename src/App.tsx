@@ -10,7 +10,7 @@ import CompTabBar from './components/composed/CompTapBar';
 const testStyle = {
     width: '200px',
     height: '125px',
-    background: 'slateblue'
+    background: 'transparent'
 };
 
 const App: React.FC = (): React.ReactElement => {

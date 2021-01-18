@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { AnySurfaceProps } from '../styleconfig/styleconfig.d';
+import { SurfaceProps } from '../styleconfig/styleconfig.d';
 
 // Styled
 
@@ -11,13 +11,11 @@ const StyledBaseSurface = styled.div<{$style: React.CSSProperties}>`
 
 // Component
 
-const BaseSurface = React.forwardRef <
-    HTMLElement, 
-    AnySurfaceProps
-> (function BaseSurface(props, ref) {
+const BaseSurface: React.FC<SurfaceProps> = (props) => {
     const {
         tag,
         style,
+        forwardRef,
         children,
         ...other
     } = props;
@@ -26,13 +24,13 @@ const BaseSurface = React.forwardRef <
         <StyledBaseSurface
             {...other}
             as={tag || 'div'}
-            ref={ref}
+            ref={forwardRef}
             $style={style || {}}
         >
             {children}
         </StyledBaseSurface>
     )
-})
+};
 
 // Exports
 

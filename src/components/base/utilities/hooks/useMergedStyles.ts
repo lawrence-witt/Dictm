@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import * as React from 'react';
 
 import deeplyMergePrimitiveObjects from '../functions/deeplyMergePrimitiveObjects';
 
 const useMergedStyles = (
     defaultStyle = {}, customStyle = {}
-): React.CSSProperties => {
-    return useMemo(() => {
+): any => {
+    return React.useMemo(() => {
         return deeplyMergePrimitiveObjects(defaultStyle, customStyle);
     }, [defaultStyle, customStyle]);
 };
