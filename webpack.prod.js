@@ -21,6 +21,28 @@ const config = {
             {
                 test: /\.tsx?$/,
                 loader: "awesome-typescript-loader",
+            },
+            {
+                test: /\.css?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: 'css/[hash].[ext]'
+                        }
+                    },
+                    'style-loader', 
+                    'css-loader'
+                ]
+            },
+            {
+                test: /\.(woff|woff2|ttf|otf)$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[hash].[ext]',
+                    outputPath: 'css/',
+                    publicPath: url => '../css/' + url
+                }
             }
         ]
     },
