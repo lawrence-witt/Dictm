@@ -6,12 +6,30 @@ import {
     Typography
 } from '@material-ui/core';
 import {
-    Menu,
     Repeat,
     Search,
     Delete
 } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+
+import MenuButton from '../generic/MenuButton';
+
+import { useBreakContext } from '../../utils/hooks/useBreakpoints';
+
+// Types
+
+interface IAppBar {
+    toggleMenu: () => void;
+}
+
+// Styled
+
+const getSpacing = (theme: Theme) => ({
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up('sm')]: {
+        marginRight: theme.spacing(3)
+    }
+});
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -22,16 +40,10 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center'
     },
     menuButton: {
-        marginRight: theme.spacing(1),
-        [theme.breakpoints.up('sm')]: {
-            marginRight: theme.spacing(2)
-        }
+        ...getSpacing(theme)
     },
     pageTitle: {
-        marginRight: theme.spacing(1),
-        [theme.breakpoints.up('sm')]: {
-            marginRight: theme.spacing(2)
-        }
+        ...getSpacing(theme)
     },
     toolGroup: {
         display: 'flex',
@@ -39,24 +51,31 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AppBar: React.FC = () => {
+// Component
+
+const AppBar: React.FC<IAppBar> = ({
+    toggleMenu
+}) => {
     const classes = useStyles();
+
+    const breakpoint = useBreakContext();
+
+    const MenuToggle = (
+        <MenuButton 
+            edge="start"
+            color="inherit"
+            className={classes.menuButton}
+            onClick={toggleMenu}
+        />
+    )
 
     return (
         <MuiAppBar
             elevation={0}
             className={classes.appBar}
         >
-            <Toolbar
-                variant={'dense'}
-            >
-                <IconButton 
-                    edge="start" 
-                    color="inherit"
-                    className={classes.menuButton}
-                >
-                    <Menu/>
-                </IconButton>
+            <Toolbar>
+                {breakpoint.index === 0 && MenuToggle}
                 <Typography 
                     variant="h6" 
                     noWrap
@@ -65,23 +84,22 @@ const AppBar: React.FC = () => {
                     Page Title
                 </Typography>
                 <div className={classes.grow}></div>
-                <div className={classes.toolGroup}>
-                    <IconButton
-                        color="inherit"
-                    >
-                        <Repeat />
-                    </IconButton>
-                    <IconButton
-                        color="inherit"
-                    >
-                        <Search />
-                    </IconButton>
-                    <IconButton
-                        color="inherit"
-                    >
-                        <Delete />
-                    </IconButton>
-                </div>
+                <IconButton
+                    color="inherit"
+                >
+                    <Repeat />
+                </IconButton>
+                <IconButton
+                    color="inherit"
+                >
+                    <Search />
+                </IconButton>
+                <IconButton
+                    color="inherit"
+                    edge="end"
+                >
+                    <Delete />
+                </IconButton>
             </Toolbar>
         </MuiAppBar>
     )

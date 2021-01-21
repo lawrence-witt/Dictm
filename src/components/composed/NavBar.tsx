@@ -1,14 +1,12 @@
-import * as React from 'react';
-import {
-    BottomNavigation,
-    BottomNavigationAction
-} from '@material-ui/core'
-import {
-    Album,
-    EventNote,
-    Category
-} from '@material-ui/icons'
+import React from 'react';
+import BottomNavigation from '@material-ui/core/BottomNavigation';
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
+import Album from '@material-ui/icons/Album';
+import EventNote from '@material-ui/icons/EventNote';
+import Category from '@material-ui/icons/Category';
 import { makeStyles } from '@material-ui/core/styles';
+
+type TabTypes = 'recordings' | 'note' | 'categories' | '';
 
 const useNavStyles = makeStyles((theme) => ({
     root: {
@@ -16,7 +14,15 @@ const useNavStyles = makeStyles((theme) => ({
         top: 'auto',
         bottom: 0,
         width: '100%',
-        background: theme.palette.primary.main
+        background: theme.palette.primary.main,
+        transform: 'translateY(0%)',
+        transition: `transform
+            ${theme.transitions.duration.standard}ms
+            ${theme.transitions.easing.easeInOut}
+        `,
+        [theme.breakpoints.up('sm')]: {
+            transform: 'translateY(100%)'
+        }
     }
 }));
 
@@ -37,16 +43,22 @@ const TabBar: React.FC = () => {
     const navClasses = useNavStyles();
     const actClasses = useActionStyles();
 
-    const [section, setSection] = React.useState('recordings');
+    const [tab, setTab] = React.useState<TabTypes>('');
+
+    // Required to stop mui from throwing TS error
+    const changeHandler = (...args: [React.MouseEvent, TabTypes] | unknown[]) => {
+        setTab(args[1] as TabTypes);
+    };
 
     return (
             <BottomNavigation
-                value={section}
-                onChange={(ev, val) => setSection(val)}
+                component="nav"
+                value={tab}
                 showLabels
                 classes={navClasses}
+                onChange={changeHandler}
             >
-                <BottomNavigationAction 
+                <BottomNavigationAction
                     label="Recordings"
                     value="recordings"
                     icon={<Album />}
