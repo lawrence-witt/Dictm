@@ -92,10 +92,10 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
 
     return (
         <ListItem component="header" className={classes.header}>
+            <Divider className={classes.divider}/>
             {isToggleVisible && MenuToggle}
             {Title}
             {BackButton}
-            <Divider className={classes.divider}/>
         </ListItem>
     )
 };

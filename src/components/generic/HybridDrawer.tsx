@@ -12,7 +12,15 @@ enum Flows {
     PERM
 }
 
-interface IHybridMenu {
+interface HybridDrawerStyleProps {
+    flow: Flows;
+    isMenuOpen: boolean;
+    isMenuVisible: boolean;
+    miniMax: number;
+    fullMax: number;
+}
+
+interface HybridDrawerProps {
     flow: Flows;
     open: boolean;
     miniMax?: number;
@@ -21,17 +29,9 @@ interface IHybridMenu {
     toggleMenu?: () => void;
 }
 
-interface BaseStyleProps {
-    flow: Flows;
-    isMenuOpen: boolean;
-    isMenuVisible: boolean;
-    miniMax: number;
-    fullMax: number;
-}
-
 // Make Styles
 
-const useDrawerStyles = (props: BaseStyleProps) => makeStyles(theme =>
+const useDrawerStyles = (props: HybridDrawerStyleProps) => makeStyles(theme =>
     createStyles({
         base: {
             width: () => {
@@ -52,21 +52,27 @@ const useDrawerStyles = (props: BaseStyleProps) => makeStyles(theme =>
         },
         frame: {
             position: 'fixed',
-            /* width: props.fullMax, */
-            width: () => {
-                if (props.flow === Flows.PERM) return props.fullMax;
-                return props.isMenuOpen ? props.fullMax : props.miniMax;
+            width: props.fullMax,
+            transform: () => {
+                let res: string;
+                const r = (val: number) => `translateX(${val}px)`;
+
+                const openTrans = 0;
+                const hybridTrans = props.miniMax - props.fullMax;
+                const closeTrans = -props.fullMax;
+
+                if (props.flow === Flows.PERM) {
+                    res = r(openTrans);
+                } else if (props.flow === Flows.HYBRID) {
+                    res = props.isMenuOpen ? r(openTrans) : r(hybridTrans);
+                } else {
+                    res = props.isMenuOpen ? r(openTrans) : r(closeTrans);
+                }
+                
+                return res;
             },
             height: '100%',
-            transform: () => {
-                const offset = props.isMenuVisible ? 0 : -100;
-                return `translateX(${offset}%)`;
-            },
-            transition: `
-                width
-                ${theme.transitions.duration.standard}ms
-                ${theme.transitions.easing.easeInOut},
-                transform
+            transition: `transform
                 ${theme.transitions.duration.standard}ms
                 ${theme.transitions.easing.easeInOut}
             `,
@@ -74,14 +80,35 @@ const useDrawerStyles = (props: BaseStyleProps) => makeStyles(theme =>
         },
         content: {
             position: 'absolute',
-            width: props.fullMax
+            width: props.fullMax,
+            transform: () => {
+                let res: string;
+                const r = (val: number) => `translateX(${val}px)`;
+
+                const openTrans = 0;
+                const hybridTrans = props.fullMax - props.miniMax;
+                const closeTrans = props.fullMax;
+
+                if (props.flow === Flows.PERM) {
+                    res = r(openTrans);
+                } else if (props.flow === Flows.HYBRID) {
+                    res = props.isMenuOpen ? r(openTrans) : r(hybridTrans);
+                } else {
+                    res = props.isMenuOpen ? r(openTrans) : r(closeTrans);
+                }
+                
+                return res;
+            },
+            transition: `transform
+            ${theme.transitions.duration.standard}ms
+            ${theme.transitions.easing.easeInOut}`
         }
     })
 );
 
 // Component
 
-const HybridMenu: React.FC<IHybridMenu> = ({ 
+const HybridMenu: React.FC<HybridDrawerProps> = ({ 
     children, ...props
 }) => {
     const {
