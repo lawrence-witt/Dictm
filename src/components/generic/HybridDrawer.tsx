@@ -4,7 +4,8 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
 
-// ${theme.transitions.duration.standard}ms
+// ${theme!transitions.duration.standard}ms
+const duration = 300;
 
 // Types
 
@@ -41,13 +42,23 @@ const getBaseWidth = (
     miniWidth: number, 
     fullWidth: number
 ) => {
-    switch(flow) {
-        case Flows.PERM: return fullWidth;
-        case Flows.HYBRID: return miniWidth;
-        case Flows.TEMP:
-        default: return 0;
+    if (flow === Flows.PERM) {
+        return fullWidth;
+    } else {
+        return miniWidth;
     }
 };
+
+const getBaseMargin = (
+    flow: Flows,
+    miniWidth: number
+) => {
+    if (flow === Flows.TEMP) {
+        return -miniWidth;
+    } else {
+        return 0;
+    }
+}
 
 const getHybridFrameTransform = (
     flow: Flows,
@@ -59,6 +70,10 @@ const getHybridFrameTransform = (
 
     if (!open && flow !== Flows.PERM) {
         val = miniWidth - fullWidth;
+    }
+
+    if (open && flow === Flows.TEMP) {
+        val += miniWidth;
     }
     
     return getTransPx(val);
@@ -87,26 +102,28 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme =>
             width: ({flow, miniWidth, fullWidth}) => {
                 return getBaseWidth(flow, miniWidth, fullWidth);
             },
+            marginLeft: ({flow, miniWidth}) => {
+                return getBaseMargin(flow, miniWidth);
+            },
             overflow: 'visible',
             zIndex: theme.zIndex.modal,
             transition: `
                 width 
-                ${theme.transitions.duration.standard}ms 
+                ${duration}ms 
+                ${theme.transitions.easing.easeInOut},
+                margin-left
+                ${duration}ms 
                 ${theme.transitions.easing.easeInOut}
             `
         },
-        mobileFrame: {
-            
-        },
         hybridFrame: {
-            position: 'fixed',
             width: ({fullWidth}) => fullWidth,
             transform: ({flow, open, miniWidth, fullWidth}) => {
                 return getHybridFrameTransform(flow, open, miniWidth, fullWidth);
             },
             height: '100%',
             transition: `transform
-            ${theme.transitions.duration.standard}ms
+            ${duration}ms
                 ${theme.transitions.easing.easeInOut}
             `,
             overflowX: 'hidden'
@@ -117,7 +134,7 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme =>
                 return getContentTransform(flow, open, miniWidth, fullWidth);
             },
             transition: `transform
-                ${theme.transitions.duration.standard}ms
+                ${duration}ms
                 ${theme.transitions.easing.easeInOut}
             `
         }
