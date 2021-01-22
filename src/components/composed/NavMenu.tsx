@@ -93,9 +93,10 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
     return (
         <ListItem component="header" className={classes.header}>
             <Divider className={classes.divider}/>
-            {isToggleVisible && MenuToggle}
+            {MenuToggle}
+            {/* {isToggleVisible && MenuToggle}
             {Title}
-            {BackButton}
+            {BackButton} */}
         </ListItem>
     )
 };
@@ -121,7 +122,7 @@ const NavMenu: React.FC<NavMenuProps> = ({
         <HybridDrawer 
             flow={breakpoint.index} 
             open={isMenuOpen}
-            toggleMenu={toggleMenu}
+            onBackDropClick={toggleMenu}
         >
             <MenuHeader
                 depth={depth}
@@ -129,6 +130,9 @@ const NavMenu: React.FC<NavMenuProps> = ({
                 toggleMenu={toggleMenu} 
                 isToggleVisible={isToggleVisible}
             />
+            <ListItem>
+                <ListItemText primary="test value text"/>
+            </ListItem>
         </HybridDrawer>
     );
 };

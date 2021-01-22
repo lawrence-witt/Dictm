@@ -1,8 +1,10 @@
 import React from 'react';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
+
+// ${theme.transitions.duration.standard}ms
 
 // Types
 
@@ -13,34 +15,77 @@ enum Flows {
 }
 
 interface HybridDrawerStyleProps {
-    flow: Flows;
-    isMenuOpen: boolean;
-    isMenuVisible: boolean;
-    miniMax: number;
-    fullMax: number;
+    flow: Flows,
+    prevFlow: React.RefObject<Flows>,
+    open: boolean;
+    miniWidth: number;
+    fullWidth: number;
 }
 
 interface HybridDrawerProps {
     flow: Flows;
     open: boolean;
-    miniMax?: number;
-    fullMax?: number;
+    miniWidth?: number;
+    fullWidth?: number;
     elevation?: number;
-    toggleMenu?: () => void;
+    onBackDropClick?: () => void;
 }
+
+// Helpers
+
+const getTrans = (val: number, m: string) => `translateX(${val}${m})`;
+const getTransPx = (val: number) => getTrans(val, 'px');
+
+const getBaseWidth = (
+    flow: Flows, 
+    miniWidth: number, 
+    fullWidth: number
+) => {
+    switch(flow) {
+        case Flows.PERM: return fullWidth;
+        case Flows.HYBRID: return miniWidth;
+        case Flows.TEMP:
+        default: return 0;
+    }
+};
+
+const getHybridFrameTransform = (
+    flow: Flows,
+    open: boolean,
+    miniWidth: number,
+    fullWidth: number
+) => {
+    let val = 0;
+
+    if (!open && flow !== Flows.PERM) {
+        val = miniWidth - fullWidth;
+    }
+    
+    return getTransPx(val);
+};
+
+const getContentTransform = (
+    flow: Flows,
+    open: boolean,
+    miniWidth: number,
+    fullWidth: number
+) => {
+    let val = 0;
+
+    if (!open && flow !== Flows.PERM) {
+        val = fullWidth - miniWidth;
+    }
+    
+    return getTransPx(val);
+};
 
 // Make Styles
 
-const useDrawerStyles = (props: HybridDrawerStyleProps) => makeStyles(theme =>
+const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => 
     createStyles({
         base: {
-            width: () => {
-                switch(props.flow) {
-                    case Flows.TEMP: return 0;
-                    case Flows.HYBRID: return props.miniMax;
-                    case Flows.PERM: return props.fullMax;
-                    default: return 0;
-                }
+            width: ({flow, miniWidth, fullWidth}) => {
+                return getBaseWidth(flow, miniWidth, fullWidth);
             },
             overflow: 'visible',
             zIndex: theme.zIndex.modal,
@@ -50,58 +95,31 @@ const useDrawerStyles = (props: HybridDrawerStyleProps) => makeStyles(theme =>
                 ${theme.transitions.easing.easeInOut}
             `
         },
-        frame: {
+        mobileFrame: {
+            
+        },
+        hybridFrame: {
             position: 'fixed',
-            width: props.fullMax,
-            transform: () => {
-                let res: string;
-                const r = (val: number) => `translateX(${val}px)`;
-
-                const openTrans = 0;
-                const hybridTrans = props.miniMax - props.fullMax;
-                const closeTrans = -props.fullMax;
-
-                if (props.flow === Flows.PERM) {
-                    res = r(openTrans);
-                } else if (props.flow === Flows.HYBRID) {
-                    res = props.isMenuOpen ? r(openTrans) : r(hybridTrans);
-                } else {
-                    res = props.isMenuOpen ? r(openTrans) : r(closeTrans);
-                }
-                
-                return res;
+            width: ({fullWidth}) => fullWidth,
+            transform: ({flow, open, miniWidth, fullWidth}) => {
+                return getHybridFrameTransform(flow, open, miniWidth, fullWidth);
             },
             height: '100%',
             transition: `transform
-                ${theme.transitions.duration.standard}ms
+            ${theme.transitions.duration.standard}ms
                 ${theme.transitions.easing.easeInOut}
             `,
             overflowX: 'hidden'
         },
         content: {
-            position: 'absolute',
-            width: props.fullMax,
-            transform: () => {
-                let res: string;
-                const r = (val: number) => `translateX(${val}px)`;
-
-                const openTrans = 0;
-                const hybridTrans = props.fullMax - props.miniMax;
-                const closeTrans = props.fullMax;
-
-                if (props.flow === Flows.PERM) {
-                    res = r(openTrans);
-                } else if (props.flow === Flows.HYBRID) {
-                    res = props.isMenuOpen ? r(openTrans) : r(hybridTrans);
-                } else {
-                    res = props.isMenuOpen ? r(openTrans) : r(closeTrans);
-                }
-                
-                return res;
+            width: ({fullWidth}) => fullWidth,
+            transform: ({flow, open, miniWidth, fullWidth}) => {
+                return getContentTransform(flow, open, miniWidth, fullWidth);
             },
             transition: `transform
-            ${theme.transitions.duration.standard}ms
-            ${theme.transitions.easing.easeInOut}`
+                ${theme.transitions.duration.standard}ms
+                ${theme.transitions.easing.easeInOut}
+            `
         }
     })
 );
@@ -114,28 +132,29 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
     const {
         flow,
         open,
-        miniMax = 56,
-        fullMax = 275,
-        elevation = 8
+        miniWidth = 56,
+        fullWidth = 275,
+        elevation = 8,
+        onBackDropClick
     } = props;
 
-    const isMenuOpen = open;
-    const isMenuVisible = flow === Flows.TEMP ? isMenuOpen : true;
     const hasEmphasis = flow !== Flows.PERM && open;
+
+    const prevFlow = React.useRef(flow);
 
     const classes = useDrawerStyles({
         flow,
-        isMenuOpen,
-        isMenuVisible,
-        miniMax,
-        fullMax
-    })();
+        prevFlow,
+        open,
+        miniWidth,
+        fullWidth
+    });
 
     return (
         <Box component="nav" className={classes.base}>
-            <Backdrop open={hasEmphasis} onClick={props.toggleMenu} />
+            <Backdrop open={hasEmphasis} onClick={onBackDropClick} />
             <Paper
-                className={classes.frame}
+                className={classes.hybridFrame}
                 elevation={hasEmphasis ? elevation : 1}
                 square
             >

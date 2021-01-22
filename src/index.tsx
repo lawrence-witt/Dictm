@@ -16,14 +16,12 @@ const theme = createMuiTheme({});
 const { lg, xl, ...rest } = theme.breakpoints.values;
 
 const rootHtml = (
-    <React.StrictMode>
-        <ThemeProvider theme={theme}>
-            <BreakContextProvider breakpoints={[{...rest}]}>
-                <CssBaseline />
-                <App />
-            </BreakContextProvider>
-        </ThemeProvider>
-    </React.StrictMode>
+    <ThemeProvider theme={theme}>
+        <BreakContextProvider breakpoints={[{...rest}]}>
+            <CssBaseline />
+            <App />
+        </BreakContextProvider>
+    </ThemeProvider>
 )
 
 ReactDOM.render(rootHtml, document.getElementById('root'));
