@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
 
 // ${theme!transitions.duration.standard}ms
-const duration = 300;
+const duration = 3000;
 
 // Types
 
@@ -15,12 +15,21 @@ enum Flows {
     PERM
 }
 
-interface HybridDrawerStyleProps {
-    flow: Flows,
-    prevFlow: React.RefObject<Flows>,
+interface IFlowOpen {
+    flow: Flows;
     open: boolean;
+}
+
+interface HybridDrawerStyleProps {
     miniWidth: number;
     fullWidth: number;
+    frameTransform: number;
+    contentTransform: number;
+    contentShouldTransition: boolean;
+    prev: {
+        flow: Flows;
+        open: boolean;
+    };
 }
 
 interface HybridDrawerProps {
@@ -42,85 +51,103 @@ const getBaseWidth = (
     miniWidth: number, 
     fullWidth: number
 ) => {
-    if (flow === Flows.PERM) {
-        return fullWidth;
-    } else {
-        return miniWidth;
+    switch(flow) {
+        case Flows.PERM: return fullWidth;
+        case Flows.HYBRID: return miniWidth;
+        case Flows.TEMP:
+        default: return 0;
     }
 };
 
-const getBaseMargin = (
-    flow: Flows,
-    miniWidth: number
+const getNewTransforms = (
+    prev: IFlowOpen,
+    next: IFlowOpen,
+    miniWidth: number,
+    fullWidth: number
 ) => {
-    if (flow === Flows.TEMP) {
-        return -miniWidth;
-    } else {
-        return 0;
+    const {flow: prevFlow, open: prevOpen} = prev;
+    const {flow: nextFlow, open: nextOpen} = next;
+
+    const prevClosed = !prevOpen;
+    const nextClosed = !nextOpen;
+
+    const tempPrev = prevFlow === Flows.TEMP;
+    const hybridPrev = prevFlow === Flows.HYBRID;
+    const tempNext = nextFlow === Flows.TEMP;
+    const hybridNext = nextFlow === Flows.HYBRID;
+
+    let frameTransform: number;
+    let contentTransform: number;
+    let contentShouldTransition: boolean;
+
+    if (tempPrev && prevClosed) {
+        if (hybridNext && nextClosed) {
+            frameTransform = -fullWidth + miniWidth;
+            contentTransform = fullWidth - miniWidth;
+            contentShouldTransition = false;
+        } else if (tempNext && nextOpen) {
+            frameTransform = 0;
+            contentTransform = 0;
+            contentShouldTransition = false;
+        }
+    } else if (hybridPrev && prevClosed) {
+        if (tempNext && nextClosed) {
+            frameTransform = -fullWidth;
+            contentTransform = fullWidth - miniWidth;
+            contentShouldTransition = true;
+        } else if (hybridNext && nextOpen) {
+            frameTransform = 0;
+            contentTransform = 0;
+            contentShouldTransition = true;
+        }
+    } else if (tempPrev && prevOpen) {
+        if (hybridNext && nextOpen) {
+            frameTransform = 0;
+            contentTransform = 0;
+            contentShouldTransition = true;
+        } else if (tempNext && nextClosed) {
+            frameTransform = -fullWidth;
+            contentTransform = 0;
+            contentShouldTransition = true;
+        }
+    } else if (hybridPrev && prevOpen) {
+        if (tempNext && nextOpen) {
+            frameTransform = 0;
+            contentTransform = 0;
+            contentShouldTransition = true;
+        } else if (hybridNext && nextClosed) {
+            frameTransform = -fullWidth + miniWidth;
+            contentTransform = fullWidth - miniWidth;
+            contentShouldTransition = true;
+        }
+    }
+
+    return {
+        frameTransform,
+        contentTransform,
+        contentShouldTransition
     }
 }
-
-const getHybridFrameTransform = (
-    flow: Flows,
-    open: boolean,
-    miniWidth: number,
-    fullWidth: number
-) => {
-    let val = 0;
-
-    if (!open && flow !== Flows.PERM) {
-        val = miniWidth - fullWidth;
-    }
-
-    if (open && flow === Flows.TEMP) {
-        val += miniWidth;
-    }
-    
-    return getTransPx(val);
-};
-
-const getContentTransform = (
-    flow: Flows,
-    open: boolean,
-    miniWidth: number,
-    fullWidth: number
-) => {
-    let val = 0;
-
-    if (!open && flow !== Flows.PERM) {
-        val = fullWidth - miniWidth;
-    }
-    
-    return getTransPx(val);
-};
 
 // Make Styles
 
 const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => 
     createStyles({
-        base: {
-            width: ({flow, miniWidth, fullWidth}) => {
-                return getBaseWidth(flow, miniWidth, fullWidth);
-            },
-            marginLeft: ({flow, miniWidth}) => {
-                return getBaseMargin(flow, miniWidth);
+        hybridBase: {
+            width: ({prev, miniWidth, fullWidth}) => {
+                return getBaseWidth(prev.flow, miniWidth, fullWidth);
             },
             overflow: 'visible',
             zIndex: theme.zIndex.modal,
             transition: `
                 width 
                 ${duration}ms 
-                ${theme.transitions.easing.easeInOut},
-                margin-left
-                ${duration}ms 
                 ${theme.transitions.easing.easeInOut}
             `
         },
         hybridFrame: {
             width: ({fullWidth}) => fullWidth,
-            transform: ({flow, open, miniWidth, fullWidth}) => {
-                return getHybridFrameTransform(flow, open, miniWidth, fullWidth);
-            },
+            transform: ({frameTransform}) => getTransPx(frameTransform),
             height: '100%',
             transition: `transform
             ${duration}ms
@@ -128,15 +155,13 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme =>
             `,
             overflowX: 'hidden'
         },
-        content: {
+        hybridContent: {
             width: ({fullWidth}) => fullWidth,
-            transform: ({flow, open, miniWidth, fullWidth}) => {
-                return getContentTransform(flow, open, miniWidth, fullWidth);
-            },
-            transition: `transform
+            transform: ({contentTransform}) => getTransPx(contentTransform),
+            transition: ({contentShouldTransition: cst}) => cst ? `transform
                 ${duration}ms
                 ${theme.transitions.easing.easeInOut}
-            `
+            ` : ''
         }
     })
 );
@@ -157,25 +182,39 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
 
     const hasEmphasis = flow !== Flows.PERM && open;
 
-    const prevFlow = React.useRef(flow);
-
-    const classes = useDrawerStyles({
-        flow,
-        prevFlow,
-        open,
+    const [menuState, setMenuState] = React.useState(() => ({
+        prev: { flow, open },
+        ...getNewTransforms({flow, open}, {flow, open}, miniWidth, fullWidth),
         miniWidth,
         fullWidth
-    });
+    }));
+
+    React.useEffect(() => {
+        setMenuState(s => {
+            if (s.prev.flow === flow && s.prev.open === open) return s;
+
+            const newTransforms = getNewTransforms(s.prev, {flow, open}, miniWidth, fullWidth);
+
+            return {
+                prev: {flow, open},
+                ...newTransforms,
+                miniWidth,
+                fullWidth
+            };
+        });
+    }, [flow, open, miniWidth, fullWidth]);
+
+    const classes = useDrawerStyles(menuState);
 
     return (
-        <Box component="nav" className={classes.base}>
+        <Box component="nav" className={classes.hybridBase}>
             <Backdrop open={hasEmphasis} onClick={onBackDropClick} />
             <Paper
                 className={classes.hybridFrame}
                 elevation={hasEmphasis ? elevation : 1}
                 square
             >
-                <Box className={classes.content}>
+                <Box className={classes.hybridContent}>
                     {children}
                 </Box>
             </Paper>
