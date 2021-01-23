@@ -5,7 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
 
 // ${theme!transitions.duration.standard}ms
-const duration = 3000;
+const duration = 300;
 
 // Types
 
@@ -60,66 +60,33 @@ const getBaseWidth = (
 };
 
 const getNewTransforms = (
-    prev: IFlowOpen,
+    prevFlow: Flows,
     next: IFlowOpen,
     miniWidth: number,
     fullWidth: number
 ) => {
-    const {flow: prevFlow, open: prevOpen} = prev;
     const {flow: nextFlow, open: nextOpen} = next;
 
-    const prevClosed = !prevOpen;
-    const nextClosed = !nextOpen;
-
     const tempPrev = prevFlow === Flows.TEMP;
-    const hybridPrev = prevFlow === Flows.HYBRID;
     const tempNext = nextFlow === Flows.TEMP;
+    const hybridPrev = prevFlow === Flows.HYBRID;
     const hybridNext = nextFlow === Flows.HYBRID;
 
-    let frameTransform: number;
-    let contentTransform: number;
-    let contentShouldTransition: boolean;
+    let frameTransform = 0;
+    let contentTransform = 0;
+    let contentShouldTransition = true;
 
-    if (tempPrev && prevClosed) {
-        if (hybridNext && nextClosed) {
+    if (!nextOpen) {
+        if (tempNext) {
+            frameTransform = -fullWidth;
+            if (hybridPrev) contentTransform = fullWidth - miniWidth;
+        } else if (hybridNext) {
             frameTransform = -fullWidth + miniWidth;
             contentTransform = fullWidth - miniWidth;
-            contentShouldTransition = false;
-        } else if (tempNext && nextOpen) {
-            frameTransform = 0;
-            contentTransform = 0;
-            contentShouldTransition = false;
+            if (tempPrev) contentShouldTransition = false;
         }
-    } else if (hybridPrev && prevClosed) {
-        if (tempNext && nextClosed) {
-            frameTransform = -fullWidth;
-            contentTransform = fullWidth - miniWidth;
-            contentShouldTransition = true;
-        } else if (hybridNext && nextOpen) {
-            frameTransform = 0;
-            contentTransform = 0;
-            contentShouldTransition = true;
-        }
-    } else if (tempPrev && prevOpen) {
-        if (hybridNext && nextOpen) {
-            frameTransform = 0;
-            contentTransform = 0;
-            contentShouldTransition = true;
-        } else if (tempNext && nextClosed) {
-            frameTransform = -fullWidth;
-            contentTransform = 0;
-            contentShouldTransition = true;
-        }
-    } else if (hybridPrev && prevOpen) {
-        if (tempNext && nextOpen) {
-            frameTransform = 0;
-            contentTransform = 0;
-            contentShouldTransition = true;
-        } else if (hybridNext && nextClosed) {
-            frameTransform = -fullWidth + miniWidth;
-            contentTransform = fullWidth - miniWidth;
-            contentShouldTransition = true;
-        }
+    } else {
+        if (tempNext) contentShouldTransition = false;
     }
 
     return {
@@ -184,7 +151,7 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
 
     const [menuState, setMenuState] = React.useState(() => ({
         prev: { flow, open },
-        ...getNewTransforms({flow, open}, {flow, open}, miniWidth, fullWidth),
+        ...getNewTransforms(flow, {flow, open}, miniWidth, fullWidth),
         miniWidth,
         fullWidth
     }));
@@ -193,7 +160,7 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
         setMenuState(s => {
             if (s.prev.flow === flow && s.prev.open === open) return s;
 
-            const newTransforms = getNewTransforms(s.prev, {flow, open}, miniWidth, fullWidth);
+            const newTransforms = getNewTransforms(s.prev.flow, {flow, open}, miniWidth, fullWidth);
 
             return {
                 prev: {flow, open},
