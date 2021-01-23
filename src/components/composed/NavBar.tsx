@@ -16,10 +16,6 @@ const useNavStyles = makeStyles((theme) => ({
         width: '100%',
         background: theme.palette.primary.main,
         transform: 'translateY(0%)',
-        transition: `transform
-            ${theme.transitions.duration.standard}ms
-            ${theme.transitions.easing.easeInOut}
-        `,
         [theme.breakpoints.up('sm')]: {
             transform: 'translateY(100%)'
         }

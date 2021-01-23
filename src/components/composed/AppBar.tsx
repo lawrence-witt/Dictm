@@ -10,7 +10,7 @@ import {
     Search,
     Delete
 } from '@material-ui/icons';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import MenuButton from '../generic/MenuButton';
 
@@ -31,43 +31,38 @@ const getSpacing = (theme: Theme) => ({
     }
 });
 
-const useStyles = makeStyles((theme) => ({
-    grow: {
-        flexGrow: 1
-    },
-    appBar: {
-        height: '56px',
-        justifyContent: 'center'
-    },
-    menuButton: {
-        ...getSpacing(theme)
-    },
-    pageTitle: {
-        ...getSpacing(theme)
-    },
-    toolGroup: {
-        display: 'flex',
-        flexWrap: 'nowrap'
-    }
-}));
+const useStyles = makeStyles<Theme, {buttonVisible: boolean}>(theme => (
+    createStyles({
+        grow: {
+            flexGrow: 1
+        },
+        appBar: {
+            height: '56px',
+            justifyContent: 'center'
+        },
+        menuButton: {
+            display: props => props.buttonVisible ? 'block' : 'none',
+            ...getSpacing(theme),
+        },
+        pageTitle: {
+            ...getSpacing(theme)
+        },
+        toolGroup: {
+            display: 'flex',
+            flexWrap: 'nowrap'
+        }
+    })
+));
 
 // Component
 
 const AppBar: React.FC<IAppBar> = ({
     toggleMenu
 }) => {
-    const classes = useStyles();
-
     const breakpoint = useBreakContext();
-
-    const MenuToggle = (
-        <MenuButton 
-            edge="start"
-            color="inherit"
-            className={classes.menuButton}
-            onClick={toggleMenu}
-        />
-    )
+    const classes = useStyles({
+        buttonVisible: breakpoint.index === 0
+    });
 
     return (
         <MuiAppBar
@@ -75,7 +70,12 @@ const AppBar: React.FC<IAppBar> = ({
             className={classes.appBar}
         >
             <Toolbar>
-                {breakpoint.index === 0 && MenuToggle}
+                <MenuButton 
+                    edge="start"
+                    color="inherit"
+                    className={classes.menuButton}
+                    onClick={toggleMenu}
+                />
                 <Typography 
                     variant="h6" 
                     noWrap

@@ -10,7 +10,7 @@ import NavMenu from './components/composed/NavMenu';
 
 import useToggle from './utils/hooks/useToggle';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
     fixedBase: {
         display: 'flex',
         height: '100%',
@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
         position: 'fixed'
     },
     pageBase: {
-        transform: 'scaleY(1)',
+        transform: 'scaleY(1)', // for fixed bars to latch on to
         height: '100%',
         flex: 1
     }

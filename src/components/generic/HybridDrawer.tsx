@@ -4,9 +4,6 @@ import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
 
-// ${theme!transitions.duration.standard}ms
-const duration = 300;
-
 // Types
 
 enum Flows {
@@ -15,30 +12,24 @@ enum Flows {
     PERM
 }
 
-interface IFlowOpen {
-    flow: Flows;
-    open: boolean;
-}
-
 interface HybridDrawerStyleProps {
+    flow: Flows;
+    baseWidth: number;
+    frameWidth: number;
+    frameTransform: string;
+    menuShouldTransition: boolean;
     miniWidth: number;
     fullWidth: number;
-    frameTransform: number;
-    contentTransform: number;
-    contentShouldTransition: boolean;
-    prev: {
-        flow: Flows;
-        open: boolean;
-    };
 }
 
 interface HybridDrawerProps {
-    flow: Flows;
-    open: boolean;
+    children: React.ReactNode;
+    flow?: Flows;
+    open?: boolean;
     miniWidth?: number;
     fullWidth?: number;
     elevation?: number;
-    onBackDropClick?: () => void;
+    onClose?: (e: React.MouseEvent) => void;
 }
 
 // Helpers
@@ -46,9 +37,9 @@ interface HybridDrawerProps {
 const getTrans = (val: number, m: string) => `translateX(${val}${m})`;
 const getTransPx = (val: number) => getTrans(val, 'px');
 
-const getBaseWidth = (
-    flow: Flows, 
-    miniWidth: number, 
+const getBaseMeasure = (
+    flow: Flows,
+    miniWidth: number,
     fullWidth: number
 ) => {
     switch(flow) {
@@ -57,81 +48,74 @@ const getBaseWidth = (
         case Flows.TEMP:
         default: return 0;
     }
-};
+}
 
-const getNewTransforms = (
+const getNewDrawerState = (
     prevFlow: Flows,
-    next: IFlowOpen,
+    nextFlow: Flows,
+    open: boolean,
     miniWidth: number,
     fullWidth: number
 ) => {
-    const {flow: nextFlow, open: nextOpen} = next;
-
-    const tempPrev = prevFlow === Flows.TEMP;
-    const tempNext = nextFlow === Flows.TEMP;
-    const hybridPrev = prevFlow === Flows.HYBRID;
-    const hybridNext = nextFlow === Flows.HYBRID;
-
+    const baseWidth = getBaseMeasure(nextFlow, miniWidth, fullWidth);
+    let frameWidth = fullWidth;
     let frameTransform = 0;
-    let contentTransform = 0;
-    let contentShouldTransition = true;
+    let menuShouldTransition = true;
 
-    if (!nextOpen) {
-        if (tempNext) {
-            frameTransform = -fullWidth;
-            if (hybridPrev) contentTransform = fullWidth - miniWidth;
-        } else if (hybridNext) {
-            frameTransform = -fullWidth + miniWidth;
-            contentTransform = fullWidth - miniWidth;
-            if (tempPrev) contentShouldTransition = false;
-        }
-    } else {
-        if (tempNext) contentShouldTransition = false;
+    const prevTemp = prevFlow === Flows.TEMP;
+    const prevHybrid = prevFlow === Flows.HYBRID;
+    const nextTemp = nextFlow === Flows.TEMP;
+    const nextHybrid = nextFlow === Flows.HYBRID;
+
+    if ((prevTemp && nextHybrid) || (prevHybrid && nextTemp)) {
+        menuShouldTransition = false;
     }
+
+    if (!open && nextTemp) frameTransform = -fullWidth;
+    if (!open && nextHybrid) frameWidth = miniWidth;
 
     return {
-        frameTransform,
-        contentTransform,
-        contentShouldTransition
+        baseWidth,
+        frameWidth,
+        frameTransform: getTransPx(frameTransform),
+        menuShouldTransition
     }
-}
+};
 
 // Make Styles
 
-const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => 
-    createStyles({
+const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
+    return createStyles({
         hybridBase: {
-            width: ({prev, miniWidth, fullWidth}) => {
-                return getBaseWidth(prev.flow, miniWidth, fullWidth);
-            },
-            overflow: 'visible',
-            zIndex: theme.zIndex.modal,
-            transition: `
+            transition: ({menuShouldTransition: mst}) => `
                 width 
-                ${duration}ms 
-                ${theme.transitions.easing.easeInOut}
-            `
-        },
-        hybridFrame: {
-            width: ({fullWidth}) => fullWidth,
-            transform: ({frameTransform}) => getTransPx(frameTransform),
-            height: '100%',
-            transition: `transform
-            ${duration}ms
+                ${mst ? theme.transitions.duration.standard : 0}ms 
                 ${theme.transitions.easing.easeInOut}
             `,
+            overflow: 'visible',
+            zIndex: theme.zIndex.modal,
+            width: ({baseWidth}) => baseWidth
+        },
+        hybridFrame: {
+            transition: ({menuShouldTransition: mst}) => `
+                width 
+                ${mst ? theme.transitions.duration.standard : 0}ms 
+                ${theme.transitions.easing.easeInOut},
+                transform 
+                ${mst ? theme.transitions.duration.standard : 0}ms 
+                ${theme.transitions.easing.easeInOut}
+            `,
+            height: '100%',
+            width: ({frameWidth}) => frameWidth,
+            transform: ({frameTransform}) => frameTransform,
             overflowX: 'hidden'
         },
         hybridContent: {
-            width: ({fullWidth}) => fullWidth,
-            transform: ({contentTransform}) => getTransPx(contentTransform),
-            transition: ({contentShouldTransition: cst}) => cst ? `transform
-                ${duration}ms
-                ${theme.transitions.easing.easeInOut}
-            ` : ''
+            height: '100%',
+            width: ({fullWidth}) => fullWidth
         }
     })
-);
+});
 
 // Component
 
@@ -139,43 +123,36 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
     children, ...props
 }) => {
     const {
-        flow,
-        open,
+        flow = 0,
+        open = false,
         miniWidth = 56,
         fullWidth = 275,
         elevation = 8,
-        onBackDropClick
+        onClose
     } = props;
 
     const hasEmphasis = flow !== Flows.PERM && open;
 
-    const [menuState, setMenuState] = React.useState(() => ({
-        prev: { flow, open },
-        ...getNewTransforms(flow, {flow, open}, miniWidth, fullWidth),
-        miniWidth,
-        fullWidth
+    const [drawerState, setDrawerState] = React.useState(() => ({
+        ...getNewDrawerState(flow, flow, open, miniWidth, fullWidth),
+        flow, miniWidth, fullWidth
     }));
 
     React.useEffect(() => {
-        setMenuState(s => {
-            if (s.prev.flow === flow && s.prev.open === open) return s;
-
-            const newTransforms = getNewTransforms(s.prev.flow, {flow, open}, miniWidth, fullWidth);
-
-            return {
-                prev: {flow, open},
-                ...newTransforms,
-                miniWidth,
-                fullWidth
-            };
-        });
+        setDrawerState(s => ({
+            ...getNewDrawerState(s.flow, flow, open, miniWidth, fullWidth),
+            flow, miniWidth, fullWidth
+        }))
     }, [flow, open, miniWidth, fullWidth]);
 
-    const classes = useDrawerStyles(menuState);
+    const classes = useDrawerStyles(drawerState);
 
     return (
-        <Box component="nav" className={classes.hybridBase}>
-            <Backdrop open={hasEmphasis} onClick={onBackDropClick} />
+        <Box 
+            component="nav" 
+            className={classes.hybridBase}
+        >
+            <Backdrop open={hasEmphasis} onClick={onClose} />
             <Paper
                 className={classes.hybridFrame}
                 elevation={hasEmphasis ? elevation : 1}
@@ -189,4 +166,4 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
     )
 };
 
-export default HybridMenu;
+export default React.memo(HybridMenu);

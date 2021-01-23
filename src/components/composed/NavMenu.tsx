@@ -14,6 +14,12 @@ import { useBreakContext } from '../../utils/hooks/useBreakpoints';
 
 // Types
 
+enum Flows {
+    TEMP,
+    HYBRID,
+    PERM
+}
+
 interface MenuHeaderStyleProps {
     isMenuNested: boolean;
     isToggleVisible: boolean;
@@ -21,9 +27,10 @@ interface MenuHeaderStyleProps {
 }
 
 interface MenuHeaderProps {
+    flow?: Flows;
+    open?: boolean;
     depth?: number;
     title?: string;
-    isToggleVisible?: boolean;
     toggleMenu: () => void;
 }
 
@@ -40,6 +47,9 @@ const useHeaderStyles = (props: MenuHeaderStyleProps) => makeStyles(theme =>
             height: 56,
             width: '100%',
             position: 'relative'
+        },
+        menuButton: {
+            display: () => props.isToggleVisible ? 'block' : 'none'
         },
         title: {
             display: () => !props.isToggleVisible ? 'block' : 'none',
@@ -62,9 +72,28 @@ const useHeaderStyles = (props: MenuHeaderStyleProps) => makeStyles(theme =>
 
 // Menu Header
 
-const MenuHeader: React.FC<MenuHeaderProps> = ({
-    depth = 0, title = "", isToggleVisible = false, toggleMenu
-}) => {
+const MenuHeader: React.FC<MenuHeaderProps> = React.memo(function MenuHeader({
+    flow = Flows.TEMP, open = false, depth = 0, title = "", toggleMenu
+}) {
+    
+    // Control toggle visibility based on last flow
+
+    const getHeaderState = React.useCallback((prevFlow, nextFlow, open) => {
+        const isToggleVisible = (nextFlow === Flows.HYBRID && !open) || 
+        (nextFlow === Flows.TEMP && prevFlow === Flows.HYBRID);
+
+        return { flow: nextFlow, isToggleVisible };
+    }, []);
+
+    const [headerState, setHeaderState] = React.useState(() => getHeaderState(flow, flow, open));
+
+    React.useEffect(() => {
+        setHeaderState(s => getHeaderState(s.flow, flow, open));
+    }, [flow, open, getHeaderState]);
+
+    // Internal selectors
+
+    const { isToggleVisible } = headerState;
     const isMenuNested = depth >= 2;
     const isBackButtonVisible = isMenuNested && !isToggleVisible;
 
@@ -74,32 +103,21 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
         isBackButtonVisible
     })();
 
-    const MenuToggle = (
-        <MenuButton onClick={toggleMenu} edge="start"/>
-    );
-    const Title = (
-        <ListItemText disableTypography>
-            <Typography variant="h6" className={classes.title}>
-                {title}
-            </Typography>
-        </ListItemText>
-    );
-    const BackButton = (
-        <ListItemSecondaryAction className={classes.backButton}>
-            <DirectionButton direction="left" edge="end"/>
-        </ListItemSecondaryAction>
-    )
-
     return (
         <ListItem component="header" className={classes.header}>
             <Divider className={classes.divider}/>
-            {MenuToggle}
-            {/* {isToggleVisible && MenuToggle}
-            {Title}
-            {BackButton} */}
+            <MenuButton onClick={toggleMenu} className={classes.menuButton} edge="start"/>
+            <ListItemText disableTypography>
+                <Typography variant="h6" className={classes.title}>
+                    {title}
+                </Typography>
+            </ListItemText>
+            <ListItemSecondaryAction className={classes.backButton}>
+                <DirectionButton direction="left" edge="end"/>
+            </ListItemSecondaryAction>
         </ListItem>
     )
-};
+});
 
 // Menu List
 
@@ -116,19 +134,18 @@ const NavMenu: React.FC<NavMenuProps> = ({
         return isMenuOpen ? 1 : 0;
     }, [isMenuOpen]);
 
-    const isToggleVisible = !isMenuOpen && breakpoint.index === 1;
-
     return (
         <HybridDrawer 
             flow={breakpoint.index} 
             open={isMenuOpen}
-            onBackDropClick={toggleMenu}
+            onClose={toggleMenu}
         >
             <MenuHeader
+                flow={breakpoint.index}
+                open={isMenuOpen}
                 depth={depth}
                 title={'Lazarus'}
-                toggleMenu={toggleMenu} 
-                isToggleVisible={isToggleVisible}
+                toggleMenu={toggleMenu}
             />
             <ListItem>
                 <ListItemText primary="test value text"/>
