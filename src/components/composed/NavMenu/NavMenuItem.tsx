@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { animated } from 'react-spring';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -66,7 +67,8 @@ const NavMenuItem: React.FC<NavMenuItemProps> = props => {
         icon,
         divider,
         subItems,
-        increaseDepth
+        increaseDepth,
+        ...other
     } = props;
 
     const history = useHistory();
@@ -85,7 +87,7 @@ const NavMenuItem: React.FC<NavMenuItemProps> = props => {
     };
 
     return (
-        <ListItem button disableGutters onClick={handlePrimaryClick}>
+        <ListItem button disableGutters onClick={handlePrimaryClick} {...other}>
             {icon && <ListItemIcon className={classes.icon}>{iconList[icon]}</ListItemIcon>}
             <ListItemText className={classes.primary} primary={primary}/>
             {divider && <Divider className={classes.divider}/>}

@@ -1,7 +1,11 @@
 import React from 'react';
+import { useTransition, animated } from 'react-spring';
 import List from '@material-ui/core/List';
+import { makeStyles } from '@material-ui/core/styles';
 
 import HybridDrawer from '../../generic/HybridDrawer';
+
+import demoDirectory from './demoDirectory';
 import NavMenuHeader from './NavMenuHeader';
 import NavMenuItem from './NavMenuItem';
 
@@ -9,71 +13,25 @@ import { useBreakContext } from '../../../utils/hooks/useBreakpoints';
 
 // Types
 
-type IconTypes = 'album' | 'note' | 'category' | 'settings' | 'signout';
-
 interface NavMenuProps {
     isMenuOpen: boolean;
     toggleMenu: () => void;
 }
 
-interface MenuItem {
-    primary: string,
-    secondary?: string,
-    type: 'link' | 'action',
-    value: string,
-    icon?: IconTypes,
-    divider?: boolean,
-    subItems?: MenuItem[]
-}
+// Styles
 
-// List Structure
-
-const demoDirectory: MenuItem[] = [
-    {
-        primary: 'Recordings', 
-        secondary: '',
-        type: 'link',  
-        value: '/', 
-        icon: 'album'
+const useNavMenuStyles = makeStyles(() => ({
+    listContainer: {
+        height: '100%',
+        position: 'relative'
     },
-    {
-        primary: 'Notes',
-        secondary: '',
-        type: 'link',
-        value: '/notes',
-        icon: 'note'
-    },
-    {
-        primary: 'Categories',
-        secondary: '',
-        type: 'link',
-        value: '/categories',
-        icon: 'category',
-        subItems: [
-            {
-                primary: 'CategoryOne',
-                secondary: '',
-                type: 'link',
-                value: '/categories/categoryOne'
-            }
-        ]
-    },
-    {
-        primary: 'Settings',
-        secondary: '',
-        type: 'link',
-        value: '/settings',
-        icon: 'settings',
-        divider: true
-    },
-    {
-        primary: 'Sign Out',
-        secondary: '',
-        type: 'action',
-        value: 'sign-out',
-        icon: 'signout'
+    list: {
+        position: 'absolute',
+        width: '100%'
     }
-];
+}));
+
+const AnimatedList = animated(List);
 
 // Component
 
@@ -87,10 +45,11 @@ const NavMenu: React.FC<NavMenuProps> = ({
         root: demoDirectory,
         current: demoDirectory
     });
-
     const { depth, path, current } = appDirectory;
 
     const breakpoint = useBreakContext();
+
+    const classes = useNavMenuStyles();
 
     React.useEffect(() => {
         const newDepth = (isMenuOpen || breakpoint.index === 2) ? 1 : 0;
@@ -134,6 +93,13 @@ const NavMenu: React.FC<NavMenuProps> = ({
         })
     }, []);
 
+    const transition = useTransition([current], {
+        initial: {transform: 'translateX(0%)'},
+        from: { transform: 'translateX(100%)'},
+        enter: { transform: 'translateX(0%)'},
+        leave: { transform: 'translateX(-100%)'}
+    });
+
     return (
         <HybridDrawer 
             flow={breakpoint.index} 
@@ -148,15 +114,19 @@ const NavMenu: React.FC<NavMenuProps> = ({
                 toggleMenu={toggleMenu}
                 reduceDepth={reduceDepth}
             />
-            <List disablePadding>
-                {current.map((item, i) => (
-                    <NavMenuItem 
-                        key={`${i}${item.primary}`}
-                        increaseDepth={increaseDepth}
-                        {...item} 
-                    />
+            <div className={classes.listContainer}>
+                {transition((style, items) => items && (
+                    <AnimatedList style={style} disablePadding className={classes.list}>
+                        {items.map((item, i) => (
+                            <NavMenuItem 
+                                key={`${i}${item.primary}`}
+                                increaseDepth={increaseDepth}
+                                {...item} 
+                            />
+                        ))}
+                    </AnimatedList>
                 ))}
-            </List>
+            </div>
         </HybridDrawer>
     );
 };

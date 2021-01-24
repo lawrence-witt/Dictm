@@ -112,6 +112,8 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
         },
         hybridContent: {
             position: 'absolute',
+            display: 'flex',
+            flexDirection: 'column',
             height: '100%',
             width: ({fullWidth}) => fullWidth
         }
