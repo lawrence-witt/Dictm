@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Album from '@material-ui/icons/Album';
@@ -41,6 +42,9 @@ const TabBar: React.FC = () => {
 
     const [tab, setTab] = React.useState<TabTypes>('');
 
+    const history = useHistory();
+    const pushHistory = (val: string) => history.push(val);
+
     // Required to stop mui from throwing TS error
     const changeHandler = (...args: [React.MouseEvent, TabTypes] | unknown[]) => {
         setTab(args[1] as TabTypes);
@@ -59,18 +63,21 @@ const TabBar: React.FC = () => {
                     value="recordings"
                     icon={<Album />}
                     classes={actClasses}
+                    onClick={() => pushHistory('/')}
                 />
                 <BottomNavigationAction
                     label="Notes"
                     value="notes"
                     icon={<EventNote />}
                     classes={actClasses}
+                    onClick={() => pushHistory('/notes')}
                 />
                 <BottomNavigationAction
                     label="Categories"
                     value="categories"
                     icon={<Category />}
                     classes={actClasses}
+                    onClick={() => pushHistory('/categories')}
                 />
             </BottomNavigation>
     );

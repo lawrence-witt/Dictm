@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import Typography from '@material-ui/core/Typography';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -6,11 +6,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Divider from '@material-ui/core/Divider';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-import MenuButton from '../generic/MenuButton';
-import HybridDrawer from '../generic/HybridDrawer';
-import DirectionButton from '../generic/DirectionButton';
-
-import { useBreakContext } from '../../utils/hooks/useBreakpoints';
+import MenuButton from '../../generic/MenuButton';
+import DirectionButton from '../../generic/DirectionButton';
 
 // Types
 
@@ -32,11 +29,7 @@ interface MenuHeaderProps {
     depth?: number;
     title?: string;
     toggleMenu: () => void;
-}
-
-interface NavMenuProps {
-    isMenuOpen: boolean;
-    toggleMenu: () => void;
+    reduceDepth: () => void;
 }
 
 // Styled
@@ -45,8 +38,7 @@ const useHeaderStyles = (props: MenuHeaderStyleProps) => makeStyles(theme =>
     createStyles({
         header: {
             height: 56,
-            width: '100%',
-            position: 'relative'
+            width: '100%'
         },
         menuButton: {
             display: () => props.isToggleVisible ? 'block' : 'none'
@@ -72,28 +64,34 @@ const useHeaderStyles = (props: MenuHeaderStyleProps) => makeStyles(theme =>
 
 // Menu Header
 
-const MenuHeader: React.FC<MenuHeaderProps> = React.memo(function MenuHeader({
-    flow = Flows.TEMP, open = false, depth = 0, title = "", toggleMenu
-}) {
+const MenuHeader: React.FC<MenuHeaderProps> = (props) => {
+    const {
+        flow = Flows.TEMP,
+        open = false,
+        depth = 0,
+        title = "",
+        toggleMenu,
+        reduceDepth
+    } = props;
     
     // Control toggle visibility based on last flow
 
-    const getHeaderState = React.useCallback((prevFlow, nextFlow, open) => {
+    const getToggleState = React.useCallback((prevFlow, nextFlow, open) => {
         const isToggleVisible = (nextFlow === Flows.HYBRID && !open) || 
         (nextFlow === Flows.TEMP && prevFlow === Flows.HYBRID);
 
         return { flow: nextFlow, isToggleVisible };
     }, []);
 
-    const [headerState, setHeaderState] = React.useState(() => getHeaderState(flow, flow, open));
+    const [toggleState, setToggleState] = React.useState(() => getToggleState(flow, flow, open));
 
     React.useEffect(() => {
-        setHeaderState(s => getHeaderState(s.flow, flow, open));
-    }, [flow, open, getHeaderState]);
+        setToggleState(s => getToggleState(s.flow, flow, open));
+    }, [flow, open, getToggleState]);
 
     // Internal selectors
 
-    const { isToggleVisible } = headerState;
+    const { isToggleVisible } = toggleState;
     const isMenuNested = depth >= 2;
     const isBackButtonVisible = isMenuNested && !isToggleVisible;
 
@@ -113,45 +111,10 @@ const MenuHeader: React.FC<MenuHeaderProps> = React.memo(function MenuHeader({
                 </Typography>
             </ListItemText>
             <ListItemSecondaryAction className={classes.backButton}>
-                <DirectionButton direction="left" edge="end"/>
+                <DirectionButton direction="left" edge="end" onClick={reduceDepth}/>
             </ListItemSecondaryAction>
         </ListItem>
     )
-});
-
-// Menu List
-
-// Menu Item
-
-// Nav Menu
-
-const NavMenu: React.FC<NavMenuProps> = ({
-    isMenuOpen, toggleMenu
-}) => {
-
-    const breakpoint = useBreakContext();
-    const depth = React.useMemo(() => {
-        return isMenuOpen ? 1 : 0;
-    }, [isMenuOpen]);
-
-    return (
-        <HybridDrawer 
-            flow={breakpoint.index} 
-            open={isMenuOpen}
-            onClose={toggleMenu}
-        >
-            <MenuHeader
-                flow={breakpoint.index}
-                open={isMenuOpen}
-                depth={depth}
-                title={'Lazarus'}
-                toggleMenu={toggleMenu}
-            />
-            <ListItem>
-                <ListItemText primary="test value text"/>
-            </ListItem>
-        </HybridDrawer>
-    );
 };
 
-export default NavMenu;
+export default MenuHeader;

@@ -87,16 +87,20 @@ const getNewDrawerState = (
 const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
     return createStyles({
         hybridBase: {
+            zIndex: theme.zIndex.modal,
+            width: ({baseWidth}) => baseWidth,
             transition: ({menuShouldTransition: mst}) => `
                 width 
                 ${mst ? theme.transitions.duration.standard : 0}ms 
                 ${theme.transitions.easing.easeInOut}
             `,
-            overflow: 'visible',
-            zIndex: theme.zIndex.modal,
-            width: ({baseWidth}) => baseWidth
         },
         hybridFrame: {
+            position: 'relative',
+            height: '100%',
+            width: ({frameWidth}) => frameWidth,
+            transform: ({frameTransform}) => frameTransform,
+            overflowX: 'hidden',
             transition: ({menuShouldTransition: mst}) => `
                 width 
                 ${mst ? theme.transitions.duration.standard : 0}ms 
@@ -105,12 +109,9 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
                 ${mst ? theme.transitions.duration.standard : 0}ms 
                 ${theme.transitions.easing.easeInOut}
             `,
-            height: '100%',
-            width: ({frameWidth}) => frameWidth,
-            transform: ({frameTransform}) => frameTransform,
-            overflowX: 'hidden'
         },
         hybridContent: {
+            position: 'absolute',
             height: '100%',
             width: ({fullWidth}) => fullWidth
         }

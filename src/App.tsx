@@ -4,9 +4,9 @@ import { hot } from 'react-hot-loader';
 import { makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import { useMediaQuery } from '@material-ui/core';
 
-import AppBar from './components/composed/AppBar';
+import PageBar from './components/composed/PageBar';
 import NavBar from './components/composed/NavBar';
-import NavMenu from './components/composed/NavMenu';
+import NavMenu from './components/composed/NavMenu/NavMenu';
 
 import useToggle from './utils/hooks/useToggle';
 
@@ -36,7 +36,7 @@ const App: React.FC = (): React.ReactElement => {
                 toggleMenu={toggleMenu}
             />
             <div className={classes.pageBase}>
-                <AppBar
+                <PageBar
                     toggleMenu={toggleMenu}
                 />
                 <NavBar />

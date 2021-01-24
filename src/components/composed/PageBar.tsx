@@ -1,15 +1,11 @@
 import React from 'react';
-import { 
-    AppBar as MuiAppBar,
-    Toolbar,
-    IconButton,
-    Typography
-} from '@material-ui/core';
-import {
-    Repeat,
-    Search,
-    Delete
-} from '@material-ui/icons';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import Repeat from '@material-ui/icons/Repeat';
+import Search from '@material-ui/icons/Search';
+import Delete from '@material-ui/icons/Delete';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import MenuButton from '../generic/MenuButton';
@@ -56,7 +52,7 @@ const useStyles = makeStyles<Theme, {buttonVisible: boolean}>(theme => (
 
 // Component
 
-const AppBar: React.FC<IAppBar> = ({
+const PageBar: React.FC<IAppBar> = ({
     toggleMenu
 }) => {
     const breakpoint = useBreakContext();
@@ -65,7 +61,7 @@ const AppBar: React.FC<IAppBar> = ({
     });
 
     return (
-        <MuiAppBar
+        <AppBar
             elevation={0}
             className={classes.appBar}
         >
@@ -101,8 +97,8 @@ const AppBar: React.FC<IAppBar> = ({
                     <Delete />
                 </IconButton>
             </Toolbar>
-        </MuiAppBar>
+        </AppBar>
     )
 };
 
-export default AppBar;
+export default PageBar;

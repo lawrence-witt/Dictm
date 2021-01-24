@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider, unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core/styles'
 
@@ -17,10 +18,12 @@ const { lg, xl, ...rest } = theme.breakpoints.values;
 
 const rootHtml = (
     <ThemeProvider theme={theme}>
-        <BreakContextProvider breakpoints={[{...rest}]}>
-            <CssBaseline />
-            <App />
-        </BreakContextProvider>
+        <Router>
+            <BreakContextProvider breakpoints={[{...rest}]}>
+                <CssBaseline />
+                <App />
+            </BreakContextProvider>
+        </Router>
     </ThemeProvider>
 )
 

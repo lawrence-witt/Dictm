@@ -3,7 +3,7 @@ import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ArrowRight from '@material-ui/icons/ArrowForward';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 // Types
 
@@ -19,18 +19,22 @@ interface ChevronButtonProps extends ChevronButtonStyleProps, IconButtonProps {
 
 // Styled
 
-const useStyles = (props: ChevronButtonStyleProps) => makeStyles(() => 
+const useStyles = makeStyles<Theme, {direction: Direction}>(() => 
     createStyles({
         icon: {
-            transform: `rotateZ(${(() => {
-                switch(props.direction) {
-                    case 'up': return -90;
-                    case 'down': return 90;
-                    case 'left': return 180;
-                    case 'right':
-                    default: return 0;
-                }
-            })()}deg)`
+            transform: props => {
+                const val = (() => {
+                    switch(props.direction) {
+                        case 'up': return -90;
+                        case 'down': return 90;
+                        case 'left': return 180;
+                        case 'right':
+                        default: return 0;
+                    }
+                })();
+                
+                return `rotateZ(${val}deg)`;
+            }
         }
     })    
 );
@@ -44,7 +48,7 @@ const DirectionButton: React.FC<ChevronButtonProps> = (props) => {
         ...other
     } = props;
 
-    const classes = useStyles({direction})();
+    const classes = useStyles({direction})
 
     const Icon = (iprops: SvgIconProps) => {
         switch(design) {
