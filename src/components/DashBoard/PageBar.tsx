@@ -8,7 +8,7 @@ import Search from '@material-ui/icons/Search';
 import Delete from '@material-ui/icons/Delete';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
-import MenuButton from '../generic/MenuButton';
+import MenuButton from '../Buttons/MenuButton';
 
 import { useBreakContext } from '../../utils/hooks/useBreakpoints';
 

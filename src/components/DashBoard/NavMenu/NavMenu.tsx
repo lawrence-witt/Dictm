@@ -3,7 +3,7 @@ import { useTransition, animated } from 'react-spring';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 
-import HybridDrawer from '../../generic/HybridDrawer';
+import HybridDrawer from '../../Drawers/HybridDrawer';
 
 import demoDirectory from './demoDirectory';
 import NavMenuHeader from './NavMenuHeader';

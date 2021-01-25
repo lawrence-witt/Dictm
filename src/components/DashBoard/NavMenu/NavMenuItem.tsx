@@ -12,8 +12,8 @@ import EventNote from '@material-ui/icons/EventNote';
 import Category from '@material-ui/icons/Category';
 import Settings from '@material-ui/icons/Settings';
 
-import AuthIcon from '../../generic/AuthIcon';
-import DirectionButton from '../../generic/DirectionButton';
+import AuthIcon from '../../AuthIcon';
+import DirectionButton from '../../Buttons/DirectionButton';
 
 // Types
 

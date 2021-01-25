@@ -1,12 +1,14 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 
+import IconButton from '@material-ui/core/IconButton';
 import { makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import { useMediaQuery } from '@material-ui/core';
 
-import PageBar from './components/composed/PageBar';
-import NavBar from './components/composed/NavBar';
-import NavMenu from './components/composed/NavMenu/NavMenu';
+import PageBar from './components/DashBoard/PageBar';
+import NavBar from './components/DashBoard/NavBar';
+import NavMenu from './components/DashBoard/NavMenu/NavMenu';
+import RecordingCard from './components/Cards/RecordingCard';
 
 import useToggle from './utils/hooks/useToggle';
 
@@ -36,9 +38,10 @@ const App: React.FC = (): React.ReactElement => {
                 toggleMenu={toggleMenu}
             />
             <div className={classes.pageBase}>
-                <PageBar
+                {/* <PageBar
                     toggleMenu={toggleMenu}
-                />
+                /> */}
+                <RecordingCard />
                 <NavBar />
             </div>
         </div>

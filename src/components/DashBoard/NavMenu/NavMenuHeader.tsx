@@ -6,8 +6,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Divider from '@material-ui/core/Divider';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
 
-import MenuButton from '../../generic/MenuButton';
-import DirectionButton from '../../generic/DirectionButton';
+import MenuButton from '../../Buttons/MenuButton';
+import DirectionButton from '../../Buttons/DirectionButton';
 
 // Types
 
