@@ -3,9 +3,9 @@ import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import Play from '@material-ui/icons/PlayArrow';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
-import CardBase, { CardBasePrimaryRow } from './CardBase';
+import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow } from './CardBase';
 
-// Needs a permanent background varient (with 9px padding to match checkbox)
+// Needs a permanent background variant (with 9px padding to match checkbox)
 
 const PlayButton: React.FC<IconButtonProps> = (props) => {
     return (

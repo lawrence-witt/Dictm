@@ -1,5 +1,5 @@
 import React from 'react';
-import ListItem from '@material-ui/core/ListItem';
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -38,7 +38,16 @@ const useHeaderStyles = (props: MenuHeaderStyleProps) => makeStyles(theme =>
     createStyles({
         header: {
             height: 56,
-            width: '100%'
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
+            padding: `
+                ${theme.spacing(1)}px
+                ${theme.spacing(4)}px
+                ${theme.spacing(1)}px
+                ${theme.spacing(2)}px
+            `
         },
         menuButton: {
             display: () => props.isToggleVisible ? 'block' : 'none'
@@ -102,7 +111,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = (props) => {
     })();
 
     return (
-        <ListItem component="header" className={classes.header}>
+        <Box component="header" className={classes.header}>
             <Divider className={classes.divider}/>
             <MenuButton onClick={toggleMenu} className={classes.menuButton} edge="start"/>
             <ListItemText disableTypography>
@@ -113,7 +122,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = (props) => {
             <ListItemSecondaryAction className={classes.backButton}>
                 <DirectionButton direction="left" edge="end" onClick={reduceDepth}/>
             </ListItemSecondaryAction>
-        </ListItem>
+        </Box>
     )
 };
 

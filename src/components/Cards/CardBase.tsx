@@ -1,9 +1,8 @@
 import React from 'react';
 import Card from '@material-ui/core/Card';
 import ButtonBase from '@material-ui/core/ButtonBase';
-import Checkbox from '@material-ui/core/Checkbox';
-import { IconButtonProps } from '@material-ui/core/IconButton';
-import Box, { BoxProps } from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
@@ -25,10 +24,10 @@ interface CardBasePrimaryRowProps {
 
 const useBaseStyles = makeStyles<Theme, {isCardFocussed: boolean}>(theme => 
     createStyles({
-        root: {
+        cardRoot: {
             position: 'relative',
             minWidth: 275,
-            maxWidth: 325,
+            maxWidth: 350,
 
             "&::before": {
                 content: '""',
@@ -55,8 +54,7 @@ const usePrimaryRowStyles = makeStyles(theme =>
             gridTemplate: '1fr / 50px 1fr',
             columnGap: theme.spacing(1),
             alignItems: 'center',
-            height: 65,
-            padding: `0px ${theme.spacing(2)}px`,
+            padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
 
             "& .title": {
                 fontWeight: theme.typography.fontWeightMedium
@@ -64,7 +62,8 @@ const usePrimaryRowStyles = makeStyles(theme =>
 
             "& .subtitle": {
                 display: 'flex',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                overflow: 'hidden'
             }
         }
     })    
@@ -73,13 +72,41 @@ const usePrimaryRowStyles = makeStyles(theme =>
 const useSecondaryRowStyles = makeStyles(theme => 
     createStyles({
         secondaryRow: {
-            display: 'flex',
-            padding: `${theme.spacing(1)}px 0px`
+            padding: `
+                0px
+                ${theme.spacing(2)}px
+                ${theme.spacing(1)}px
+                ${theme.spacing(2)}px`,
+        },
+        divider: {
+            marginBottom: theme.spacing(1)
         }
-    })    
+    })
 );
 
-// Component
+// Components
+
+const CardBase: React.FC<CardBaseProps> = (props) => {
+    const {
+        onCardAction,
+        isCardFocussed = false,
+        isCheckActive = false,
+        children
+    } = props;
+
+    const classes = useBaseStyles({isCardFocussed});
+
+    return (
+        <Card className={classes.cardRoot}>
+            <ButtonBase 
+                className={classes.buttonBase} 
+                disabled={isCheckActive} 
+                onClick={onCardAction}
+            />
+            {children}
+        </Card>
+    )
+};
 
 const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
     const {
@@ -99,35 +126,28 @@ const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
                 {subTitle && (
                     <Box className="subtitle">
                         <Typography variant="caption" noWrap>{subTitle}</Typography>
-                        {date && <Typography variant="caption">{date}</Typography>}
+                        {date && <Typography variant="caption" noWrap>{date}</Typography>}
                     </Box>
                 )}
             </Box>
         </Box>
     )
-}
+};
 
-const CardBase: React.FC<CardBaseProps> = (props) => {
+const CardBaseSecondaryRow: React.FC = (props) => {
     const {
-        onCardAction,
-        isCardFocussed = false,
-        isCheckActive = false,
         children
     } = props;
 
-    const classes = useBaseStyles({isCardFocussed});
+    const classes = useSecondaryRowStyles();
 
     return (
-        <Card className={classes.root}>
-            <ButtonBase 
-                className={classes.buttonBase} 
-                disabled={isCheckActive} 
-                onClick={onCardAction}
-            />
+        <Box className={classes.secondaryRow}>
+            <Divider className={classes.divider}/>
             {children}
-        </Card>
+        </Box>
     )
-};
+}
 
-export { CardBasePrimaryRow };
+export { CardBasePrimaryRow, CardBaseSecondaryRow };
 export default CardBase;

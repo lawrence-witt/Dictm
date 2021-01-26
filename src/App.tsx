@@ -1,14 +1,13 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 
-import IconButton from '@material-ui/core/IconButton';
-import { makeStyles, useTheme, Theme } from '@material-ui/core/styles';
-import { useMediaQuery } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 import PageBar from './components/DashBoard/PageBar';
 import NavBar from './components/DashBoard/NavBar';
 import NavMenu from './components/DashBoard/NavMenu/NavMenu';
 import RecordingCard from './components/Cards/RecordingCard';
+import NoteCard from './components/Cards/NoteCard';
 
 import useToggle from './utils/hooks/useToggle';
 
@@ -20,9 +19,9 @@ const useStyles = makeStyles(() => ({
         position: 'fixed'
     },
     pageBase: {
-        transform: 'scaleY(1)', // for fixed bars to latch on to
+        transform: 'rotateX(0)', // for fixed bars to latch on to
         height: '100%',
-        flex: 1
+        width: '100%'
     }
 }));
 
@@ -42,6 +41,7 @@ const App: React.FC = (): React.ReactElement => {
                     toggleMenu={toggleMenu}
                 /> */}
                 <RecordingCard />
+                <NoteCard />
                 <NavBar />
             </div>
         </div>
