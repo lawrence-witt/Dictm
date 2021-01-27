@@ -13,7 +13,22 @@ import { BreakContextProvider } from './utils/hooks/useBreakpoints';
 
 import App from './App';
 
-const theme = createMuiTheme({});
+/* const theme = createMuiTheme({}); */
+const theme = createMuiTheme({
+    palette: {
+      primary: {
+        light: '#8133f1',
+        main: '#6200EE',
+        dark: '#4400a6'
+      },
+      secondary: {
+        light: '#35e1d0',
+        main: '#03DAC5',
+        dark: '#029889'
+      },
+    },
+  });
+
 const { lg, xl, ...rest } = theme.breakpoints.values;
 
 const rootHtml = (

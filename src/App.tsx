@@ -8,6 +8,7 @@ import NavBar from './components/DashBoard/NavBar';
 import NavMenu from './components/DashBoard/NavMenu/NavMenu';
 import RecordingCard from './components/Cards/RecordingCard';
 import NoteCard from './components/Cards/NoteCard';
+import CategoryCard from './components/Cards/CategoryCard';
 
 import useToggle from './utils/hooks/useToggle';
 
@@ -42,6 +43,7 @@ const App: React.FC = (): React.ReactElement => {
                 /> */}
                 <RecordingCard />
                 <NoteCard />
+                <CategoryCard />
                 <NavBar />
             </div>
         </div>

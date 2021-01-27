@@ -1,38 +1,19 @@
 import React from 'react';
 import Typography from '@material-ui/core/Typography';
-import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
-import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow } from './CardBase';
+import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitch } from './CardBase';
 
-const useStyles = makeStyles(() => 
+const useStyles = makeStyles(theme => 
     createStyles({
-        root: {
-            justifySelf: 'center',
-            alignSelf: 'center',
-            padding: 9
-        },
-        label: {
-            height: 24,
-            width: 24
-        },
-        flex: {
-            //
-        },
-        text: {
-            //
+        caption: {
             display: 'block'
+        },
+        textIcon: {
+            fontWeight: theme.typography.fontWeightBold
         }
     })    
-)
-
-const TextToSpeechButton: React.FC<IconButtonProps> = (props) => {
-    return (
-        <IconButton {...props}>
-            <Typography variant="h6">T</Typography>
-        </IconButton>
-    )
-};
+);
 
 const NoteCard: React.FC = () => {
     const classes = useStyles();
@@ -44,10 +25,20 @@ const NoteCard: React.FC = () => {
                 subTitle="30 words / 275 chars"
                 date="23 Nov 2020"
             >
-                <TextToSpeechButton edge="start" classes={{root: classes.root, label: classes.label}}/>
+                <CardBaseActionSwitch
+                    primaryIcon={() => (
+                        <Typography variant="h6" className={classes.textIcon}>
+                            T
+                        </Typography>
+                    )}
+                    contained={true}
+                    onSecondaryAction={() => console.log('note secondary')}
+                    isSecondaryActive={false}
+                    isSecondarySelected={true}
+                />
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>
-                <Typography variant="caption" noWrap className={classes.text}>
+                <Typography variant="caption" noWrap className={classes.caption}>
                     My text preview for this note is much longer and will wrap to the next line
                 </Typography>
             </CardBaseSecondaryRow>
