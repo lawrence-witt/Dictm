@@ -4,6 +4,10 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitch } from './CardBase';
 
+interface NoteCardProps {
+    title?: string;
+}
+
 const useStyles = makeStyles(theme => 
     createStyles({
         caption: {
@@ -15,13 +19,17 @@ const useStyles = makeStyles(theme =>
     })    
 );
 
-const NoteCard: React.FC = () => {
+const NoteCard: React.FC<NoteCardProps> = (props) => {
+    const {
+        title = ''
+    } = props;
+
     const classes = useStyles();
 
     return (
         <CardBase>
             <CardBasePrimaryRow
-                title="Note"
+                title={title}
                 subTitle="30 words / 275 chars"
                 date="23 Nov 2020"
             >

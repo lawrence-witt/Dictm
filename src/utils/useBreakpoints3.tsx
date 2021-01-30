@@ -6,7 +6,11 @@ type BreakIdentifier = string | number;
 
 type BreakpointSchema = Record<BreakIdentifier, number>;
 
-type Breakpoints = (BreakIdentifier | BreakpointSchema)[];
+type BreakpointsArray = (BreakIdentifier | BreakpointSchema)[]
+
+type Breakpoints = BreakpointSchema | BreakpointsArray;
+
+type FloorType = BreakIdentifier | boolean;
 
 // Internal Types
 
@@ -51,33 +55,68 @@ const parseBreakpointsObject = (obj: UnknownObject) => {
     }, []);
 };
 
-const normaliseBreakpointsArray = (breakpoints: Breakpoints) => {
-    return breakpoints.reduce((out: BreakObjectArray, el) => {
-        if (isStringOrNumber(el) && !isOfValueNaN(castParseInt(el))) {
+const normaliseBreakpoints = (breakpoints: Breakpoints) => {
+    let breakObjectArray: BreakObjectArray;
+
+    if (isObjectLiteral(breakpoints)) {
+        breakObjectArray = parseBreakpointsObject(breakpoints as UnknownObject);
+    }
+    
+    breakObjectArray = (breakpoints as []).reduce((out: BreakObjectArray, el) => {
+        if (!isOfValueNaN(castParseInt(el))) {
             out = [...out, {key: el as BreakIdentifier, value: castParseInt(el)}];
-        } else if (!isStringOrNumber(el) && isObjectLiteral(el)) {
+        } else if (isObjectLiteral(el)) {
             out = [...out, ...parseBreakpointsObject(el as UnknownObject)];
         }
-
         return out;
     }, []);
+
+    return sortBreakObjectArray(breakObjectArray);
 };
 
 const createDataMap = (normalisedData: BreakObjectArray) => {
     return normalisedData.reduce((out: NormalisedValues, bo) => {
-        out.keys.push(bo.key);
-        out.entries[bo.key] = bo.value;
-
-        return out;
+        return {
+            keys: [...out.keys, bo.key], 
+            entries: {...out.entries, [bo.key]: bo.value}
+        };
     }, {keys: [], entries: {}});
+};
+
+const addFloors = (
+    widthMap: NormalisedValues,
+    heightMap: NormalisedValues,
+    val: FloorType
+): void => {
+    const floorKey = 
+        typeof val === 'string' || 
+        (typeof val === 'number' && !isOfValueNaN(val)) ?
+        val : '_';
+
+    [widthMap, heightMap].forEach(map => {
+        if (map.entries[map.keys[0]] !== 0) {
+            map.keys.unshift(floorKey);
+            map.entries[floorKey] = 0;
+        }
+    });
 };
 
 // Base Hook
 
 const useBreakpoints = (
-    breakpoints: Breakpoints, 
-    createFloor?: boolean
+    widthPoints: Breakpoints, 
+    heightPoints: Breakpoints,
+    createFloor: FloorType = true
 )  => {
+
+    const normalisedBreakpoints = React.useMemo(() => {
+        const widthMap = createDataMap(normaliseBreakpoints(widthPoints || []));
+        const heightMap = createDataMap(normaliseBreakpoints(heightPoints || []));
+
+        createFloor && addFloors(widthMap, heightMap, createFloor);
+
+        return { widthMap, heightMap };
+    }, [widthPoints, heightPoints, createFloor]);
 
     return 'hello';
 };

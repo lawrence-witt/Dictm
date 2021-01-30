@@ -12,7 +12,7 @@ import EventNote from '@material-ui/icons/EventNote';
 import Category from '@material-ui/icons/Category';
 import Settings from '@material-ui/icons/Settings';
 
-import AuthIcon from '../../AuthIcon';
+import AuthIcon from '../../Icons/AuthIcon';
 import DirectionButton from '../../Buttons/DirectionButton';
 
 // Types

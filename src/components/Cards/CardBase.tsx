@@ -2,7 +2,6 @@ import React from 'react';
 import Card from '@material-ui/core/Card';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Divider from '@material-ui/core/Divider';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import CheckBox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
@@ -11,7 +10,7 @@ import { fade } from '@material-ui/core/styles/colorManipulator';
 
 import ContainedIconButton from '../Buttons/ContainedIconButton';
 
-// Types
+/* TYPES */
 
 interface CardBaseProps {
     onCardAction?: () => void;
@@ -34,14 +33,16 @@ interface CardBaseActionSwitchProps {
     isSecondarySelected?: boolean;
 }
 
+/* CARD BASE */
+
 // Styled
 
 const useBaseStyles = makeStyles<Theme, {isCardFocussed: boolean}>(theme => 
     createStyles({
         cardRoot: {
             position: 'relative',
-            minWidth: 275,
-            maxWidth: 350,
+            maxWidth: 400,
+            width: '100%',
 
             "&::before": {
                 content: '""',
@@ -60,6 +61,34 @@ const useBaseStyles = makeStyles<Theme, {isCardFocussed: boolean}>(theme =>
         }
     })
 );
+
+// Component
+
+const CardBase: React.FC<CardBaseProps> = (props) => {
+    const {
+        onCardAction,
+        isCardFocussed = false,
+        isSecondaryActive = false,
+        children
+    } = props;
+
+    const classes = useBaseStyles({isCardFocussed});
+
+    return (
+        <Card className={classes.cardRoot}>
+            <ButtonBase 
+                className={classes.buttonBase} 
+                disabled={isSecondaryActive} 
+                onClick={onCardAction}
+            />
+            {children}
+        </Card>
+    )
+};
+
+/* CARD BASE PRIMARY ROW */
+
+// Styled
 
 const usePrimaryRowStyles = makeStyles(theme => 
     createStyles({
@@ -84,6 +113,41 @@ const usePrimaryRowStyles = makeStyles(theme =>
     })    
 );
 
+// Component
+
+const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
+    const {
+        title,
+        subTitle,
+        date,
+        children
+    } = props;
+
+    const classes = usePrimaryRowStyles();
+
+    const titleType = <Typography variant="body2" className="title" noWrap>{title}</Typography>;
+    const subtitleType = (
+        <div className="subtitle">
+            <Typography variant="caption" noWrap>{subTitle}</Typography>
+            {date && <Typography variant="caption" noWrap>{date}</Typography>}
+        </div>
+    );
+
+    return (
+        <div className={classes.primaryRow}>
+            {children}
+            <div className="info-box">
+                {title && titleType}
+                {subTitle && subtitleType}
+            </div>
+        </div>
+    )
+};
+
+/* CARD BASE SECONDARY ROW */
+
+// Styled
+
 const useSecondaryRowStyles = makeStyles(theme => 
     createStyles({
         secondaryRow: {
@@ -99,7 +163,28 @@ const useSecondaryRowStyles = makeStyles(theme =>
     })
 );
 
-const useCommonCardActionStyles = makeStyles(theme => ({
+// Component
+
+const CardBaseSecondaryRow: React.FC = (props) => {
+    const {
+        children
+    } = props;
+
+    const classes = useSecondaryRowStyles();
+
+    return (
+        <div className={classes.secondaryRow}>
+            <Divider className={classes.divider}/>
+            {children}
+        </div>
+    )
+};
+
+/* CARD BASE ACTION SWITCH */
+
+// Styled
+
+const useCommonCardActionStyles = makeStyles(() => ({
     actionRoot: {
         justifySelf: 'center',
         alignSelf: 'center',
@@ -130,70 +215,7 @@ const useSecondaryCardActionStyles = makeStyles(theme => ({
     checked: {}
 }));
 
-// Components
-
-const CardBase: React.FC<CardBaseProps> = (props) => {
-    const {
-        onCardAction,
-        isCardFocussed = false,
-        isSecondaryActive = false,
-        children
-    } = props;
-
-    const classes = useBaseStyles({isCardFocussed});
-
-    return (
-        <Card className={classes.cardRoot}>
-            <ButtonBase 
-                className={classes.buttonBase} 
-                disabled={isSecondaryActive} 
-                onClick={onCardAction}
-            />
-            {children}
-        </Card>
-    )
-};
-
-const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
-    const {
-        title,
-        subTitle,
-        date,
-        children
-    } = props;
-
-    const classes = usePrimaryRowStyles();
-
-    return (
-        <Box className={classes.primaryRow}>
-            {children}
-            <Box className="info-box">
-                {title && <Typography variant="body2" className="title" noWrap>{title}</Typography>}
-                {subTitle && (
-                    <Box className="subtitle">
-                        <Typography variant="caption" noWrap>{subTitle}</Typography>
-                        {date && <Typography variant="caption" noWrap>{date}</Typography>}
-                    </Box>
-                )}
-            </Box>
-        </Box>
-    )
-};
-
-const CardBaseSecondaryRow: React.FC = (props) => {
-    const {
-        children
-    } = props;
-
-    const classes = useSecondaryRowStyles();
-
-    return (
-        <Box className={classes.secondaryRow}>
-            <Divider className={classes.divider}/>
-            {children}
-        </Box>
-    )
-};
+// Component
 
 const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
     const {
@@ -237,6 +259,8 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
 
     return isSecondaryActive ? SecondaryAction : PrimaryAction;
 };
+
+/* EXPORTS */
 
 export { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitch };
 export default CardBase;

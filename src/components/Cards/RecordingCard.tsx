@@ -15,7 +15,7 @@ const RecordingCard: React.FC = () => {
                     primaryIcon={Play}
                     contained={true}
                     onSecondaryAction={() => console.log('rec secondary')}
-                    isSecondaryActive={true}
+                    isSecondaryActive={false}
                     isSecondarySelected={false}
                 />
             </CardBasePrimaryRow>
