@@ -11,14 +11,12 @@ type TabTypes = 'recordings' | 'note' | 'categories' | '';
 
 const useNavStyles = makeStyles((theme) => ({
     root: {
-        position: 'fixed',
-        top: 'auto',
-        bottom: 0,
+        display: 'flex',
+        flex: '0 0 auto',
         width: '100%',
         background: theme.palette.primary.main,
-        transform: 'translateY(0%)',
         [theme.breakpoints.up('sm')]: {
-            transform: 'translateY(100%)'
+            display: 'none'
         }
     }
 }));

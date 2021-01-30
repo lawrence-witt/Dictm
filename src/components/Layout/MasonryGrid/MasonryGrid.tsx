@@ -10,21 +10,8 @@ interface MasonryGridProps {
     repeat?: RepeatType;
     min?: number;
     max?: MinMax;
-    gridStyle?: React.CSSProperties;
-    columnStyle?: React.CSSProperties;
-}
-
-// Styles
-
-const defaultGridStyle: React.CSSProperties  = { 
-    display: 'flex',
-    height: '100%',
-    width: '100%'
-}
-
-const defaultColumnStyle: React.CSSProperties = {
-    height: '100%',
-    width: '100%'
+    gridClass?: string;
+    colClass?: string;
 }
 
 // Helpers
@@ -63,12 +50,15 @@ const getColumns = (
 const Masonry: React.FC<MasonryGridProps> = (props) => {
     const {
         repeat = 'auto-fit',
-        min = 250,
+        min = 275,
         max = '1fr',
-        gridStyle = {},
-        columnStyle = {},
+        gridClass = '',
+        colClass = '',
         children
     } = props;
+
+    const gridClassName = gridClass || 'rpt-masonry-grid';
+    const colClassName = colClass || 'rpt-masonry-col';
 
     const [state, setState] = React.useState({
         width: undefined,
@@ -77,13 +67,7 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
         maxWidth: undefined
     });
 
-    const gsMemo = React.useMemo(() => (
-        Object.assign({}, defaultGridStyle, gridStyle)
-    ), [gridStyle]);
-
-    const csMemo = React.useMemo(() => (
-        Object.assign({}, defaultColumnStyle, columnStyle)
-    ), [columnStyle]);
+    // react-measure callback
 
     const childCount = React.Children.count(children);
 
@@ -109,6 +93,8 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
             return { width, columns, minWidth, maxWidth};
         });
     }, [repeat, min, max, childCount]);
+    
+    // memoise column calculation
 
     const AssignedColumns = React.useMemo(() => {
         const { width, columns, maxWidth, minWidth } = state;
@@ -122,14 +108,16 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
             _columns[colIndex] = [..._columns[colIndex], child];
         });
 
-        const limitColumnStyle = Object.assign({}, csMemo, { maxWidth, minWidth });
-
         return _columns.map((col, i) => (
-            <div key={i} className="masonry-column" style={limitColumnStyle}>
+            <div 
+                key={i} 
+                className={colClassName} 
+                style={{maxWidth, minWidth}
+            }>
                 {col && col}
             </div>
         ));
-    }, [children, state, csMemo]);
+    }, [children, state, colClassName]);
 
     return (
         <Measure
@@ -137,7 +125,7 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
             onResize={onResize}
         >
             {({measureRef}) => (
-                <div ref={measureRef} className="masonry-grid" style={gsMemo}>
+                <div ref={measureRef} className={gridClassName}>
                     {AssignedColumns}
                 </div>
             )}

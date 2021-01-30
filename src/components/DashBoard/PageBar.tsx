@@ -33,6 +33,7 @@ const useStyles = makeStyles<Theme, {buttonVisible: boolean}>(theme => (
             flexGrow: 1
         },
         appBar: {
+            position: 'static',
             height: '56px',
             justifyContent: 'center'
         },

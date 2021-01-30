@@ -99,6 +99,9 @@ const usePrimaryRowStyles = makeStyles(theme =>
             columnGap: theme.spacing(1),
             alignItems: 'center',
             padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+        },
+        infoBox: {
+            overflow: 'hidden',
 
             "& .title": {
                 fontWeight: theme.typography.fontWeightMedium
@@ -108,6 +111,11 @@ const usePrimaryRowStyles = makeStyles(theme =>
                 display: 'flex',
                 justifyContent: 'space-between',
                 overflow: 'hidden'
+            },
+
+            "& .date": {
+                whiteSpace: 'nowrap',
+                marginLeft: theme.spacing(1)
             }
         }
     })    
@@ -129,14 +137,14 @@ const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
     const subtitleType = (
         <div className="subtitle">
             <Typography variant="caption" noWrap>{subTitle}</Typography>
-            {date && <Typography variant="caption" noWrap>{date}</Typography>}
+            {date && <Typography variant="caption" className="date">{date}</Typography>}
         </div>
     );
 
     return (
         <div className={classes.primaryRow}>
             {children}
-            <div className="info-box">
+            <div className={classes.infoBox}>
                 {title && titleType}
                 {subTitle && subtitleType}
             </div>

@@ -86,7 +86,7 @@ const getNewDrawerState = (
 
 const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
     return createStyles({
-        hybridBase: {
+        hybridDrawerBase: {
             zIndex: theme.zIndex.modal,
             width: ({baseWidth}) => baseWidth,
             transition: ({menuShouldTransition: mst}) => `
@@ -95,7 +95,7 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
                 ${theme.transitions.easing.easeInOut}
             `,
         },
-        hybridFrame: {
+        hybridDrawerFrame: {
             position: 'relative',
             height: '100%',
             width: ({frameWidth}) => frameWidth,
@@ -110,7 +110,7 @@ const useDrawerStyles = makeStyles<Theme, HybridDrawerStyleProps>(theme => {
                 ${theme.transitions.easing.easeInOut}
             `,
         },
-        hybridContent: {
+        hybridDrawerContent: {
             position: 'absolute',
             display: 'flex',
             flexDirection: 'column',
@@ -153,15 +153,15 @@ const HybridMenu: React.FC<HybridDrawerProps> = ({
     return (
         <Box 
             component="nav" 
-            className={classes.hybridBase}
+            className={classes.hybridDrawerBase}
         >
             <Backdrop open={hasEmphasis} onClick={onClose} />
             <Paper
-                className={classes.hybridFrame}
+                className={classes.hybridDrawerFrame}
                 elevation={hasEmphasis ? elevation : 1}
                 square
             >
-                <Box className={classes.hybridContent}>
+                <Box className={classes.hybridDrawerContent}>
                     {children}
                 </Box>
             </Paper>
