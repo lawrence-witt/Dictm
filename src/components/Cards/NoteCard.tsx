@@ -42,7 +42,7 @@ const NoteCard: React.FC<NoteCardProps> = (props) => {
                     contained={true}
                     onSecondaryAction={() => console.log('note secondary')}
                     isSecondaryActive={false}
-                    isSecondarySelected={true}
+                    isSecondarySelected={false}
                 />
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>

@@ -3,7 +3,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
-import MasonryGrid from './MasonryGrid/MasonryGrid';
+import MasonryGrid from './MasonryGrid';
 
 // Types
 

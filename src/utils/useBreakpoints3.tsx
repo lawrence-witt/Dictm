@@ -14,19 +14,14 @@ type FloorType = BreakIdentifier | boolean;
 
 // Internal Types
 
-type BreakObject = {
-    key: string | number;
-    value: number;
-}
+type BreakpointEntry = [BreakIdentifier, number];
 
-type BreakIdentifierArray = BreakIdentifier[];
-
-type BreakObjectArray = BreakObject[];
+type BreakpointEntries = BreakpointEntry[];
 
 type UnknownObject = Record<string, unknown>;
 
 interface NormalisedValues {
-    keys: BreakIdentifierArray;
+    keys: BreakIdentifier[];
     entries: BreakpointSchema;
 }
 
@@ -37,55 +32,45 @@ interface BreakpointData extends NormalisedValues {
     index: number;
 }
 
-// Helpers
+// Type Helpers
 
 const castParseInt = (val: unknown) => parseInt(`${val}`);
-const isStringOrNumber = (test: unknown) => typeof test === 'number' || typeof test === 'string';
 const isObjectLiteral = (test: unknown) => test && Object.getPrototypeOf(test) === Object.prototype;
 const isOfValueNaN = (test: unknown) => test !== test;
 
-const sortBreakObjectArray = (arr: BreakObjectArray) => [...arr].sort((a, b) => a.value - b.value);
+// Normalising Functions
 
 const parseBreakpointsObject = (obj: UnknownObject) => {
-    return Object.keys(obj).reduce((out: BreakObjectArray, key) => {
+    return Object.keys(obj).reduce((out: BreakpointEntries, key) => {
         if (!isOfValueNaN(castParseInt(obj[key]))) {
-            out = [...out, {key, value: castParseInt(obj[key])}];
+            out = [...out, [key, castParseInt(obj[key])]];
         }
         return out;
     }, []);
 };
 
 const normaliseBreakpoints = (breakpoints: Breakpoints) => {
-    let breakObjectArray: BreakObjectArray;
+    let breakpointEntries: BreakpointEntries = [];
 
     if (isObjectLiteral(breakpoints)) {
-        breakObjectArray = parseBreakpointsObject(breakpoints as UnknownObject);
+        breakpointEntries = parseBreakpointsObject(breakpoints as UnknownObject);
+    } else if (Array.isArray(breakpoints)) {
+        breakpointEntries = breakpoints.reduce((out: BreakpointEntries, el) => {
+            if (!isOfValueNaN(castParseInt(el))) {
+                out = [...out, [el as BreakIdentifier, castParseInt(el)]];
+            } else if (isObjectLiteral(el)) {
+                out = [...out, ...parseBreakpointsObject(el as UnknownObject)];
+            }
+            return out;
+        }, []);
     }
-    
-    breakObjectArray = (breakpoints as []).reduce((out: BreakObjectArray, el) => {
-        if (!isOfValueNaN(castParseInt(el))) {
-            out = [...out, {key: el as BreakIdentifier, value: castParseInt(el)}];
-        } else if (isObjectLiteral(el)) {
-            out = [...out, ...parseBreakpointsObject(el as UnknownObject)];
-        }
-        return out;
-    }, []);
 
-    return sortBreakObjectArray(breakObjectArray);
-};
-
-const createDataMap = (normalisedData: BreakObjectArray) => {
-    return normalisedData.reduce((out: NormalisedValues, bo) => {
-        return {
-            keys: [...out.keys, bo.key], 
-            entries: {...out.entries, [bo.key]: bo.value}
-        };
-    }, {keys: [], entries: {}});
+    return breakpointEntries.sort((a, b) => a[1] - b[1]);
 };
 
 const addFloors = (
-    widthMap: NormalisedValues,
-    heightMap: NormalisedValues,
+    widthEntries: BreakpointEntries,
+    heightEntries: BreakpointEntries,
     val: FloorType
 ): void => {
     const floorKey = 
@@ -93,12 +78,44 @@ const addFloors = (
         (typeof val === 'number' && !isOfValueNaN(val)) ?
         val : '_';
 
-    [widthMap, heightMap].forEach(map => {
-        if (map.entries[map.keys[0]] !== 0) {
-            map.keys.unshift(floorKey);
-            map.entries[floorKey] = 0;
+    [widthEntries, heightEntries].forEach(list => {
+        if (!list[0] || list[0][1] !== 0) {
+            list.unshift([floorKey, 0]);
         }
     });
+};
+
+const constructReturnObject = (
+    entries: BreakpointEntry[], 
+    index: number
+) => ({
+    id: entries[index][0],
+    index,
+    keys: entries.map(e => e[0]),
+    map: entries.reduce((o: BreakpointSchema, e) => {o[e[0]] = e[1]; return o;}, {})
+});
+
+// Query Constructors
+
+const belowMedia = (val: number) => `(max-width: ${val})`;
+const betweenMedia = (min: number, max: number) => `(min-width: ${min}) and (max-width: ${max})`;
+const aboveMedia = (val: number) => `(min-width: ${val})`;
+
+// Query Functions
+
+const getInitialBreakpointIndex = (
+    widthValues: number[],
+    heightValues: number[]
+) => {
+    const getIndex = (arr: number[]) => (
+        arr.findIndex((v, i) => (
+            window.matchMedia(
+                betweenMedia(v, arr[i+1] || window.innerWidth)
+            ).matches
+        ))
+    );
+
+    return [ getIndex(widthValues), getIndex(heightValues) ];
 };
 
 // Base Hook
@@ -110,13 +127,31 @@ const useBreakpoints = (
 )  => {
 
     const normalisedBreakpoints = React.useMemo(() => {
-        const widthMap = createDataMap(normaliseBreakpoints(widthPoints || []));
-        const heightMap = createDataMap(normaliseBreakpoints(heightPoints || []));
+        const widthEntries = normaliseBreakpoints(widthPoints || []);
+        const heightEntries = normaliseBreakpoints(heightPoints || []);
 
-        createFloor && addFloors(widthMap, heightMap, createFloor);
+        createFloor && addFloors(widthEntries, heightEntries, createFloor);
 
-        return { widthMap, heightMap };
+        const [
+            widthIdx,
+            heightIdx
+        ] = getInitialBreakpointIndex(
+            widthEntries.map(e => e[1]), 
+            heightEntries.map(e => e[1])
+        );
+
+        return { widthEntries, heightEntries, widthIdx, heightIdx };
     }, [widthPoints, heightPoints, createFloor]);
+
+    const [widthObject, setWidthObject] = React.useState(() => {
+        const { widthEntries, widthIdx } = normalisedBreakpoints;
+        return constructReturnObject(widthEntries, widthIdx);
+    });
+
+    const [heightObject, setHeightObject] = React.useState(() => {
+        const { heightEntries, heightIdx } = normalisedBreakpoints;
+        return constructReturnObject(heightEntries, heightIdx);
+    });
 
     return 'hello';
 };

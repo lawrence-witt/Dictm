@@ -9,6 +9,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 
 import ContainedIconButton from '../Buttons/ContainedIconButton';
+import PrimaryCheckBox from '../Inputs/PrimaryCheckbox';
 
 /* TYPES */
 
@@ -192,7 +193,7 @@ const CardBaseSecondaryRow: React.FC = (props) => {
 
 // Styled
 
-const useCommonCardActionStyles = makeStyles(() => ({
+const useActionSwitchStyles = makeStyles(() => ({
     actionRoot: {
         justifySelf: 'center',
         alignSelf: 'center',
@@ -202,25 +203,6 @@ const useCommonCardActionStyles = makeStyles(() => ({
         height: 24,
         width: 24
     }
-}));
-
-const useSecondaryCardActionStyles = makeStyles(theme => ({
-    colorSecondary: {
-        '&$checked': {
-            color: theme.palette.primary.light,
-            '&:hover': {
-                backgroundColor: fade(theme.palette.primary.light, theme.palette.action.hoverOpacity)
-            },
-        },
-        '&$disabled': {
-            color: theme.palette.action.disabled,
-        },
-        '&:hover': {
-            backgroundColor: fade(theme.palette.primary.light, theme.palette.action.hoverOpacity)
-        },
-    },
-    disabled: {},
-    checked: {}
 }));
 
 // Component
@@ -235,8 +217,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
         isSecondarySelected
     } = props;
 
-    const comm = useCommonCardActionStyles();
-    const sec = useSecondaryCardActionStyles();
+    const classes = useActionSwitchStyles();
 
     const IconButtonType = contained ? ContainedIconButton : IconButton;
 
@@ -245,23 +226,19 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
             edge="start"
             onClick={onPrimaryAction} 
             classes={{
-                root: comm.actionRoot, 
-                label: comm.iconButtonLabel
+                root: classes.actionRoot, 
+                label: classes.iconButtonLabel
             }}>
             <PrimaryIcon />
         </IconButtonType>
     );
-
+    
     const SecondaryAction = (
-        <CheckBox 
+        <PrimaryCheckBox 
+            classes={{root: classes.actionRoot}}
             checked={isSecondarySelected}
             onChange={onSecondaryAction}
             edge="start"
-            color="secondary"
-            classes={{
-                root: comm.actionRoot,
-                ...sec
-            }}
         />
     );
 

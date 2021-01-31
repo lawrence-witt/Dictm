@@ -20,17 +20,10 @@ interface IAppBar {
 
 // Styled
 
-const getSpacing = (theme: Theme) => ({
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up('sm')]: {
-        marginRight: theme.spacing(3)
-    }
-});
-
 const useStyles = makeStyles<Theme, {buttonVisible: boolean}>(theme => (
     createStyles({
         grow: {
-            flexGrow: 1
+            flex: 1
         },
         appBar: {
             position: 'static',
@@ -39,10 +32,10 @@ const useStyles = makeStyles<Theme, {buttonVisible: boolean}>(theme => (
         },
         menuButton: {
             display: props => props.buttonVisible ? 'block' : 'none',
-            ...getSpacing(theme),
+            marginRight: theme.spacing(1)
         },
         pageTitle: {
-            ...getSpacing(theme)
+            marginRight: theme.spacing(1)
         },
         toolGroup: {
             display: 'flex',
