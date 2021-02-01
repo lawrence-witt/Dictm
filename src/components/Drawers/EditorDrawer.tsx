@@ -1,5 +1,7 @@
 import React from 'react';
+import clsx from 'clsx';
 import Drawer from '@material-ui/core/Drawer';
+import Box, { BoxProps } from '@material-ui/core/Box';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -120,17 +122,19 @@ const useContentStyles = makeStyles(() => ({
 
 // Component
 
-const EditorDrawerContent: React.FC = (props) => {
+const EditorDrawerContent: React.FC<BoxProps> = (props) => {
     const {
-        children
+        className,
+        children,
+        ...other
     } = props;
 
     const classes = useContentStyles();
 
     return (
-        <div className={classes.drawerContent}>
+        <Box {...other} className={clsx(classes.drawerContent, className)}>
             {children}
-        </div>
+        </Box>
     );
 };
 
