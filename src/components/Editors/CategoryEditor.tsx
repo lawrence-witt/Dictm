@@ -4,7 +4,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-import EditorDrawer, { EditorDrawerBar, EditorDrawerContent } from '../Drawers/EditorDrawer';
+import EditorDrawer, { EditorDrawerBar, EditorDrawerFrame, EditorDrawerContent } from '../Drawers/EditorDrawer';
 import MediaAutocomplete, { MediaOptionProps } from '../Inputs/MediaAutocomplete';
 
 /* CATEGORY FORM */
@@ -67,9 +67,14 @@ const CategoryEditor: React.FC = () => {
                     <SaveIcon />
                 </IconButton>
             </EditorDrawerBar>
-            <EditorDrawerContent className={classes.categoryDrawerContent}>
-                <CategoryForm />
-            </EditorDrawerContent>
+            <EditorDrawerFrame>
+                <EditorDrawerContent 
+                    component="form"
+                    className={classes.categoryDrawerContent}
+                >
+                    <CategoryForm />
+                </EditorDrawerContent>
+            </EditorDrawerFrame>
         </EditorDrawer>
     )
 };

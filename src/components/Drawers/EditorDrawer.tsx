@@ -1,10 +1,11 @@
 import React from 'react';
 import clsx from 'clsx';
+import { animated, SpringValue } from 'react-spring';
 import Drawer from '@material-ui/core/Drawer';
 import Box, { BoxProps } from '@material-ui/core/Box';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import DirectionButton from '../Buttons/DirectionButton';
 
@@ -12,6 +13,13 @@ import DirectionButton from '../Buttons/DirectionButton';
 
 interface EditorDrawerBarProps {
     title?: string;
+}
+
+interface EditorDrawerContentProps extends BoxProps {
+    disableGutters?: boolean;
+    springStyle?: {
+        transform: SpringValue<string>;
+    }
 }
 
 /* EDITOR DRAWER */
@@ -22,7 +30,6 @@ const useDrawerStyles = makeStyles(theme => ({
     paper: {
         width: '100%',
         maxWidth: 450,
-        padding: `0px ${theme.spacing(2)}px`,
         overflowX: 'hidden'
     }
 }));
@@ -54,9 +61,13 @@ const EditorDrawer: React.FC = (props) => {
 
 const useBarStyles = makeStyles(theme => ({
     drawerBar: {
+        position: 'sticky',
+        top: 0,
         height: 56,
         minHeight: 'unset',
-        padding: 0
+        background: theme.palette.background.paper,
+        zIndex: theme.zIndex.appBar,
+        padding: `0px ${theme.spacing(2)}px`,
     },
     backButton: {
         marginRight: theme.spacing(1)
@@ -108,37 +119,77 @@ const EditorDrawerBar: React.FC<EditorDrawerBarProps> = (props) => {
     );
 };
 
-/* EDITOR DRAWER CONTENT */
+/* EDITOR DRAWER FRAME */
 
-// Styled
+// Styles
 
-const useContentStyles = makeStyles(() => ({
-    drawerContent: {
+const useFrameStyles = makeStyles({
+    drawerFrame: {
         position: 'relative',
         height: '100%',
         width: '100%'
     }
-}));
+})
 
 // Component
 
-const EditorDrawerContent: React.FC<BoxProps> = (props) => {
+const EditorDrawerFrame: React.FC = (props) => {
+    const { 
+        children 
+    } = props;
+
+    const classes = useFrameStyles();
+
+    return (
+        <Box className={classes.drawerFrame}>
+            {children}
+        </Box>
+    )
+}
+
+/* EDITOR DRAWER CONTENT */
+
+// Styled
+
+const useContentStyles = makeStyles<Theme, {disableGutters: boolean}>(theme => 
+    createStyles({
+        drawerContent: {
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+            margin: 0,
+            padding: ({disableGutters: dg}) => dg ? 0 : `0px ${theme.spacing(2)}px`,
+        }
+    })
+);
+
+// Component
+
+const AnimatedBox = animated(Box);
+
+const EditorDrawerContent: React.FC<EditorDrawerContentProps> = (props) => {
     const {
-        className,
+        disableGutters = false,
+        className = "",
+        springStyle,
         children,
         ...other
     } = props;
 
-    const classes = useContentStyles();
+    const classes = useContentStyles({disableGutters});
 
     return (
-        <Box {...other} className={clsx(classes.drawerContent, className)}>
+        <AnimatedBox
+            {...other}
+            style={springStyle} 
+            className={clsx(classes.drawerContent, className)}
+        >
             {children}
-        </Box>
+        </AnimatedBox>
     );
 };
 
 /* EXPORTS */
 
-export { EditorDrawerBar, EditorDrawerContent };
+export { EditorDrawerBar, EditorDrawerFrame, EditorDrawerContent };
 export default EditorDrawer;
