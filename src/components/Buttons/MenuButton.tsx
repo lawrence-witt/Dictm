@@ -3,12 +3,13 @@ import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreIcon from '@material-ui/icons/MoreVert';
 
-interface IMenuButton extends IconButtonProps {
+interface MenuButtonProps extends IconButtonProps {
     design?: 'bars' | 'dots';
 }
 
-
-const MenuButton: React.FC<IMenuButton> = (props) => {
+const MenuButton = React.forwardRef<
+    HTMLButtonElement, MenuButtonProps
+>(function MenuButton(props, ref) {
     const {
         design = 'bars',
         ...other
@@ -25,11 +26,12 @@ const MenuButton: React.FC<IMenuButton> = (props) => {
 
     return (
         <IconButton
+            ref={ref}
             {...other}
         >
             <Icon />
         </IconButton>
     )
-};
+})
 
 export default MenuButton;

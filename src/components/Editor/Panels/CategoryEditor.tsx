@@ -7,10 +7,13 @@ import MediaAutocomplete, { MediaOptionProps } from '../../Inputs/MediaAutocompl
 
 /* CATEGORY BUTTONS */
 
-const CategoryButtons: React.FC = () => {
+const CategoryBarButtons: React.FC = () => {
     return (
         <>
-            <IconButton edge="end">
+            <IconButton 
+                color="inherit"
+                edge="end"
+            >
                 <SaveIcon />
             </IconButton>
         </>
@@ -59,5 +62,5 @@ const CategoryEditor: React.FC = () => {
 
 /* EXPORTS */
 
-export { CategoryButtons };
+export { CategoryBarButtons };
 export default CategoryEditor;

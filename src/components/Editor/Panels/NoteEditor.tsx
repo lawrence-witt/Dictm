@@ -10,10 +10,13 @@ import { makeStyles } from '@material-ui/core/styles';
 
 /* NOTE BUTTONS */
 
-const NoteButtons: React.FC = () => {
+const NoteBarButtons: React.FC = () => {
     return (
         <>
-            <IconButton edge="end">
+            <IconButton 
+                color="inherit"
+                edge="end"
+            >
                 <SaveIcon />
             </IconButton>
         </>
@@ -92,5 +95,5 @@ const NoteEditor: React.FC = () => {
 
 /* EXPORTS */
 
-export { NoteButtons };
+export { NoteBarButtons };
 export default NoteEditor;

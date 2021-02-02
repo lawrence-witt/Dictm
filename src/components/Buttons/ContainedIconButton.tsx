@@ -36,8 +36,8 @@ const ContainedIconButton: React.FC<IconButtonProps> = (props) => {
         <IconButton 
             {...props} 
             classes={{
-                root: clsx(containedClasses.root, classes.root), 
-                label: classes.label
+                root: clsx(containedClasses.root, classes?.root), 
+                label: classes?.label
             }}>
             {children}
         </IconButton>

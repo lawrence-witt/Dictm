@@ -4,15 +4,20 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import FocusDrawer from '../Drawers/FocusDrawer';
 import { EditorBar, EditorFrame, EditorContent } from './EditorLayout';
-import CategoryEditor, { CategoryButtons } from './Panels/CategoryEditor';
+import CategoryEditor, { CategoryBarButtons } from './Panels/CategoryEditor';
 import ChooseEditor from './Panels/ChooseEditor';
-import NoteEditor, { NoteButtons } from './Panels/NoteEditor';
+import NoteEditor, { NoteBarButtons } from './Panels/NoteEditor';
+import RecordingEditor, { RecordingBarButtons } from './Panels/RecordingEditor/RecordingEditor';
+
+/* TYPES */
 
 type PanelTypes = 'cat' | 'choose' | 'note' | 'rec';
 
 type EditorContentClasses = 
     'categoryEditorContent' | 
-    'noteEditorContent';
+    'noteEditorContent' |
+    'recordingEditorContent'
+;
 
 interface EditorPanel {
     type: PanelTypes;
@@ -24,6 +29,8 @@ interface EditorPanel {
     Content: React.FC
 }
 
+/* EDITOR VARIANTS */
+
 const panels: Record<string, EditorPanel> = {
     category: {
         type: 'cat',
@@ -31,7 +38,7 @@ const panels: Record<string, EditorPanel> = {
         disableGutters: false,
         component: "form",
         className: "categoryEditorContent",
-        Buttons: CategoryButtons,
+        Buttons: CategoryBarButtons,
         Content: CategoryEditor
     },
     choose: {
@@ -47,11 +54,24 @@ const panels: Record<string, EditorPanel> = {
         disableGutters: false,
         component: "div",
         className: "noteEditorContent",
-        Buttons: NoteButtons,
+        Buttons: NoteBarButtons,
         Content: NoteEditor
+    },
+    recording: {
+        type: 'rec',
+        title: "New Recording",
+        disableGutters: true,
+        component: "div",
+        className: "recordingEditorContent",
+        Buttons: RecordingBarButtons,
+        Content: RecordingEditor
     }
 };
 
+/* EDITOR CONTROLLER */
+
+// Styled
+ 
 const useStyles = makeStyles(theme => ({
     categoryEditorContent: {
         "& > *:not(:last-child)": {
@@ -64,11 +84,17 @@ const useStyles = makeStyles(theme => ({
         "& > *:not(:last-child)": {
             marginBottom: theme.spacing(2)
         }
+    },
+    recordingEditorContent: {
+        display: 'flex',
+        flexDirection: 'column'
     }
-}))
+}));
+
+// Component
 
 const EditorController: React.FC = () => {
-    const [panel, setPanel] = React.useState(panels.choose);
+    const [panel, setPanel] = React.useState(panels.recording);
     const { title, Buttons } = panel;
 
     const classes = useStyles();
@@ -105,5 +131,7 @@ const EditorController: React.FC = () => {
         </FocusDrawer>
     )
 };
+
+/* EXPORT */
 
 export default EditorController;
