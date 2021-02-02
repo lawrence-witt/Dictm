@@ -9,8 +9,7 @@ import NavMenu from './components/DashBoard/NavMenu/NavMenu';
 import RecordingCard from './components/Cards/RecordingCard';
 import NoteCard from './components/Cards/NoteCard';
 import CategoryCard from './components/Cards/CategoryCard';
-import MediaEditor from './components/Editors/MediaEditor/MediaEditor';
-import CategoryEditor from './components/Editors/CategoryEditor';
+import Editor from './components/Editor/EditorController';
 
 import useToggle from './utils/hooks/useToggle';
 import CardGrid from './components/Layout/CardGrid';
@@ -50,7 +49,7 @@ const App: React.FC = (): React.ReactElement => {
                 <CardGrid>
                     {num.map((n, i) => <NoteCard title={'Note'} key={i} />)}
                 </CardGrid>
-                <MediaEditor />
+                <Editor />
                 <NavBar />
             </div>
         </div>

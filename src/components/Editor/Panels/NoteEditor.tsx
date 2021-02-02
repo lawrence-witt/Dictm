@@ -1,10 +1,26 @@
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import { makeStyles } from '@material-ui/core/styles';
+
+/* NOTE BUTTONS */
+
+const NoteButtons: React.FC = () => {
+    return (
+        <>
+            <IconButton edge="end">
+                <SaveIcon />
+            </IconButton>
+        </>
+    )
+};
+
+/* NOTE EDITOR */
 
 const categories = [
     {id: 1, title: 'My Category'},
@@ -74,4 +90,7 @@ const NoteEditor: React.FC = () => {
     )
 };
 
+/* EXPORTS */
+
+export { NoteButtons };
 export default NoteEditor;

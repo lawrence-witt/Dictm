@@ -2,12 +2,22 @@ import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
 
-import EditorDrawer, { EditorDrawerBar, EditorDrawerFrame, EditorDrawerContent } from '../Drawers/EditorDrawer';
-import MediaAutocomplete, { MediaOptionProps } from '../Inputs/MediaAutocomplete';
+import MediaAutocomplete, { MediaOptionProps } from '../../Inputs/MediaAutocomplete';
 
-/* CATEGORY FORM */
+/* CATEGORY BUTTONS */
+
+const CategoryButtons: React.FC = () => {
+    return (
+        <>
+            <IconButton edge="end">
+                <SaveIcon />
+            </IconButton>
+        </>
+    )
+};
+
+/* CATEGORY EDITOR */
 
 const recOptions: MediaOptionProps[] = [
     {title: 'My Rec', isSelected: false, assignedCategory: 'A really long category name of Guitar Recordings'},
@@ -19,7 +29,7 @@ const noteOptions: MediaOptionProps[] = [
     {title: 'My Other Note', isSelected: false}
 ];
 
-const CategoryForm: React.FC = () => {
+const CategoryEditor: React.FC = () => {
     const [recState, setRecState] = React.useState(recOptions);
     const [noteState, setNoteState] = React.useState(noteOptions);
 
@@ -47,36 +57,7 @@ const CategoryForm: React.FC = () => {
     );
 };
 
-/* CATEGORY EDITOR */
+/* EXPORTS */
 
-const useCategoryEditorStyles = makeStyles(theme => ({
-    categoryDrawerContent: {
-        "& > *:not(:last-child)": {
-            marginBottom: theme.spacing(3)
-        }
-    }
-}));
-
-const CategoryEditor: React.FC = () => {
-    const classes = useCategoryEditorStyles();
-
-    return (
-        <EditorDrawer>
-            <EditorDrawerBar title={'New Category'}>
-                <IconButton>
-                    <SaveIcon />
-                </IconButton>
-            </EditorDrawerBar>
-            <EditorDrawerFrame>
-                <EditorDrawerContent 
-                    component="form"
-                    className={classes.categoryDrawerContent}
-                >
-                    <CategoryForm />
-                </EditorDrawerContent>
-            </EditorDrawerFrame>
-        </EditorDrawer>
-    )
-};
-
+export { CategoryButtons };
 export default CategoryEditor;
