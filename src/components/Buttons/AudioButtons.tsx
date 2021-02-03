@@ -6,6 +6,7 @@ import Forward5Icon from '@material-ui/icons/Forward5';
 import PauseIcon from '@material-ui/icons/Pause';
 import SaveIcon from '@material-ui/icons/Save';
 import RecordIcon from '@material-ui/icons/FiberManualRecord';
+import { makeStyles } from '@material-ui/core/styles';
 
 import ContainedIconButton from './ContainedIconButton';
 
@@ -17,21 +18,37 @@ interface PrimaryAudioButtonProps extends IconButtonProps {
 
 /* PRIMARY AUDIO BUTTON */
 
+const usePrimaryStyles = makeStyles(() => ({
+    buttonLabel: {
+        width: '1em',
+        height: '1em',
+        position: 'relative'
+    },
+    recIcon: {
+        fill: '#E43737',
+        position: 'absolute',
+        width: '2em',
+        height: '2em'
+    }
+}));
+
 const PrimaryAudioButton: React.FC<PrimaryAudioButtonProps> = (props) => {
     const {
         icon,
         ...other
     } = props;
 
+    const classes = usePrimaryStyles();
+
     const SelectedIcon = {
-        play: PlayIcon,
-        pause: PauseIcon,
-        record: RecordIcon
+        play: function I() { return <PlayIcon /> },
+        pause: function I() { return <PauseIcon /> },
+        record: function I() { return <RecordIcon className={classes.recIcon}/> }
     }[icon];
 
     return (
-        <ContainedIconButton {...other}>
-            <SelectedIcon />
+        <ContainedIconButton classes={{label: classes.buttonLabel}} {...other}>
+            {SelectedIcon()}
         </ContainedIconButton>
     )
 };

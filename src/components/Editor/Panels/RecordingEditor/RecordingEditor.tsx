@@ -9,6 +9,7 @@ import FlexSpace from '../../../Layout/FlexSpace';
 
 import Timer from './Timer';
 import WaveForm from './WaveForm';
+import Form from './Form';
 import Controls from './Controls';
 
 /* RECORDING BAR BUTTONS */
@@ -53,12 +54,16 @@ const RecordingBarButtons: React.FC = () => {
 /* RECORDING EDITOR */
 
 const RecordingEditor: React.FC = () => {
+    const hasData = true;
+    const mode = "edit";
+
     return (
         <>
             <Timer />
             <WaveForm />
             <FlexSpace />
-            <Controls hasData={false} mode="play"/>
+            {hasData && mode === "edit" && <Form />}
+            <Controls hasData={hasData} mode={mode}/>
         </>
     )
 };
