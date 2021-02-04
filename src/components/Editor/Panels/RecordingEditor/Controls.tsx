@@ -10,81 +10,14 @@ import {
     SaveButton
 } from '../../../Buttons/AudioButtons';
 
-/* TYPES */
+// Types
 
 interface ControlsProps {
     mode: 'play' | 'edit';
     hasData: boolean;
 }
 
-interface PlayControlsProps {
-    isPlaying?: boolean;
-    canRewind?: boolean;
-    canForward?: boolean;
-}
-
-interface EditControlsProps {
-    hasData?: boolean;
-    isRecording?: boolean;
-    isPlaying?: boolean;
-    canRewind?: boolean;
-    canForward?: boolean;
-    canSave?: boolean;
-}
-
-/* PLAY CONTROLS */
-
-const PlayControls: React.FC<PlayControlsProps> = (props) => {
-    const {
-        isPlaying,
-        canRewind,
-        canForward
-    } = props;
-
-    return (
-        <>
-            <Replay5Button color="inherit" disabled={!canRewind}/>
-            <PrimaryAudioButton color="inherit" icon={isPlaying ? 'pause' : 'play'}/>
-            <Forward5Button color="inherit" disabled={!canForward}/>
-        </>
-    );
-};
-
-/* EDIT CONTROLS */
-
-const EditControls: React.FC<EditControlsProps> = (props) => {
-    const {
-        hasData,
-        isPlaying,
-        isRecording,
-        canRewind = true,
-        canForward = true,
-        canSave
-    } = props;
-
-    const PrimaryControl = (
-        <PrimaryAudioButton 
-            icon={isRecording ? 'pause' : 'record'}
-            disabled={isPlaying}
-        />
-    );
-
-    return (
-        <>
-            {hasData && <Replay5Button color="inherit" disabled={!canRewind} />}
-            {hasData && (
-                isPlaying ? 
-                <PauseButton color="inherit" /> : 
-                <PlayButton color="inherit" disabled={isRecording}/>
-            )}
-            {PrimaryControl}
-            {hasData && <SaveButton color="inherit" disabled={!canSave}/>}
-            {hasData && <Forward5Button color="inherit" disabled={!canForward}/>}
-        </>
-    )
-};
-
-/* CONTROLS */
+// Styled
 
 const useStyles = makeStyles<Theme, {addPseudo: boolean}>(theme => 
     createStyles({
@@ -107,24 +40,49 @@ const useStyles = makeStyles<Theme, {addPseudo: boolean}>(theme =>
     })
 );
 
+// Component
+
 const Controls: React.FC<ControlsProps> = (props) => {
     const {
         mode,
         hasData
     } = props;
 
-    const classes = useStyles({addPseudo: mode === 'play' || !hasData});
+    const isEditable = mode === 'edit';
+    const classes = useStyles({addPseudo: !isEditable || !hasData});
 
-    const CurrentControls = mode === 'play' ? 
-        <PlayControls /> : 
-        <EditControls hasData={hasData}/>
-    ;
+    const isPlaying = false;
+    const isRecording = false;
+    const canRewind = false;
+    const canSave = false;
+    const canForward = false;
+
+    const PrimaryControl = (
+        <PrimaryAudioButton 
+            icon={isEditable ? (
+                isRecording ? 'pause' : 'record'
+            ) : (
+                isPlaying ? 'pause' : 'play'
+            )}
+            disabled={isEditable && isPlaying}
+        />
+    );
 
     return (
         <div className={classes.controlsContainer}>
-            {CurrentControls}
+            {hasData && <Replay5Button color="inherit" disabled={!canRewind} />}
+            {hasData && isEditable && (
+                isPlaying ? 
+                <PauseButton color="inherit" /> :
+                <PlayButton color="inherit" disabled={isRecording}/>
+            )}
+            {PrimaryControl}
+            {hasData && isEditable && <SaveButton color="inherit" disabled={!canSave}/>}
+            {hasData && <Forward5Button color="inherit" disabled={!canForward}/>}
         </div>
     )
 }
+
+// Export
 
 export default Controls;
