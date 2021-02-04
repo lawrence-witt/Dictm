@@ -17,6 +17,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "clsx": "^1.1.1",
+    "lamejs": "^1.2.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-measure": "^2.5.2",
@@ -24,6 +25,7 @@
     "react-spring": "9.0.0-rc.3"
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.7",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-measure": "^2.0.6",

@@ -12,10 +12,25 @@ import WaveForm from './WaveForm';
 import Form from './Form';
 import Controls from './Controls';
 
+import CassetteProvider from '../../../../utils/providers/CassetteProvider';
+
+/* TYPES */
+
+interface RecordingBarButtonsProps {
+    mode: 'edit' | 'play';
+}
+
+interface RecordingEditorProps {
+    hasData: boolean;
+    mode: 'edit' | 'play';
+}
+
 /* RECORDING BAR BUTTONS */
 
-const RecordingBarButtons: React.FC = () => {
-    const mode = 'play';
+const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
+    const {
+        mode = 'edit'
+    } = props;
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const menuRef = React.useRef(null);
@@ -48,23 +63,25 @@ const RecordingBarButtons: React.FC = () => {
         </>
     );
 
-    return mode == 'play' && playButtons;
+    return mode === 'play' && playButtons;
 };
 
 /* RECORDING EDITOR */
 
-const RecordingEditor: React.FC = () => {
-    const hasData = true;
-    const mode = "edit";
+const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
+    const {
+        hasData = true,
+        mode = 'edit'
+    } = props;
 
     return (
-        <>
+        <CassetteProvider>
             <Timer />
             <WaveForm />
             <FlexSpace />
             {hasData && mode === "edit" && <Form />}
             <Controls hasData={hasData} mode={mode}/>
-        </>
+        </CassetteProvider>
     )
 };
 
