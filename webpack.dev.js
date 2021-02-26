@@ -7,7 +7,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 
 const lintPlugin = new ESLintPlugin({
     files: 'src/**/*',
-    extensions: ['ts', 'tsx']
+    extensions: ['.ts', '.tsx']
 });
 
 const config = {
@@ -20,7 +20,7 @@ const config = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: "awesome-typescript-loader",
+                loader: "awesome-typescript-loader"
             },
             {
                 test: /\.css?$/,

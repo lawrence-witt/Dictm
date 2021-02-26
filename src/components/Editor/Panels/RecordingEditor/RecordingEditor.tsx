@@ -12,7 +12,7 @@ import WaveForm from './WaveForm';
 import Form from './Form';
 import Controls from './Controls';
 
-import CassetteProvider from '../../../../utils/providers/CassetteProvider';
+//import useCassette from '../../../../utils/hooks/useCassette/useCassette';
 
 /* TYPES */
 
@@ -74,14 +74,16 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
         mode = 'edit'
     } = props;
 
+    //useCassette();
+
     return (
-        <CassetteProvider>
+        <>
             <Timer />
             <WaveForm />
             <FlexSpace />
             {hasData && mode === "edit" && <Form />}
             <Controls hasData={hasData} mode={mode}/>
-        </CassetteProvider>
+        </>
     )
 };
 

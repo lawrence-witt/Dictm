@@ -5,7 +5,7 @@ import TextField from '@material-ui/core/TextField';
 
 import MediaAutocomplete, { MediaOptionProps } from '../../Inputs/MediaAutocomplete';
 
-/* CATEGORY BUTTONS */
+/* CATEGORY BAR BUTTONS */
 
 const CategoryBarButtons: React.FC = () => {
     return (

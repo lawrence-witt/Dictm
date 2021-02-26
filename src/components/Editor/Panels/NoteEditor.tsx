@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import CustomSelect from '../../Inputs/CustomSelect';
 
-/* NOTE BUTTONS */
+/* NOTE BAR BUTTONS */
 
 const NoteBarButtons: React.FC = () => {
     return (
