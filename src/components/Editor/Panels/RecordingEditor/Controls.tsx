@@ -1,6 +1,8 @@
 import React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
+import { useCassetteStatus, useCassetteControls } from '../../../../utils/providers/CassetteProvider';
+
 import {
     PrimaryAudioButton,
     PlayButton,
@@ -14,7 +16,6 @@ import {
 
 interface ControlsProps {
     mode: 'play' | 'edit';
-    hasData: boolean;
 }
 
 // Styled
@@ -43,42 +44,72 @@ const useStyles = makeStyles<Theme, {addPseudo: boolean}>(theme =>
 // Component
 
 const Controls: React.FC<ControlsProps> = (props) => {
-    const {
-        mode,
-        hasData
-    } = props;
+    const { mode } = props;
+
+    // Flags and Props
+
+    const { 
+        connect, disconnect, insert, 
+        eject, record, play, 
+        pause, scanTo, scanBy, unlink 
+    } = useCassetteControls();
+    const { status, flags } = useCassetteStatus();
 
     const isEditable = mode === 'edit';
-    const classes = useStyles({addPseudo: !isEditable || !hasData});
+    const isPlaying = status === "playing";
+    const isRecording = status === "recording";
 
-    const isPlaying = false;
-    const isRecording = false;
-    const canRewind = false;
-    const canSave = false;
-    const canForward = false;
+    const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
 
-    const PrimaryControl = (
-        <PrimaryAudioButton 
-            icon={isEditable ? (
-                isRecording ? 'pause' : 'record'
-            ) : (
-                isPlaying ? 'pause' : 'play'
-            )}
-            disabled={isEditable && isPlaying}
-        />
-    );
+    // Handlers
+
+    const handleConnect = React.useCallback(async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+            await connect(stream);
+        } catch(err) {
+            console.log(err);
+            // send to toast
+        }
+    }, [connect]);
+    
+    const handleSave = async () => {
+        const file = await eject();
+        console.log(file);
+    }
+
+    // Get Stream in Edit Mode
+
+    React.useEffect(() => {
+        if (mode !== "edit") return;
+        handleConnect();
+    }, [mode, handleConnect]);
+
+    // Deduce primary icon type
+
+    const primaryIcon = (
+        isEditable ? (
+            isRecording ? 'pause' : 'record'
+        ) : (
+            isPlaying ? 'play' : 'pause'
+        )
+    )
 
     return (
         <div className={classes.controlsContainer}>
-            {hasData && <Replay5Button color="inherit" disabled={!canRewind} />}
-            {hasData && isEditable && (
+            {flags.hasData && <Replay5Button color="inherit" onClick={() => scanBy(-5)} disabled={!flags.canScan} />}
+            {flags.hasData && isEditable && (
                 isPlaying ? 
-                <PauseButton color="inherit" /> :
-                <PlayButton color="inherit" disabled={isRecording}/>
+                <PauseButton color="inherit" onClick={pause} disabled={!flags.canPause} /> :
+                <PlayButton color="inherit" onClick={play} disabled={!flags.canPlay}/>
             )}
-            {PrimaryControl}
-            {hasData && isEditable && <SaveButton color="inherit" disabled={!canSave}/>}
-            {hasData && <Forward5Button color="inherit" disabled={!canForward}/>}
+            <PrimaryAudioButton 
+                icon={primaryIcon}
+                onClick={flags.canPause ? pause : isEditable ? record : play}
+                disabled={isEditable && isPlaying}
+            />
+            {flags.hasData && isEditable && <SaveButton color="inherit" onClick={handleSave} disabled={!flags.canEject}/>}
+            {flags.hasData && <Forward5Button color="inherit" onClick={() => scanBy(5)} disabled={!flags.canScan}/>}
         </div>
     )
 }

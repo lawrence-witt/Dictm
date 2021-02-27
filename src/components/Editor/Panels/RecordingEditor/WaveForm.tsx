@@ -1,6 +1,16 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { CassetteProgressCallback, CassetteAnalysisCallback } from 'cassette-js';
+import { ProgressHandle, AnalysisHandle } from './RecordingEditor.types';
+
+import { useCassetteControls } from '../../../../utils/providers/CassetteProvider';
+
+interface WaveFormProps {
+    progressHandle: React.RefObject<ProgressHandle>;
+    analysisHandle: React.RefObject<AnalysisHandle>;
+}
+
 const useStyles = makeStyles(theme => ({
     container: {
         width: '100%',
@@ -17,8 +27,31 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const WaveForm: React.FC = () => {
+const WaveForm: React.FC<WaveFormProps> = (props) => {
+    const {
+        progressHandle,
+        analysisHandle,
+    } = props;
+
     const classes = useStyles();
+
+    const { scanTo } = useCassetteControls();
+
+    const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
+        //
+    }, []);
+
+    const output = React.useCallback<CassetteAnalysisCallback>((analysis) => {
+        //
+    }, []);
+
+    React.useImperativeHandle(progressHandle, () => ({
+        increment
+    }), [increment]);
+
+    React.useImperativeHandle(analysisHandle, () => ({
+        output
+    }), [output]);
 
     return (
         <div className={classes.container}>

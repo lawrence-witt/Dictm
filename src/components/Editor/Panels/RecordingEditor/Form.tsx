@@ -2,6 +2,8 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { useCassetteStatus } from '../../../../utils/providers/CassetteProvider';
+
 import CustomSelect from '../../../Inputs/CustomSelect';
 
 const useStyles = makeStyles(theme => ({
@@ -16,7 +18,9 @@ const useStyles = makeStyles(theme => ({
 const Form: React.FC = () => {
     const classes = useStyles();
 
-    return (
+    const { flags } = useCassetteStatus();
+
+    return flags.hasData && (
         <form className={classes.form}>
             <TextField 
                 label="Title" 

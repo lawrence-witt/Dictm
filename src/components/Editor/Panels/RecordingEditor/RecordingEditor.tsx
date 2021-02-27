@@ -7,23 +7,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuButton from '../../../Buttons/MenuButton';
 import FlexSpace from '../../../Layout/FlexSpace';
 
+import { RecordingBarButtonsProps, RecordingEditorProps, ProgressHandle, AnalysisHandle } from './RecordingEditor.types';
 import Timer from './Timer';
 import WaveForm from './WaveForm';
 import Form from './Form';
 import Controls from './Controls';
 
-//import useCassette from '../../../../utils/hooks/useCassette/useCassette';
-
-/* TYPES */
-
-interface RecordingBarButtonsProps {
-    mode: 'edit' | 'play';
-}
-
-interface RecordingEditorProps {
-    hasData: boolean;
-    mode: 'edit' | 'play';
-}
+import CassetteProvider from '../../../../utils/providers/CassetteProvider';
+import { CassetteProgressCallback, CassetteAnalysisCallback } from 'cassette-js';
 
 /* RECORDING BAR BUTTONS */
 
@@ -68,22 +59,45 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
 
 /* RECORDING EDITOR */
 
-const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
-    const {
-        hasData = true,
-        mode = 'edit'
-    } = props;
+const clockOptions = {
+    increment: 0.01,
+    floorOutput: true
+}
 
-    //useCassette();
+const analyserOptions = {
+    recording: true,
+    getByteFrequencyData: true
+}
+
+const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
+    const { mode = 'edit' } = props;
+
+    const timerProgressHandle = React.useRef<ProgressHandle>();
+    const waveProgressHandle = React.useRef<ProgressHandle>();
+    const waveAnalysisHandle = React.useRef<AnalysisHandle>();
+
+    const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
+        timerProgressHandle.current.increment(progress, duration);
+        waveProgressHandle.current.increment(progress, duration);
+    }, []);
+
+    const onAnalysis = React.useCallback<CassetteAnalysisCallback>((analysis) => {
+        waveAnalysisHandle.current.output(analysis);
+    }, []);
 
     return (
-        <>
-            <Timer />
-            <WaveForm />
+        <CassetteProvider 
+            clockOptions={clockOptions} 
+            analyserOptions={analyserOptions}
+            onProgress={onProgress}
+            onAnalysis={onAnalysis}
+        >
+            <Timer progressHandle={timerProgressHandle}/>
+            <WaveForm  progressHandle={waveProgressHandle} analysisHandle={waveAnalysisHandle}/>
             <FlexSpace />
-            {hasData && mode === "edit" && <Form />}
-            <Controls hasData={hasData} mode={mode}/>
-        </>
+            {mode === "edit" && <Form />}
+            <Controls mode={mode} />
+        </CassetteProvider>
     )
 };
 
