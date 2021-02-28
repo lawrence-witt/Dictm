@@ -26,7 +26,7 @@ interface CardBasePrimaryRowProps {
 }
 
 interface CardBaseActionSwitchProps {
-    primaryIcon?: React.ComponentType;
+    primaryIcon?: React.FunctionComponent;
     contained?: boolean;
     onPrimaryAction?: () => void;
     onSecondaryAction?: () => void;
@@ -229,7 +229,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
                 root: classes.actionRoot, 
                 label: classes.iconButtonLabel
             }}>
-            <PrimaryIcon />
+            {PrimaryIcon && <PrimaryIcon />}
         </IconButtonType>
     );
     

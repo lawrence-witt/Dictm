@@ -7,14 +7,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuButton from '../../../Buttons/MenuButton';
 import FlexSpace from '../../../Layout/FlexSpace';
 
-import { RecordingBarButtonsProps, RecordingEditorProps, ProgressHandle, AnalysisHandle } from './RecordingEditor.types';
+import { RecordingBarButtonsProps, RecordingEditorProps, ProgressHandle } from './RecordingEditor.types';
 import Timer from './Timer';
 import WaveForm from './WaveForm';
 import Form from './Form';
 import Controls from './Controls';
 
 import CassetteProvider from '../../../../utils/providers/CassetteProvider';
-import { CassetteProgressCallback, CassetteAnalysisCallback } from 'cassette-js';
+import { CassetteProgressCallback } from 'cassette-js';
 
 /* RECORDING BAR BUTTONS */
 
@@ -65,8 +65,7 @@ const clockOptions = {
 }
 
 const analyserOptions = {
-    recording: true,
-    getByteFrequencyData: true
+    recording: true
 }
 
 const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
@@ -74,15 +73,10 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
 
     const timerProgressHandle = React.useRef<ProgressHandle>();
     const waveProgressHandle = React.useRef<ProgressHandle>();
-    const waveAnalysisHandle = React.useRef<AnalysisHandle>();
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
         timerProgressHandle.current.increment(progress, duration);
         waveProgressHandle.current.increment(progress, duration);
-    }, []);
-
-    const onAnalysis = React.useCallback<CassetteAnalysisCallback>((analysis) => {
-        waveAnalysisHandle.current.output(analysis);
     }, []);
 
     return (
@@ -90,10 +84,9 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
             clockOptions={clockOptions} 
             analyserOptions={analyserOptions}
             onProgress={onProgress}
-            onAnalysis={onAnalysis}
         >
             <Timer progressHandle={timerProgressHandle}/>
-            <WaveForm  progressHandle={waveProgressHandle} analysisHandle={waveAnalysisHandle}/>
+            <WaveForm progressHandle={waveProgressHandle}/>
             <FlexSpace />
             {mode === "edit" && <Form />}
             <Controls mode={mode} />
