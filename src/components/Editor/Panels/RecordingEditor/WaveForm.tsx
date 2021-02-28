@@ -30,7 +30,6 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         height: '100%',
         position: 'absolute',
-        paddingLeft: 'calc(50% - 15px)',
         overflowX: 'auto',
         overflowY: 'hidden',
         scrollbarWidth: 'none'
@@ -52,7 +51,8 @@ const useStyles = makeStyles(theme => ({
     },
     canvas: {
         height: 250,
-        width: 0
+        width: 0,
+        margin: '0px calc(50% - 15px)'
     },
 }));
 
