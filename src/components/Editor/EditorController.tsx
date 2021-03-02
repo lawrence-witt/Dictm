@@ -25,8 +25,8 @@ interface EditorPanel {
     disableGutters: boolean;
     component: string;
     className?: EditorContentClasses;
-    Buttons?: React.FC,
-    Content: React.FC
+    Buttons?: React.FC<any>,
+    Content: React.FC<any>
 }
 
 /* EDITOR VARIANTS */

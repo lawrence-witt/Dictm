@@ -23,9 +23,9 @@ const useStyles = makeStyles(theme => ({
 const Timer: React.FC<TimerProps> = ({ progressHandle }) => {
     const classes = useStyles();
 
-    const minRef = React.useRef<HTMLSpanElement>();
-    const secRef = React.useRef<HTMLSpanElement>();
-    const csRef = React.useRef<HTMLSpanElement>();
+    const minRef = React.useRef<HTMLSpanElement>(null);
+    const secRef = React.useRef<HTMLSpanElement>(null);
+    const csRef = React.useRef<HTMLSpanElement>(null);
 
     const increment = React.useCallback((progress: number) => {
         const totalMs = progress * 1000;
@@ -33,9 +33,9 @@ const Timer: React.FC<TimerProps> = ({ progressHandle }) => {
 
         const addZero = (n: number) => n < 10 ? `0${n}`: `${n}`;
 
-        minRef.current.innerHTML = addZero(d.getMinutes());
-        secRef.current.innerHTML = addZero(d.getSeconds());
-        csRef.current.innerHTML = addZero(Math.floor(d.getMilliseconds() / 10));
+        if (minRef.current) minRef.current.innerHTML = addZero(d.getMinutes());
+        if (secRef.current) secRef.current.innerHTML = addZero(d.getSeconds());
+        if (csRef.current) csRef.current.innerHTML = addZero(Math.floor(d.getMilliseconds() / 10));
     }, []);
 
     React.useImperativeHandle(progressHandle, () => ({

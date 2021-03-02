@@ -5,7 +5,7 @@ import { CassetteProgressCallback } from 'cassette-js';
 import { ProgressHandle } from './RecordingEditor.types';
 import WaveClass from './WaveForm.class';
 
-import { useCassetteAnalysis, useCassetteControls, useCassetteStatus } from '../../../../utils/providers/CassetteProvider';
+import { useCassetteControls, useCassetteStatus, useCassetteGetters } from '../../../../utils/providers/CassetteProvider';
 
 interface WaveFormProps {
     progressHandle: React.RefObject<ProgressHandle>;
@@ -61,44 +61,35 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         progressHandle
     } = props;
 
-    const classes = useStyles();
-
     // Cassette Props
 
     const { scanTo } = useCassetteControls();
     const { status } = useCassetteStatus();
-    const { analyser } = useCassetteAnalysis();
+    const { nodeMap } = useCassetteGetters();
 
     const isRecording = status === "recording";
 
+    // Style
+
+    const classes = useStyles();
+
     // Canvas Controls
 
-    const canvasRef = React.useRef<HTMLCanvasElement>(null);
-    const waveClass = React.useRef<WaveClass>(null);
+    const canvasRef = React.useRef() as React.MutableRefObject<HTMLCanvasElement>;
+    const waveClass = React.useRef() as React.MutableRefObject<WaveClass>;
 
     // Set Initial Options
 
     React.useLayoutEffect(() => {
         if (waveClass.current) return;
 
-        analyser.fftSize = 1024;
-        waveClass.current = new WaveClass(canvasRef.current, analyser);
-        waveClass.current.drawStampMap();
-    }, [analyser]);
-
-    // Handle Cassette Tick
-
-    const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
-        //
+        waveClass.current = new WaveClass(canvasRef.current);
+        waveClass.current.drawFrequencyData();
     }, []);
-
-    React.useImperativeHandle(progressHandle, () => ({
-        increment
-    }), [increment]);
 
     // Handle Scroll Grab
 
-    const tapeRef = React.useRef<HTMLDivElement>(null);
+    const tapeRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
     const scrollCoords = React.useRef<{left: number, x: number} | null>(null);
 
     const startScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -120,6 +111,22 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         scrollCoords.current = null;
         e.currentTarget.style.cursor = "grab";
     }
+
+    // Handle Cassette Tick
+
+    const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
+        if (!isRecording) return;
+
+        if (isRecording) {
+            const analyser = nodeMap().recording[0];
+            if (!(analyser instanceof AnalyserNode)) throw new Error('AnalyserNode not found.');
+            waveClass.current.addFrequencyPoint(p, analyser);
+        }
+    }, [isRecording, nodeMap]);
+
+    React.useImperativeHandle(progressHandle, () => ({
+        increment
+    }), [increment]);
 
     return (
         <div className={classes.container}>

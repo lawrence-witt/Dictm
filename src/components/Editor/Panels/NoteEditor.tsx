@@ -46,7 +46,7 @@ const useTextAreaStyles = makeStyles(theme => ({
 
 const NoteEditor: React.FC = () => {
     const textAreaClasses = useTextAreaStyles();
-    const textAreaRef = React.useRef<HTMLInputElement>(null);
+    const textAreaRef = React.useRef() as React.MutableRefObject<HTMLInputElement>;
 
     return (
         <>

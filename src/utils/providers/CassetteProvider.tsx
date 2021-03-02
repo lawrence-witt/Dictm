@@ -1,34 +1,34 @@
 import React from 'react';
-import { CassetteUserParams } from 'cassette-js';
+import { CassetteUserParams, CassettePublicMethods, CassetteStatus, CassettePublicFlags } from 'cassette-js';
 
-import useCassette from '../hooks/useCassette';
+import useCassette, { CassetteGetters } from '../hooks/useCassette';
 
-interface CassetteProviderProps {
-    clockOptions?: CassetteUserParams["clockOptions"];
-    analyserOptions?: CassetteUserParams["analyserOptions"];
-    onProgress?: CassetteUserParams["onProgress"];
-    onStatus?: CassetteUserParams["onStatus"];
-    onAnalysis?: CassetteUserParams["onAnalysis"];
-    onError?: CassetteUserParams["onError"];
+interface StampContext {
+    progress: number;
+    duration: number;
 }
 
-const CassetteControlsContext = React.createContext(null);
-const CassetteStampContext = React.createContext(null);
-const CassetteStatusContext = React.createContext(null);
-const CassetteAnalysisContext = React.createContext(null);
-const CassetteErrorContext = React.createContext(null);
+interface StatusContext {
+    status: CassetteStatus;
+    flags: CassettePublicFlags;
+}
 
-const useCassetteControls = () => React.useContext(CassetteControlsContext);
-const useCassetteStamps = (): { progress: number, duration: number } => React.useContext(CassetteStampContext);
-const useCassetteStatus = () => React.useContext(CassetteStatusContext);
-const useCassetteAnalysis = () => React.useContext(CassetteAnalysisContext);
-const useCassetteError = () => React.useContext(CassetteErrorContext);
+const CassetteControlsContext = React.createContext<CassettePublicMethods | null>(null);
+const CassetteStampContext = React.createContext<StampContext | null>(null);
+const CassetteStatusContext = React.createContext<StatusContext | null>(null);
+const CassetteGetterContext = React.createContext<CassetteGetters | null>(null);
+const CassetteErrorContext = React.createContext<unknown>(null);
 
-const CassetteProvider: React.FC<CassetteProviderProps> = ({
-    clockOptions, analyserOptions, onProgress, onStatus, onAnalysis, onError, children
+const useCassetteControls = (): CassettePublicMethods => React.useContext(CassetteControlsContext) as CassettePublicMethods;
+const useCassetteStamps = (): StampContext => React.useContext(CassetteStampContext) as StampContext;
+const useCassetteStatus = (): StatusContext => React.useContext(CassetteStatusContext) as StatusContext;
+const useCassetteGetters = (): CassetteGetters => React.useContext(CassetteGetterContext) as CassetteGetters;
+const useCassetteError = (): unknown => React.useContext(CassetteErrorContext);
+
+const CassetteProvider: React.FC<CassetteUserParams> = ({
+    increment, floorOutput, onProgress, onStatus, onError, children
 }) => {
-
-    const cassette = useCassette(clockOptions, analyserOptions, onProgress, onStatus, onAnalysis, onError);
+    const cassette = useCassette(increment, floorOutput, onProgress, onStatus, onError);
 
     const stampContext = React.useMemo(() => ({
         progress: cassette.progress,
@@ -40,20 +40,15 @@ const CassetteProvider: React.FC<CassetteProviderProps> = ({
         flags: cassette.flags
     }), [cassette.status, cassette.flags]);
 
-    const analysisContext = React.useMemo(() => ({
-        analyser: cassette.analyser,
-        analysis: cassette.analysis
-    }), [cassette.analyser, cassette.analysis]);
-
     return (
         <CassetteControlsContext.Provider value={cassette.controls}>
             <CassetteStampContext.Provider value={stampContext}>
                 <CassetteStatusContext.Provider value={statusContext}>
-                    <CassetteAnalysisContext.Provider value={analysisContext}>
+                    <CassetteGetterContext.Provider value={cassette.get}>
                         <CassetteErrorContext.Provider value={cassette.error}>
                             {children}
                         </CassetteErrorContext.Provider>
-                    </CassetteAnalysisContext.Provider>
+                    </CassetteGetterContext.Provider>
                 </CassetteStatusContext.Provider>
             </CassetteStampContext.Provider>
         </CassetteControlsContext.Provider>
@@ -61,4 +56,4 @@ const CassetteProvider: React.FC<CassetteProviderProps> = ({
 };
 
 export default CassetteProvider;
-export { useCassetteControls, useCassetteStamps, useCassetteStatus, useCassetteAnalysis, useCassetteError };
+export { useCassetteControls, useCassetteStamps, useCassetteStatus, useCassetteGetters, useCassetteError };

@@ -1,5 +1,5 @@
 import React from 'react';
-import Measure from 'react-measure';
+import Measure, { BoundingRect } from 'react-measure';
 
 // Types
 
@@ -12,6 +12,13 @@ interface MasonryGridProps {
     max?: MinMax;
     gridClass?: string;
     colClass?: string;
+}
+
+interface MasonryGridState {
+    width?: number;
+    columns: unknown[][];
+    minWidth?: number;
+    maxWidth?: string | number;
 }
 
 // Helpers
@@ -29,7 +36,7 @@ const getColumns = (
 
     if (repeat === 'auto-fill') {
         length = Math.floor(width/min); 
-    } else if (repeat === 'auto-fit') {
+    } else {
         length = smallestOf(Math.floor(width/min), childCount);
     }
 
@@ -60,7 +67,7 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
     const gridClassName = gridClass || 'rpt-masonry-grid';
     const colClassName = colClass || 'rpt-masonry-col';
 
-    const [state, setState] = React.useState({
+    const [state, setState] = React.useState<MasonryGridState>({
         width: undefined,
         columns: [],
         minWidth: undefined,
@@ -71,8 +78,8 @@ const Masonry: React.FC<MasonryGridProps> = (props) => {
 
     const childCount = React.Children.count(children);
 
-    const onResize = React.useCallback(({bounds}) => {
-        const { width } = bounds;
+    const onResize = React.useCallback((content: { bounds: BoundingRect }) => {
+        const { width } = content.bounds;
         setState(s => {
             const { 
                 columns: pCols,

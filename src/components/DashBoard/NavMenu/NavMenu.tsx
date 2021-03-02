@@ -67,7 +67,8 @@ const NavMenu: React.FC<NavMenuProps> = ({
     }, [isMenuOpen, breakpoint.index]);
 
     const increaseDepth = React.useCallback((primary: string) => {
-        setAppDirectory(ad => {
+        /* setAppDirectory(ad => {
+            // issue here is newList.subItmes possibly undefined
             const newList = ad.current.find(item => item.primary === primary);
             if (!newList) return ad;
 
@@ -77,7 +78,7 @@ const NavMenu: React.FC<NavMenuProps> = ({
                 root: ad.root,
                 current: newList.subItems
             }
-        });
+        }); */
     }, []);
 
     const reduceDepth = React.useCallback(() => {

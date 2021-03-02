@@ -20,7 +20,7 @@ const Form: React.FC = () => {
 
     const { flags } = useCassetteStatus();
 
-    return flags.hasData && (
+    return flags.hasData ? (
         <form className={classes.form}>
             <TextField 
                 label="Title" 
@@ -32,7 +32,7 @@ const Form: React.FC = () => {
                 options={[]}
             />
         </form>
-    );
+    ) : null;
 };
 
 export default Form;

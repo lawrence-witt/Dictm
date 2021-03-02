@@ -54,25 +54,16 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
         </>
     );
 
-    return mode === 'play' && playButtons;
+    return mode === 'play' ? playButtons : null;
 };
 
 /* RECORDING EDITOR */
 
-const clockOptions = {
-    increment: 0.01,
-    floorOutput: true
-}
-
-const analyserOptions = {
-    recording: true
-}
-
 const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
     const { mode = 'edit' } = props;
 
-    const timerProgressHandle = React.useRef<ProgressHandle>();
-    const waveProgressHandle = React.useRef<ProgressHandle>();
+    const timerProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
+    const waveProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
         timerProgressHandle.current.increment(progress, duration);
@@ -81,8 +72,8 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
 
     return (
         <CassetteProvider 
-            clockOptions={clockOptions} 
-            analyserOptions={analyserOptions}
+            increment={0.01}
+            floorOutput={true}
             onProgress={onProgress}
         >
             <Timer progressHandle={timerProgressHandle}/>

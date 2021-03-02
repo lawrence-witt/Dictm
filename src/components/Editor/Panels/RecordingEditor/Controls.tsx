@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
-import { useCassetteStatus, useCassetteControls } from '../../../../utils/providers/CassetteProvider';
+import { useCassetteStatus, useCassetteControls, useCassetteGetters } from '../../../../utils/providers/CassetteProvider';
 
 import {
     PrimaryAudioButton,
@@ -49,10 +49,13 @@ const Controls: React.FC<ControlsProps> = (props) => {
     // Flags and Props
 
     const { 
-        connect, disconnect, insert, 
-        eject, record, play, 
-        pause, scanTo, scanBy, unlink 
+        connect, insert,
+        eject, addNode, removeNodes, 
+        record, play, pause, scanBy
     } = useCassetteControls();
+    const {
+        context
+    } = useCassetteGetters();
     const { status, flags } = useCassetteStatus();
 
     const isEditable = mode === 'edit';
@@ -60,6 +63,9 @@ const Controls: React.FC<ControlsProps> = (props) => {
     const isRecording = status === "recording";
 
     const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
+
+    // Audio Node Refs
+    const analyser = React.useRef(null) as React.MutableRefObject<AnalyserNode | null>;
 
     // Handlers
 
@@ -72,11 +78,26 @@ const Controls: React.FC<ControlsProps> = (props) => {
             // send to toast
         }
     }, [connect]);
-    
-    const handleSave = async () => {
+
+    const handleRecord = React.useCallback(async () => {
+        analyser.current = context().createAnalyser();
+        await addNode(analyser.current, 0);
+        await record();
+    }, [addNode, record, context]);
+
+    const handlePause = React.useCallback(async () => {
+        await pause();
+
+        if (isRecording) {
+            if (analyser.current) await removeNodes([analyser.current]);
+            analyser.current = null;
+        }
+    }, [removeNodes, pause, isRecording]);
+
+    const handleSave = React.useCallback(async () => {
         const file = await eject();
         console.log(file);
-    }
+    }, [eject]);
 
     // Get Stream in Edit Mode
 
@@ -100,12 +121,12 @@ const Controls: React.FC<ControlsProps> = (props) => {
             {flags.hasData && <Replay5Button color="inherit" onClick={() => scanBy(-5)} disabled={!flags.canScan} />}
             {flags.hasData && isEditable && (
                 isPlaying ? 
-                <PauseButton color="inherit" onClick={pause} disabled={!flags.canPause} /> :
-                <PlayButton color="inherit" onClick={play} disabled={!flags.canPlay}/>
+                <PauseButton color="inherit" onClick={() => handlePause()} disabled={!flags.canPause} /> :
+                <PlayButton color="inherit" onClick={() => play()} disabled={!flags.canPlay}/>
             )}
             <PrimaryAudioButton 
                 icon={primaryIcon}
-                onClick={flags.canPause ? pause : isEditable ? record : play}
+                onClick={() => flags.canPause ? handlePause() : isEditable ? handleRecord() : play()}
                 disabled={isEditable && isPlaying}
             />
             {flags.hasData && isEditable && <SaveButton color="inherit" onClick={handleSave} disabled={!flags.canEject}/>}

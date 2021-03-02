@@ -38,7 +38,7 @@ const isOfValueNaN = (test: unknown) => test !== test;
 const createBreakObject = (key: BreakIdentifier, value: number): BreakObject => ({key, value});
 
 const extractBreakpoints = (obj: {[key: string]: unknown}): BreakObject[] => {
-    return Object.keys(obj).reduce((out, key) => {
+    return Object.keys(obj).reduce((out: BreakObject[], key) => {
         if (!isOfValueNaN(parseInt(`${obj[key]}`))) {
             out = [...out, createBreakObject(key, parseInt(`${obj[key]}`))];
         }
@@ -167,7 +167,7 @@ const useBreakpoints = (
 
 // Encapsulate hook with context
 
-const BreakContext = React.createContext(null);
+const BreakContext = React.createContext<ReturnType<typeof useBreakpoints> | null>(null);
 
 const BreakContextProvider: React.FC<{
     breakpoints: Breakpoints, createFloor?: boolean
@@ -184,7 +184,9 @@ const BreakContextProvider: React.FC<{
 }
 
 const useBreakContext = (): BreakpointData => {
-    return React.useContext(BreakContext);
+    const context = React.useContext(BreakContext);
+    if (!context) throw new Error('useBreakContext must be used within BreakContextProvider.')
+    return context;
 };
 
 // Exports

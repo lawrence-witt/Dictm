@@ -1,9 +1,11 @@
 import React from 'react';
 import isEqual from 'react-fast-compare';
 import Cassette, { 
-    CassetteUserParams, 
-    CassetteStatus, 
-    CassetteAnalyserEmissions,
+    CassetteUserParams,
+    CassettePublicMethods,
+    CassetteStatus,
+    CassettePublicFlags,
+    CassetteNodeMap,
     CassetteErrorCallback,
     WavObject
 } from 'cassette-js';
@@ -13,46 +15,49 @@ import Cassette, {
 *   BEFORE MAKING DEP/PATH CHANGES TO EITHER 
 */
 
+export interface CassetteGetters {
+    context: () => AudioContext;
+    status: () => CassetteStatus;
+    flags: () => CassettePublicFlags;
+    progress: () => number;
+    duration: () => number;
+    wavData: () => WavObject | null;
+    nodeMap: () => CassetteNodeMap;
+}
+
+interface CassetteReturn {
+    progress: number;
+    duration: number;
+    status: CassetteStatus;
+    flags: CassettePublicFlags;
+    controls: CassettePublicMethods;
+    get: CassetteGetters;
+    data: WavObject | null;
+    error: unknown;
+}
+
 const useCassette = (
-    clockOptions?: CassetteUserParams["clockOptions"],
-    analyserOptions?: CassetteUserParams["analyserOptions"],
+    increment?: CassetteUserParams["increment"],
+    floorOutput?: CassetteUserParams["floorOutput"],
     onProgress?: CassetteUserParams["onProgress"],
     onStatus?: CassetteUserParams["onStatus"],
-    onAnalysis?: CassetteUserParams["onAnalysis"],
     onError?: CassetteUserParams["onError"]
-) => {
+): CassetteReturn => {
+    
     // Base Class
-
-    const cassette = React.useRef<Cassette>(null);
+    const cassette = React.useRef() as React.MutableRefObject<Cassette>;
 
     // Utility Callbacks
-
-    const getFlags = React.useCallback(() => ({
-        hasData: Boolean(cassette.current.wavData),
-        canConnect: cassette.current.canConnect,
-        canDisconnect: cassette.current.canDisconnect,
-        canInsert: cassette.current.canInsert,
-        canEject: cassette.current.canEject,
-        canRecord: cassette.current.canRecord,
-        canPlay: cassette.current.canPlay,
-        canPause: cassette.current.canPause,
-        canScan: cassette.current.canScan,
-        canUnlink: cassette.current.canUnlink
-    }), []);
 
     const defaultOnProgress = React.useCallback((progress: number, duration: number) => {
         setProgress(progress);
         setDuration(duration);
     }, []);
 
-    const defaultOnStatus = React.useCallback((status: CassetteStatus) => {
+    const defaultOnStatus = React.useCallback((status: CassetteStatus, flags: CassettePublicFlags) => {
         setStatus(status);
-        setFlags(getFlags());
-    }, [getFlags]);
-
-    const defaultOnAnalysis = React.useCallback((analysis: Partial<CassetteAnalyserEmissions>) => {
-        setAnalysis(analysis);
-    }, [])
+        setFlags(flags);
+    }, []);
 
     const defaultOnError = React.useCallback((error: unknown) => {
         setError(error);
@@ -61,42 +66,31 @@ const useCassette = (
     // Mounting and Unmounting
 
     if (!cassette.current) {
-        const params = { clockOptions, analyserOptions };
+        const params = { increment, floorOutput };
         const cbs = { 
             onProgress: onProgress || defaultOnProgress, 
-            onStatus: onStatus || defaultOnStatus, 
-            onAnalysis: onAnalysis || defaultOnAnalysis,
+            onStatus: onStatus || defaultOnStatus,
             onError: onError || defaultOnError
         };
         cassette.current = new Cassette({...params, ...cbs});
     }
 
     React.useEffect(() => {
-        return () => cassette.current.canUnlink && cassette.current.unlink();
+        return () => {
+            cassette.current.flags.canUnlink && cassette.current.unlink()
+        };
     }, []);
 
     // Manage Params
 
-    const prevClockOptions = React.useRef(clockOptions);
-    const prevAnalyserOptions = React.useRef(analyserOptions);
     const prevOnProgress = React.useRef(onProgress);
     const prevOnStatus = React.useRef(onStatus);
-    const prevOnAnalysis = React.useRef(onAnalysis);
     const prevOnError = React.useRef(onError);
 
     React.useEffect(() => {
-        if (!isEqual(clockOptions, prevClockOptions.current)) {
-            prevClockOptions.current = clockOptions;
-            cassette.current.clockOptions = clockOptions;
-        }
-    }, [clockOptions]);
-
-    React.useEffect(() => {
-        if (!isEqual(analyserOptions, prevAnalyserOptions.current)) {
-            prevAnalyserOptions.current = analyserOptions;
-            cassette.current.analyserOptions = analyserOptions;
-        }
-    }, [analyserOptions]);
+        if (increment) cassette.current.increment = increment;
+        if (floorOutput) cassette.current.floorOutput = floorOutput;
+    }, [increment, floorOutput]);
 
     React.useEffect(() => {
         if (!isEqual(onProgress, prevOnProgress.current)) {
@@ -113,13 +107,6 @@ const useCassette = (
     }, [onStatus, defaultOnStatus]);
 
     React.useEffect(() => {
-        if (!isEqual(onAnalysis, prevOnAnalysis.current)) {
-            prevOnAnalysis.current = onAnalysis;
-            cassette.current.onAnalysis = onAnalysis || defaultOnAnalysis;
-        }
-    }, [onAnalysis, defaultOnAnalysis]);
-
-    React.useEffect(() => {
         if (!isEqual(onError, prevOnError.current)) {
             prevOnError.current = onError;
             cassette.current.onError = onError || defaultOnError;
@@ -131,31 +118,43 @@ const useCassette = (
     const [progress, setProgress] = React.useState(cassette.current.progress);
     const [duration, setDuration] = React.useState(cassette.current.duration);
     const [status, setStatus] = React.useState(cassette.current.status);
-    const [flags, setFlags] = React.useState(getFlags());
-    const [analysis, setAnalysis] = React.useState<Partial<CassetteAnalyserEmissions>>({});
+    const [flags, setFlags] = React.useState(cassette.current.flags);
     const [error, setError] = React.useState<unknown>();
 
-    const controls = React.useMemo(() => ({
-        connect: async (stream: MediaStream, cb?: CassetteErrorCallback) => await cassette.current.connect(stream, cb),
-        disconnect: async (cb?: CassetteErrorCallback) => await cassette.current.disconnect(cb),
-        insert: async (file: WavObject | Blob, cb?: CassetteErrorCallback ) => await cassette.current.insert(file, cb),
+    const controls: CassettePublicMethods = React.useMemo(() => ({
+        connect: async (stream, cb?) => await cassette.current.connect(stream, cb),
+        disconnect: async (cb?) => await cassette.current.disconnect(cb),
+        insert: async (file, cb?) => await cassette.current.insert(file, cb),
         eject: async (cb?: CassetteErrorCallback): Promise<WavObject | null> => await cassette.current.eject(cb),
-        record: async (cb?: CassetteErrorCallback) => await cassette.current.record(cb),
-        play: async (cb?: CassetteErrorCallback) => await cassette.current.play(cb),
-        pause: async (cb?: CassetteErrorCallback) => await cassette.current.pause(cb),
-        scanTo: async (secs: number, cb?: CassetteErrorCallback) => await cassette.current.scanTo(secs, cb),
-        scanBy: async (secs: number, cb?: CassetteErrorCallback) => await cassette.current.scanBy(secs, cb),
-        unlink: async (cb?: CassetteErrorCallback) => await cassette.current.unlink(cb)
+        addNode: async (n, rI?, pI?, cb?) => await cassette.current.addNode(n, rI, pI, cb),
+        modifyNode: async (n, rI?, pI?, cb?) => await cassette.current.modifyNode(n, rI, pI, cb),
+        removeNodes: async (n, cb?) => await cassette.current.removeNodes(n, cb),
+        record: async (cb?) => await cassette.current.record(cb),
+        play: async (cb?) => await cassette.current.play(cb),
+        pause: async (cb?) => await cassette.current.pause(cb),
+        scanTo: async (secs, cb?) => await cassette.current.scanTo(secs, cb),
+        scanBy: async (secs, cb?) => await cassette.current.scanBy(secs, cb),
+        unlink: async (cb?) => await cassette.current.unlink(cb)
+    }), []);
+
+    const get = React.useMemo(() => ({
+        context: () => cassette.current.context,
+        status: () => cassette.current.status,
+        flags: () => cassette.current.flags,
+        progress: () => cassette.current.progress,
+        duration: () => cassette.current.duration,
+        wavData: () => cassette.current.wavData,
+        nodeMap: () => cassette.current.nodeMap
     }), []);
 
     return {
-        controls,
         progress,
         duration,
         status,
         flags,
-        analyser: cassette.current.analyser,
-        analysis,
+        controls,
+        get,
+        data: cassette.current.wavData,
         error
     }
 }
