@@ -32,7 +32,6 @@ interface CassetteReturn {
     flags: CassettePublicFlags;
     controls: CassettePublicMethods;
     get: CassetteGetters;
-    data: WavObject | null;
     error: unknown;
 }
 
@@ -61,6 +60,7 @@ const useCassette = (
 
     const defaultOnError = React.useCallback((error: unknown) => {
         setError(error);
+        console.log(error);
     }, []);
 
     // Mounting and Unmounting
@@ -154,7 +154,6 @@ const useCassette = (
         flags,
         controls,
         get,
-        data: cassette.current.wavData,
         error
     }
 }

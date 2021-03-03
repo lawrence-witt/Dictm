@@ -62,9 +62,12 @@ const Controls: React.FC<ControlsProps> = (props) => {
     const isPlaying = status === "playing";
     const isRecording = status === "recording";
 
+    // Styles
+
     const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
 
     // Audio Node Refs
+
     const analyser = React.useRef(null) as React.MutableRefObject<AnalyserNode | null>;
 
     // Handlers
@@ -81,6 +84,7 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     const handleRecord = React.useCallback(async () => {
         analyser.current = context().createAnalyser();
+        analyser.current.fftSize = 1024;
         await addNode(analyser.current, 0);
         await record();
     }, [addNode, record, context]);
@@ -112,7 +116,7 @@ const Controls: React.FC<ControlsProps> = (props) => {
         isEditable ? (
             isRecording ? 'pause' : 'record'
         ) : (
-            isPlaying ? 'play' : 'pause'
+            isPlaying ? 'pause' : 'play'
         )
     )
 

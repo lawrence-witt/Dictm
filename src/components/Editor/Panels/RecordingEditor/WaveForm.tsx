@@ -16,7 +16,6 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
         height: 250,
         position: 'relative',
-        borderTop: '1px solid red',
         overflow: 'hidden'
     },
     background: {
@@ -56,6 +55,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const waveFormOptions = {
+    font: '11px Roboto',
+    secondBuffer: 10,
+    secondWidth: 50
+}
+
 const WaveForm: React.FC<WaveFormProps> = (props) => {
     const {
         progressHandle
@@ -63,8 +68,8 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     // Cassette Props
 
-    const { scanTo } = useCassetteControls();
-    const { status } = useCassetteStatus();
+    const { pause, play, scanTo } = useCassetteControls();
+    const { status, flags } = useCassetteStatus();
     const { nodeMap } = useCassetteGetters();
 
     const isRecording = status === "recording";
@@ -73,49 +78,99 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     const classes = useStyles();
 
-    // Canvas Controls
+    // Mutable State
 
     const canvasRef = React.useRef() as React.MutableRefObject<HTMLCanvasElement>;
     const waveClass = React.useRef() as React.MutableRefObject<WaveClass>;
+
+    const tapeRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+    const scrollCoords = React.useRef<{left: number, x: number} | null>(null);
+
+    const progressRef = React.useRef(0);
+    const durationRef = React.useRef(0);
+
+    const shouldResume = React.useRef(false);
+    const resumeTimeout = React.useRef(null) as React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
 
     // Set Initial Options
 
     React.useLayoutEffect(() => {
         if (waveClass.current) return;
 
-        waveClass.current = new WaveClass(canvasRef.current);
+        waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
         waveClass.current.drawFrequencyData();
     }, []);
 
+    // Cancel Timeout
+
+    React.useEffect(() => {
+        if(!flags.canPlay && resumeTimeout.current) {
+            clearTimeout(resumeTimeout.current);
+            resumeTimeout.current = null;
+        }
+    }, [flags.canPlay]);
+
     // Handle Scroll Grab
 
-    const tapeRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
-    const scrollCoords = React.useRef<{left: number, x: number} | null>(null);
+    const startScrollGrab = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (!flags.canScan) return;
 
-    const startScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (resumeTimeout.current) { 
+            clearTimeout(resumeTimeout.current);
+            resumeTimeout.current = null;
+        }
+        if (flags.canPause) {
+            pause();
+            shouldResume.current = true;
+        }
+
         scrollCoords.current = {
             left: tapeRef.current.scrollLeft,
             x: e.clientX
         }
+
         e.currentTarget.style.cursor = "grabbing";
+        document.body.style.userSelect = "none";
     }
 
-    const handleScrollGrab = (e: React.MouseEvent) => {
-        if (scrollCoords.current) {
-            const dx = e.clientX - scrollCoords.current.x;
-            tapeRef.current.scrollLeft = scrollCoords.current.left - dx;
-        }
+    const handleScrollGrab = async (e: React.MouseEvent) => {
+        if (!scrollCoords.current) return;
+
+        const dx = e.clientX - scrollCoords.current.x;
+        const rawScroll = scrollCoords.current.left - dx;
+        const maxScroll = durationRef.current * waveFormOptions.secondWidth;
+
+        const clamped = Math.max(0, Math.min(rawScroll, maxScroll));
+        const newProg = +((rawScroll/maxScroll) * durationRef.current).toFixed(2);
+
+        await scanTo(newProg);
+        tapeRef.current.scrollLeft = clamped;
     }
 
     const stopScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (!scrollCoords.current) return;
+
+        if (shouldResume.current) {
+            resumeTimeout.current = setTimeout(() => {
+                play();
+                shouldResume.current = false;
+            }, 1000);
+        }
         scrollCoords.current = null;
+
         e.currentTarget.style.cursor = "grab";
+        document.body.style.removeProperty("user-select");
     }
 
     // Handle Cassette Tick
 
     const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
-        if (!isRecording) return;
+        progressRef.current = p;
+        durationRef.current = d;
+
+        if (scrollCoords.current) return;
+
+        tapeRef.current.scrollLeft = p * waveFormOptions.secondWidth;
 
         if (isRecording) {
             const analyser = nodeMap().recording[0];
