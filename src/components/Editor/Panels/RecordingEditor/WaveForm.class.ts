@@ -1,5 +1,3 @@
-// Types
-
 type WaveFormOptions = {
     textStyle: string;
     markStyle: string;
@@ -180,15 +178,24 @@ class WaveForm {
 
         const decFreqAvg = Math.floor(recFreqs.reduce((prev, next) => prev + next, 0)/recFreqs.length);
 
-        if (!this._freqData[secs]) throw new Error('secIndex missing for this workingDecisecondIndex');
+        if (!this._freqData[secs]) {
+            console.log(this._freqData, secs);
+            throw new Error('secIndex missing for this workingDecisecondIndex');
+        }
         
         if (this._freqData[secs][decis]) {
             this._freqData[secs][decis] = decFreqAvg;
         } else {
-            if (this._freqData[secs].length < decis) {
-                console.log(this._workingDecisecondIndex, this._freqData)
-                throw new Error('workingDecisecondIndex is out of sync with frequencyData');
+            const currentSecLen = this._freqData[secs].length;
+
+            if (currentSecLen < decis) {
+                for (let i=currentSecLen; i<decis; i++) {
+                    console.log('filling missing decis');
+                    this._freqData[secs].push(1);
+                    this._drawDecisecond(secs, i, 150);
+                }
             }
+            
             this._freqData[secs].push(decFreqAvg);
         }
 
@@ -227,16 +234,40 @@ class WaveForm {
         analyser.getByteFrequencyData(this._freqArray);
         const freqAvg = this._freqArray.reduce((prev, curr) => prev + curr, 0)/this._freqArray.length;
 
+        // Create missing data (as fallback) and create new second
         if (!this._freqData[secIndex]) {
-            for (let i=0; i<secIndex-this._freqData.length; i++) {
-                this._freqData.push(Array.from({length: 10}, () => 1));
-                // TODO: Draw extra seconds layout
+            if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
+
+            // Look at the last second and fill in any missing decis
+            const lastSec = this._freqData.length - 1;
+            const lastSecLen = (s => s ? s.length : 10)(this._freqData[lastSec]);
+
+            for (let i=lastSecLen; i<10; i++) {
+                console.log('filling last second');
+                this._drawDecisecond(this._freqData.length-1, i, 175);
             }
 
+            // Fill in any missing seconds
+            for (let i=0; i<secIndex-this._freqData.length; i++) {
+                console.log('filling missing seconds');
+                this._freqData.push(Array.from({length: 10}, () => 1));
+
+                for (let j=0; j<10; j++) {
+                    this._drawDecisecond(this._freqData.length-1, j, 255);
+                }
+            }
+
+            // Create the new second
             this._freqData.push(Array.from({length: deciIndex}, () => 1));
             this._drawLen += 1;
             this._rescaleCanvas(this._drawLen);
             this._drawSecond(this.secondWidth * (this._drawLen - 1), this._getStamp(this._drawLen - 1));
+
+            // Fill in decis between 0 and deciIndex
+            for (let i=0; i<deciIndex; i++) {
+                console.log('filling new second');
+                this._drawDecisecond(this._freqData.length-1, i, 200);
+            }
         }
 
         // Commit working record and create a new one if required
