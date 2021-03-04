@@ -15,10 +15,10 @@ type WaveFormOptions = {
     deciSecondMarkHeight: number;
 }
 
-interface WorkingDeciIndex {
+interface WorkingDecisecondIndex {
     secs: number;
     decis: number;
-    centFreqs: number[];
+    recordedFrequencies: number[];
 }
 
 class WaveForm {
@@ -39,16 +39,16 @@ class WaveForm {
     public secondBuffer = 0;
 
     public secondWidth = 50;
-    public get deciSecondWidth(): number { return this.secondWidth/10; }
+    public get decisecondWidth(): number { return this.secondWidth/10; }
 
     public secondMarkHeight = 6;
-    public deciSecondMarkHeight = 3;
+    public decisecondMarkHeight = 3;
     public markWidth = 1.0;
     public get markGap(): number { return this.secondWidth/5; }
 
     // Draw Data
     private _drawLen = 0;
-    private _workingDeciIndex: WorkingDeciIndex | null = null;
+    private _workingDecisecondIndex: WorkingDecisecondIndex | null = null;
 
     // Freq Data
     private _freqData: number[][] = [];
@@ -126,22 +126,22 @@ class WaveForm {
         this._canvasCtx.strokeStyle = this.markStyle;
         this._canvasCtx.lineWidth = this.markWidth;
         this._canvasCtx.moveTo(x, y);
-        this._canvasCtx.lineTo(x, y + (sec ? this.secondMarkHeight : this.deciSecondMarkHeight));
+        this._canvasCtx.lineTo(x, y + (sec ? this.secondMarkHeight : this.decisecondMarkHeight));
         this._canvasCtx.stroke();
     }
 
     private _drawSecond(x: number, stamp: string) {
-        this._drawStamp(stamp, x, this.tapeHeight - this.deciSecondMarkHeight);
+        this._drawStamp(stamp, x, this.tapeHeight - this.decisecondMarkHeight);
 
         for (let i=0; i<5; i++) {
             this._drawMark(i === 0, x + (i * this.markGap), this.tapeHeight);
         }
     }
 
-    private _drawDeciSecond(secs: number, decis: number, freq: number) {
+    private _drawDecisecond(secs: number, decis: number, freq: number) {
         // Calculate dimensions
-        const w = this.deciSecondWidth - 2;
-        const x = (secs * this.secondWidth) + (decis * this.deciSecondWidth) + this.offsetWidth + 1;
+        const w = this.decisecondWidth - 2;
+        const x = (secs * this.secondWidth) + (decis * this.decisecondWidth) + this.offsetWidth + 1;
         let h = Math.floor(((freq/255) * this.waveHeight));
         if (this.waveHeight % 2 !== 0 && h % 2 === 0) h += 1;
         if (this.waveHeight % 2 === 0 && h % 2 !== 0) h += 1;
@@ -155,40 +155,45 @@ class WaveForm {
 
     // Manage temporary working data
 
-    private _createWorkingDeciIndex(secs: number, decis: number) {
-        this._workingDeciIndex = {
+    private _createWorkingDecisecondIndex(secs: number, decis: number) {
+        this._workingDecisecondIndex = {
             secs,
             decis,
-            centFreqs: Array.from({length: 10}, () => 0)
+            recordedFrequencies: []
         }
     }
 
-    private _isInWorkingDeciIndex(secs: number, decis: number) {
+    private _isInWorkingDecisecondIndex(secs: number, decis: number) {
         return Boolean(
-            this._workingDeciIndex && 
-            this._workingDeciIndex.secs === secs && 
-            this._workingDeciIndex.decis === decis
+            this._workingDecisecondIndex && 
+            this._workingDecisecondIndex.secs === secs && 
+            this._workingDecisecondIndex.decis === decis
         );
     }
 
-    private _commitWorkingDeciIndex() {
-        if (!this._workingDeciIndex) throw new Error('commitWorkingDeciIndex was called without data.');
+    private _commitWorkingDecisecondIndex() {
+        if (!this._workingDecisecondIndex) {
+            throw new Error('commitWorkingDecisecondIndex was called without data.');
+        }
 
-        const { secs, decis, centFreqs } = this._workingDeciIndex;
+        const { secs, decis, recordedFrequencies: recFreqs } = this._workingDecisecondIndex;
 
-        const decFreqAvg = Math.floor(centFreqs.reduce((prev, next) => prev + next, 0)/centFreqs.length);
+        const decFreqAvg = Math.floor(recFreqs.reduce((prev, next) => prev + next, 0)/recFreqs.length);
 
-        if (!this._freqData[secs]) throw new Error('secIndex missing for this workingDeciIndex');
+        if (!this._freqData[secs]) throw new Error('secIndex missing for this workingDecisecondIndex');
         
         if (this._freqData[secs][decis]) {
             this._freqData[secs][decis] = decFreqAvg;
         } else {
-            if (this._freqData[secs].length < decis - 1) throw new Error('workingDeciIndex is out of sync with freqData');
+            if (this._freqData[secs].length < decis - 1) {
+                console.log(this._workingDecisecondIndex, this._freqData)
+                throw new Error('workingDecisecondIndex is out of sync with frequencyData');
+            }
             this._freqData[secs].push(decFreqAvg);
         }
 
-        this._drawDeciSecond(secs, decis, decFreqAvg);
-        this._workingDeciIndex = null;
+        this._drawDecisecond(secs, decis, decFreqAvg);
+        this._workingDecisecondIndex = null;
     }
 
     /* 
@@ -214,7 +219,6 @@ class WaveForm {
         const split = (secs + "").split(".");
         const secIndex = +(split[0]);
         const decIndex = split[1] ? +(split[1].charAt(0)) : 0;
-        const centIndex = split[1] && split[1].charAt(1) ? +(split[1].charAt(1)) : 0;
 
         // Get the frequency point
         if (!this._freqArray || this._freqArray.length !== analyser.frequencyBinCount) {
@@ -223,28 +227,27 @@ class WaveForm {
         analyser.getByteFrequencyData(this._freqArray);
         const freqAvg = this._freqArray.reduce((prev, curr) => prev + curr, 0)/this._freqArray.length;
 
-        // Fill missing indexes if required and create data point for this second
         if (!this._freqData[secIndex]) {
             for (let i=0; i<secIndex-this._freqData.length; i++) {
-                this._freqData.push(Array.from({length: 10}, () => 0));
+                this._freqData.push(Array.from({length: 10}, () => 1));
                 // TODO: Draw extra seconds layout
             }
 
-            this._freqData.push(Array.from({length: decIndex}, () => 0));
+            this._freqData.push(Array.from({length: decIndex + 1}, () => 1));
             this._drawLen += 1;
             this._rescaleCanvas(this._drawLen);
             this._drawSecond(this.secondWidth * (this._drawLen - 1), this._getStamp(this._drawLen - 1));
         }
 
         // Commit working record if exists and create a new one if needed
-        if (!this._isInWorkingDeciIndex(secIndex, decIndex)) {
-            if (this._workingDeciIndex) this._commitWorkingDeciIndex();
-            this._createWorkingDeciIndex(secIndex, decIndex);
+        if (!this._isInWorkingDecisecondIndex(secIndex, decIndex)) {
+            if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
+            this._createWorkingDecisecondIndex(secIndex, decIndex);
         }
 
         // Add the freqPoint to the working record
-        if (!this._workingDeciIndex) throw new Error('workingDeciIndex missing at add time.');
-        this._workingDeciIndex.centFreqs[centIndex] = freqAvg;
+        if (!this._workingDecisecondIndex) throw new Error('workingDeciIndex missing at add time.');
+        this._workingDecisecondIndex.recordedFrequencies.push(freqAvg);
     }
 
     /* 

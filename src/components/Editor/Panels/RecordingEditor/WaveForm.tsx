@@ -31,7 +31,11 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         overflowX: 'auto',
         overflowY: 'hidden',
-        scrollbarWidth: 'none'
+        scrollbarWidth: 'none',
+        "-ms-overflow-style": 'none',
+        "&::-webkit-scrollbar": {
+            display: 'none'
+        }
     },
     head: {
         height: 225,
@@ -167,6 +171,8 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
         progressRef.current = p;
         durationRef.current = d;
+
+        //console.log(p, d);
 
         if (scrollCoords.current) return;
 
