@@ -153,7 +153,7 @@ class WaveForm {
         this._canvasCtx.fill();
     }
 
-    // Manage temporary working data
+    // Manage working data buffer
 
     private _createWorkingDecisecondIndex(secs: number, decis: number) {
         this._workingDecisecondIndex = {
@@ -185,7 +185,7 @@ class WaveForm {
         if (this._freqData[secs][decis]) {
             this._freqData[secs][decis] = decFreqAvg;
         } else {
-            if (this._freqData[secs].length < decis - 1) {
+            if (this._freqData[secs].length < decis) {
                 console.log(this._workingDecisecondIndex, this._freqData)
                 throw new Error('workingDecisecondIndex is out of sync with frequencyData');
             }
@@ -218,7 +218,7 @@ class WaveForm {
         // Get the insertion index for freqData
         const split = (secs + "").split(".");
         const secIndex = +(split[0]);
-        const decIndex = split[1] ? +(split[1].charAt(0)) : 0;
+        const deciIndex = split[1] ? +(split[1].charAt(0)) : 0;
 
         // Get the frequency point
         if (!this._freqArray || this._freqArray.length !== analyser.frequencyBinCount) {
@@ -233,21 +233,25 @@ class WaveForm {
                 // TODO: Draw extra seconds layout
             }
 
-            this._freqData.push(Array.from({length: decIndex + 1}, () => 1));
+            this._freqData.push(Array.from({length: deciIndex}, () => 1));
             this._drawLen += 1;
             this._rescaleCanvas(this._drawLen);
             this._drawSecond(this.secondWidth * (this._drawLen - 1), this._getStamp(this._drawLen - 1));
         }
 
-        // Commit working record if exists and create a new one if needed
-        if (!this._isInWorkingDecisecondIndex(secIndex, decIndex)) {
+        // Commit working record and create a new one if required
+        if (!this._isInWorkingDecisecondIndex(secIndex, deciIndex)) {
             if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
-            this._createWorkingDecisecondIndex(secIndex, decIndex);
+            this._createWorkingDecisecondIndex(secIndex, deciIndex);
         }
 
         // Add the freqPoint to the working record
-        if (!this._workingDecisecondIndex) throw new Error('workingDeciIndex missing at add time.');
+        if (!this._workingDecisecondIndex) throw new Error('workingDecisecondIndex missing at add time.');
         this._workingDecisecondIndex.recordedFrequencies.push(freqAvg);
+    }
+
+    public flushFrequencyBuffer(): void {
+        if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
     }
 
     /* 

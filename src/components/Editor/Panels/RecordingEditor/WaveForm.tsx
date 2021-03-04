@@ -76,6 +76,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     const { status, flags } = useCassetteStatus();
     const { nodeMap } = useCassetteGetters();
 
+    const isListening = status === "listening";
     const isRecording = status === "recording";
 
     // Style
@@ -172,8 +173,6 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         progressRef.current = p;
         durationRef.current = d;
 
-        //console.log(p, d);
-
         if (scrollCoords.current) return;
 
         tapeRef.current.scrollLeft = p * waveFormOptions.secondWidth;
@@ -188,6 +187,11 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     React.useImperativeHandle(progressHandle, () => ({
         increment
     }), [increment]);
+
+    React.useEffect(() => {
+        const shouldFlush = Math.round(progressRef.current * 10) > progressRef.current * 10
+        if (isListening && shouldFlush) waveClass.current.flushFrequencyBuffer();
+    }, [isListening]);
 
     return (
         <div className={classes.container}>
