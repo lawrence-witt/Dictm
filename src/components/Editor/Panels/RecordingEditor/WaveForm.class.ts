@@ -131,20 +131,20 @@ class WaveForm {
         }
 
         const drawMark = (isSec: boolean, x: number, y: number) => {
-            this._canvasCtx.beginPath();
-            this._canvasCtx.strokeStyle = this.markStyle;
-            this._canvasCtx.lineWidth = this.markWidth;
             this._canvasCtx.moveTo(x, y);
             this._canvasCtx.lineTo(x, y + (isSec ? this.secondMarkHeight : this.decisecondMarkHeight));
-            this._canvasCtx.stroke();
         }
 
         const drawMarkRange = (secs: number) => {
             const x = (secs * this.secondWidth) + this.offsetWidth;
     
+            this._canvasCtx.beginPath();
+            this._canvasCtx.strokeStyle = this.markStyle;
+            this._canvasCtx.lineWidth = this.markWidth;
             for (let i=0; i<5; i++) {
                 drawMark(i === 0, x + (i * this.markGap), this.tapeHeight);
             }
+            this._canvasCtx.stroke();
         }
 
         drawStamp(secs);
@@ -161,9 +161,8 @@ class WaveForm {
         let h = Math.floor(((freq/255) * useableHeight));
         if (useableHeight % 2 !== 0 && h % 2 === 0) h += 1;
         if (useableHeight % 2 === 0 && h % 2 !== 0) h += 1;
-        const y = this.tapeHeight + (this.waveHeight/2) - h/2;
+        const y = this.tapeHeight + (this.waveHeight/2) - (h/2);
 
-        this._canvasCtx.beginPath();
         this._canvasCtx.fillStyle = this.waveStyle;
         this._canvasCtx.fillRect(x, y, w, h);
     }
@@ -221,12 +220,13 @@ class WaveForm {
     }
 
     private _handleNewSecond(second: number) {
-        // Fill and draw any missing deciseconds in last second
         const secondLen = this._freqData.length;
+        const missingSeconds = second - secondLen;
+
+        // Fill and draw any missing deciseconds in last second
         this._fillSecond(secondLen-1);
 
         // Fill and draw any missing seconds up to this second
-        const missingSeconds = second - secondLen;
         for (let i=0; i<missingSeconds; i++) {
             this._freqData.push([]);
             this._fillSecond(secondLen+i);
@@ -240,10 +240,10 @@ class WaveForm {
     }
 
     private _handleNewDecisecond(second: number, decisecond: number) {
-        // Fill and draw any missing deciseconds in this second
         const decisecondLen = this._freqData[second].length;
         const missingDeciseconds = decisecond - decisecondLen;
 
+        // Fill and draw any missing deciseconds in this second
         for (let i=0; i<missingDeciseconds; i++) {
             this._freqData[second].push(this._nullFrequency);
             this._drawDecisecond(second, decisecondLen + i, this._nullFrequency);
