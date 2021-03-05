@@ -92,7 +92,6 @@ class WaveForm {
     *   Canvas Methods   *
     *\ * * * * * * * * * */ 
 
-    // TODO: Convert this to drawImage as the consensus seem to be it improves performance
     private _rescaleCanvas(stamps: number) {
         // Save the previous canvas
         const prevW = this._canvas.width;
