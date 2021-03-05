@@ -13,16 +13,17 @@ type WaveFormOptions = {
     deciSecondMarkHeight: number;
 }
 
-interface WorkingDecisecondIndex {
+interface Buffer {
     secs: number;
     decis: number;
-    recordedFrequencies: number[];
+    buffer: number[];
 }
+
+type BufferMap = Map<string, Buffer>;
 
 class WaveForm {
     private _canvas: HTMLCanvasElement;
     private _canvasCtx: CanvasRenderingContext2D;
-    private _freqArray: Uint8Array | null = null
 
     // Settings
     public textStyle = '#000000';
@@ -45,8 +46,9 @@ class WaveForm {
     public get markGap(): number { return this.secondWidth/5; }
 
     // Draw Data
+    private _nullFrequency = 200;
     private _drawLen = 0;
-    private _workingDecisecondIndex: WorkingDecisecondIndex | null = null;
+    private _bufferMap: BufferMap = new Map();
 
     // Freq Data
     private _freqData: number[][] = [];
@@ -65,19 +67,30 @@ class WaveForm {
         }
     }
 
-    /* 
-    *   Private Methods
-    */
+    /* * * * * * * * * * *\
+    *   Utility Methods  *
+    *\ * * * * * * * * * */ 
 
-    // Utility Methods
+    private _getStamp(secs: number) {
+        const addZero = (n: number) => n < 10 ? `0${n}`: `${n}`;
+        const m = addZero(Math.floor(secs / 60));
+        const s = addZero(secs % 60);
 
-    private _clearCanvas() {
-        this._canvasCtx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        return `${m}:${s}`;
     }
 
-    private _resetCount() {
-        //
+    private _getMean(array: number[] | Uint8Array) {
+        if (Array.isArray(array)) {
+            return array.reduce((p, c) => p + c, 0)/array.length;
+        } else {
+            return array.reduce((p, c) => p + c, 0)/array.length; // Thanks TypeScript...
+        }
+        
     }
+
+    /* * * * * * * * * * *\
+    *   Canvas Methods   *
+    *\ * * * * * * * * * */ 
 
     // TODO: Convert this to drawImage as the consensus seem to be it improves performance
     private _rescaleCanvas(stamps: number) {
@@ -100,194 +113,221 @@ class WaveForm {
         this._canvasCtx.putImageData(temp, 0, 0);
     }
 
-    private _getStamp(secIndex: number) {
-        const addZero = (n: number) => n < 10 ? `0${n}`: `${n}`;
-        const mins = addZero(Math.floor(secIndex / 60));
-        const secs = addZero(secIndex % 60);
-
-        return `${mins}:${secs}`;
+    private _clearCanvas() {
+        this._canvasCtx.clearRect(0, 0, this._canvas.width, this._canvas.height);
     }
 
-    // Draw methods
+    private _drawSecond(secs: number) {
+        const drawStamp = (secs: number) => {
+            const stamp = this._getStamp(secs);
 
-    private _drawStamp(stamp: string, x: number, y: number) {
-        x += this.offsetWidth;
-        this._canvasCtx.fillStyle = this.textStyle;
-        this._canvasCtx.font = this.font;
-        this._canvasCtx.textAlign = "center";
-        this._canvasCtx.fillText(stamp, x, y);
-    }
+            const x = (secs * this.secondWidth) + this.offsetWidth;
+            const y = this.tapeHeight - this.decisecondWidth;
 
-    private _drawMark(sec: boolean, x: number, y: number) {
-        x += this.offsetWidth;
-        this._canvasCtx.beginPath();
-        this._canvasCtx.strokeStyle = this.markStyle;
-        this._canvasCtx.lineWidth = this.markWidth;
-        this._canvasCtx.moveTo(x, y);
-        this._canvasCtx.lineTo(x, y + (sec ? this.secondMarkHeight : this.decisecondMarkHeight));
-        this._canvasCtx.stroke();
-    }
-
-    private _drawSecond(x: number, stamp: string) {
-        this._drawStamp(stamp, x, this.tapeHeight - this.decisecondMarkHeight);
-
-        for (let i=0; i<5; i++) {
-            this._drawMark(i === 0, x + (i * this.markGap), this.tapeHeight);
+            this._canvasCtx.fillStyle = this.textStyle;
+            this._canvasCtx.font = this.font;
+            this._canvasCtx.textAlign = "center";
+            this._canvasCtx.fillText(stamp, x, y);
         }
+
+        const drawMark = (isSec: boolean, x: number, y: number) => {
+            this._canvasCtx.beginPath();
+            this._canvasCtx.strokeStyle = this.markStyle;
+            this._canvasCtx.lineWidth = this.markWidth;
+            this._canvasCtx.moveTo(x, y);
+            this._canvasCtx.lineTo(x, y + (isSec ? this.secondMarkHeight : this.decisecondMarkHeight));
+            this._canvasCtx.stroke();
+        }
+
+        const drawMarkRange = (secs: number) => {
+            const x = (secs * this.secondWidth) + this.offsetWidth;
+    
+            for (let i=0; i<5; i++) {
+                drawMark(i === 0, x + (i * this.markGap), this.tapeHeight);
+            }
+        }
+
+        drawStamp(secs);
+        drawMarkRange(secs);
     }
 
     private _drawDecisecond(secs: number, decis: number, freq: number) {
-        // Calculate dimensions
+        const offsetHeight = Math.max(this.secondMarkHeight, this.decisecondMarkHeight);
+        const useableHeight = this.waveHeight - (offsetHeight * 2);
+
         const w = this.decisecondWidth - 2;
         const x = (secs * this.secondWidth) + (decis * this.decisecondWidth) + this.offsetWidth + 1;
-        let h = Math.floor(((freq/255) * this.waveHeight));
-        if (this.waveHeight % 2 !== 0 && h % 2 === 0) h += 1;
-        if (this.waveHeight % 2 === 0 && h % 2 !== 0) h += 1;
+
+        let h = Math.floor(((freq/255) * useableHeight));
+        if (useableHeight % 2 !== 0 && h % 2 === 0) h += 1;
+        if (useableHeight % 2 === 0 && h % 2 !== 0) h += 1;
         const y = this.tapeHeight + (this.waveHeight/2) - h/2;
 
-        // Draw the segment
+        this._canvasCtx.beginPath();
         this._canvasCtx.fillStyle = this.waveStyle;
-        this._canvasCtx.rect(x, y, w, h);
-        this._canvasCtx.fill();
+        this._canvasCtx.fillRect(x, y, w, h);
     }
 
-    // Manage working data buffer
+    private _clearDecisecond(secs: number, decis: number) {
+        const offsetHeight = Math.max(this.secondMarkHeight, this.decisecondMarkHeight);
 
-    private _createWorkingDecisecondIndex(secs: number, decis: number) {
-        this._workingDecisecondIndex = {
-            secs,
-            decis,
-            recordedFrequencies: []
-        }
+        const w = this.decisecondWidth;
+        const x = (secs * this.secondWidth) + (decis * this.decisecondWidth) + this.offsetWidth;
+        const h = this.waveHeight - offsetHeight;
+        const y = this.tapeHeight + offsetHeight;
+
+        this._canvasCtx.clearRect(x, y, w, h);
     }
 
-    private _isInWorkingDecisecondIndex(secs: number, decis: number) {
-        return Boolean(
-            this._workingDecisecondIndex && 
-            this._workingDecisecondIndex.secs === secs && 
-            this._workingDecisecondIndex.decis === decis
-        );
-    }
+    /* * * * * * * * * * * * * * *\
+    *   Data Management Methods  *
+    *\ * * * * * * * * * * * * * */ 
 
-    private _commitWorkingDecisecondIndex() {
-        if (!this._workingDecisecondIndex) {
-            throw new Error('commitWorkingDecisecondIndex was called without data.');
-        }
+    private _commitBuffer(predicate: (secs: number, decis: number) => boolean) {
+        for (const [key, buffer] of this._bufferMap) {
+            if (!predicate(buffer.secs, buffer.decis)) break;
 
-        const { secs, decis, recordedFrequencies: recFreqs } = this._workingDecisecondIndex;
+            const secSlot = this._freqData[buffer.secs];
+            if (!secSlot) break;
+            const deciSlot = this._freqData[buffer.secs][buffer.decis];
+            const value = this._getMean(buffer.buffer);
 
-        const decFreqAvg = Math.floor(recFreqs.reduce((prev, next) => prev + next, 0)/recFreqs.length);
-
-        if (!this._freqData[secs]) {
-            console.log(this._freqData, secs);
-            throw new Error('secIndex missing for this workingDecisecondIndex');
-        }
-        
-        if (this._freqData[secs][decis]) {
-            this._freqData[secs][decis] = decFreqAvg;
-        } else {
-            const currentSecLen = this._freqData[secs].length;
-
-            if (currentSecLen < decis) {
-                for (let i=currentSecLen; i<decis; i++) {
-                    console.log('filling missing decis');
-                    this._freqData[secs].push(1);
-                    this._drawDecisecond(secs, i, 150);
-                }
+            if (deciSlot) {
+                secSlot[buffer.decis] = value;
+                this._clearDecisecond(buffer.secs, buffer.decis);
+            } else {
+                secSlot.push(value);
             }
-            
-            this._freqData[secs].push(decFreqAvg);
-        }
 
-        this._drawDecisecond(secs, decis, decFreqAvg);
-        this._workingDecisecondIndex = null;
+            this._drawDecisecond(buffer.secs, buffer.decis, value);
+            this._bufferMap.delete(key);
+        }
     }
 
-    /* 
-    *   Public Methods
-    */
+    private _fillSecond(second: number) {
+        const secondData = this._freqData[second];
 
-    public drawFrequencyData(): void {
+        if (!secondData) return;
+
+        const fillStart = secondData.length;
+        const fillRange = 10 - fillStart;
+        const filled = [...secondData, ...Array.from({length: fillRange}, () => this._nullFrequency)];
+
+        this._freqData[second] = filled;
+
+        for (let i=0; i<fillRange; i++) {
+            this._drawDecisecond(second, fillStart + i, this._nullFrequency);
+        }
+    }
+
+    private _handleNewSecond(second: number) {
+        // Fill and draw any missing deciseconds in last second
+        const secondLen = this._freqData.length;
+        this._fillSecond(secondLen-1);
+
+        // Fill and draw any missing seconds up to this second
+        const missingSeconds = second - secondLen;
+        for (let i=0; i<missingSeconds; i++) {
+            this._freqData.push([]);
+            this._fillSecond(secondLen+i);
+        }
+
+        // Commit the new second
+        this._drawLen += 1;
+        this._freqData.push([]);
+        this._rescaleCanvas(this._drawLen);
+        this._drawSecond(this._drawLen - 1);
+    }
+
+    private _handleNewDecisecond(second: number, decisecond: number) {
+        // Fill and draw any missing deciseconds in this second
+        const decisecondLen = this._freqData[second].length;
+        const missingDeciseconds = decisecond - decisecondLen;
+
+        for (let i=0; i<missingDeciseconds; i++) {
+            this._freqData[second].push(this._nullFrequency);
+            this._drawDecisecond(second, decisecondLen + i, this._nullFrequency);
+        }
+    }
+
+    /* * * * * * * * * * *\
+    *   Public Methods   *
+    *\ * * * * * * * * * */ 
+
+    public draw(): void {
+        this._clearCanvas();
+
         this._drawLen = this._freqData.length + this.secondBuffer;
-
         this._rescaleCanvas(this._drawLen);
 
-        this._freqData.forEach((deciArray, i) => {
-            this._drawSecond(this.secondWidth * i, this._getStamp(i));
+        this._freqData.forEach((second, i) => {
+            this._drawSecond(i);
+
+            second.forEach((freq, j) => {
+                this._drawDecisecond(i, j, freq);
+            })
         });
 
         for (let i=this._freqData.length; i<this._drawLen; i++) {
-            this._drawSecond(this.secondWidth * i, this._getStamp(i));
+            this._drawSecond(i);
         }
     }
 
-    public addFrequencyPoint(secs: number, analyser: AnalyserNode): void {
+    public buffer(secs: number, data: Uint8Array): void {
         // Get the insertion index for freqData
         const split = (secs + "").split(".");
-        const secIndex = +(split[0]);
-        const deciIndex = split[1] ? +(split[1].charAt(0)) : 0;
+        const second = +(split[0]);
+        const decisecond = split[1] ? +(split[1].charAt(0)) : 0;
+        const bufferKey = `${second}/${decisecond}`;
 
-        // Get the frequency point
-        if (!this._freqArray || this._freqArray.length !== analyser.frequencyBinCount) {
-            this._freqArray = new Uint8Array(analyser.frequencyBinCount);
-        }
-        analyser.getByteFrequencyData(this._freqArray);
-        const freqAvg = this._freqArray.reduce((prev, curr) => prev + curr, 0)/this._freqArray.length;
+        // Average the data
+        const freqMean = this._getMean(data);
 
-        // Create missing data (as fallback) and create new second
-        if (!this._freqData[secIndex]) {
-            if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
+        // Try to empty the buffer map up to this decisecond
+        this._commitBuffer((secs, decis) => secs < second || secs === second && decis < decisecond);
 
-            // Look at the last second and fill in any missing decis
-            const lastSec = this._freqData.length - 1;
-            const lastSecLen = (s => s ? s.length : 10)(this._freqData[lastSec]);
+        // Handle new second
+        if (!this._freqData[second]) this._handleNewSecond(second);
 
-            for (let i=lastSecLen; i<10; i++) {
-                console.log('filling last second');
-                this._drawDecisecond(this._freqData.length-1, i, 175);
-            }
+        // Handle new decisecond
+        if (!this._bufferMap.has(bufferKey)) {
+            this._handleNewDecisecond(second, decisecond);
 
-            // Fill in any missing seconds
-            for (let i=0; i<secIndex-this._freqData.length; i++) {
-                console.log('filling missing seconds');
-                this._freqData.push(Array.from({length: 10}, () => 1));
+            this._bufferMap.set(bufferKey, {
+                secs: second,
+                decis: decisecond,
+                buffer: []
+            });
+        } 
 
-                for (let j=0; j<10; j++) {
-                    this._drawDecisecond(this._freqData.length-1, j, 255);
-                }
-            }
-
-            // Create the new second
-            this._freqData.push(Array.from({length: deciIndex}, () => 1));
-            this._drawLen += 1;
-            this._rescaleCanvas(this._drawLen);
-            this._drawSecond(this.secondWidth * (this._drawLen - 1), this._getStamp(this._drawLen - 1));
-
-            // Fill in decis between 0 and deciIndex
-            for (let i=0; i<deciIndex; i++) {
-                console.log('filling new second');
-                this._drawDecisecond(this._freqData.length-1, i, 200);
-            }
-        }
-
-        // Commit working record and create a new one if required
-        if (!this._isInWorkingDecisecondIndex(secIndex, deciIndex)) {
-            if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
-            this._createWorkingDecisecondIndex(secIndex, deciIndex);
-        }
-
-        // Add the freqPoint to the working record
-        if (!this._workingDecisecondIndex) throw new Error('workingDecisecondIndex missing at add time.');
-        this._workingDecisecondIndex.recordedFrequencies.push(freqAvg);
+        // Add new data point to buffer
+        const record = this._bufferMap.get(bufferKey);
+        if (record) this._bufferMap.set(bufferKey, {
+            ...record,
+            buffer: record.buffer.concat(freqMean)
+        });
     }
 
-    public flushFrequencyBuffer(): void {
-        if (this._workingDecisecondIndex) this._commitWorkingDecisecondIndex();
+    public flush(hint?: number): void {
+        const freqDecis = (() => {
+            const secLen = (this._freqData.length - 1) * 10;
+            const deciLen = secLen > 0 ? this._freqData[this._freqData.length-1].length : 0;
+            return secLen + deciLen;
+        })();
+
+        const hintDecis = hint ? Math.floor(hint * 10) : 0;
+
+        if (hint && (hintDecis > freqDecis)) {
+            this.buffer(hint, new Uint8Array(1).fill(this._nullFrequency));
+        }
+
+        this._commitBuffer(() => true);
+        this._bufferMap.clear();
     }
 
-    /* 
-    *   Public Getters / Setters
-    */
+    /* * * * * * * * * * * * * * *\
+    *   Public Getters/Setters   *
+    *\ * * * * * * * * * * * * * */ 
 
     get frequencyData(): number[][] {
         return this._freqData;

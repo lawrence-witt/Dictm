@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     },
     head: {
         height: 225,
-        width: 1,
+        width: 2,
         position: 'absolute',
         bottom: 0,
         left: '50%',
@@ -87,6 +87,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     const canvasRef = React.useRef() as React.MutableRefObject<HTMLCanvasElement>;
     const waveClass = React.useRef() as React.MutableRefObject<WaveClass>;
+    const freqArray = React.useRef(null) as React.MutableRefObject<Uint8Array | null>
 
     const tapeRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
     const scrollCoords = React.useRef<{left: number, x: number} | null>(null);
@@ -103,10 +104,10 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         if (waveClass.current) return;
 
         waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
-        waveClass.current.drawFrequencyData();
+        waveClass.current.draw();
     }, []);
 
-    // Cancel Timeout
+    // Cancel Resume Timeout
 
     React.useEffect(() => {
         if(!flags.canPlay && resumeTimeout.current) {
@@ -180,7 +181,11 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         if (isRecording) {
             const analyser = nodeMap().recording[0];
             if (!(analyser instanceof AnalyserNode)) throw new Error('AnalyserNode not found.');
-            waveClass.current.addFrequencyPoint(p, analyser);
+
+            freqArray.current = freqArray.current || new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(freqArray.current);
+
+            waveClass.current.buffer(p, freqArray.current);
         }
     }, [isRecording, nodeMap]);
 
@@ -189,8 +194,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     }), [increment]);
 
     React.useEffect(() => {
-        const shouldFlush = Math.round(progressRef.current * 10) > progressRef.current * 10
-        if (isListening && shouldFlush) waveClass.current.flushFrequencyBuffer();
+        if (isListening) waveClass.current.flush(progressRef.current);
     }, [isListening]);
 
     return (
