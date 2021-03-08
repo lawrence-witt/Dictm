@@ -16,10 +16,10 @@ const useStyles = makeStyles(theme => ({
                 backgroundColor: theme.palette.action.disabledBackground,
             },
         },
-        '&$disabled': {
+        '&:disabled': {
             color: theme.palette.action.disabled,
-            backgroundColor: theme.palette.action.disabledBackground,
-        },
+            backgroundColor: theme.palette.grey[300]
+        }
     },
     disabled: {}
 }));

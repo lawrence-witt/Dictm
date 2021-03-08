@@ -6,7 +6,7 @@ import Forward5Icon from '@material-ui/icons/Forward5';
 import PauseIcon from '@material-ui/icons/Pause';
 import SaveIcon from '@material-ui/icons/Save';
 import RecordIcon from '@material-ui/icons/FiberManualRecord';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import ContainedIconButton from './ContainedIconButton';
 
@@ -18,14 +18,14 @@ interface PrimaryAudioButtonProps extends IconButtonProps {
 
 /* PRIMARY AUDIO BUTTON */
 
-const usePrimaryStyles = makeStyles(() => ({
+const usePrimaryStyles = makeStyles<Theme, { disabled: boolean; }>(theme => ({
     buttonLabel: {
         width: '1em',
         height: '1em',
         position: 'relative'
     },
     recIcon: {
-        fill: '#E43737',
+        fill: ({disabled}) => disabled ? theme.palette.action.disabled : '#E43737',
         position: 'absolute',
         width: '2em',
         height: '2em'
@@ -35,19 +35,26 @@ const usePrimaryStyles = makeStyles(() => ({
 const PrimaryAudioButton: React.FC<PrimaryAudioButtonProps> = (props) => {
     const {
         icon,
+        disabled = false,
         ...other
     } = props;
 
-    const classes = usePrimaryStyles();
+    const classes = usePrimaryStyles({ disabled });
 
     const SelectedIcon = {
         play: function I() { return <PlayIcon /> },
         pause: function I() { return <PauseIcon /> },
-        record: function I() { return <RecordIcon className={classes.recIcon}/> }
+        record: function I() { return <RecordIcon classes={{root: classes.recIcon}}/> }
     }[icon];
 
     return (
-        <ContainedIconButton classes={{label: classes.buttonLabel}} {...other}>
+        <ContainedIconButton 
+            classes={{
+                label: classes.buttonLabel
+            }}
+            disabled={disabled}
+            {...other}
+    >
             {SelectedIcon()}
         </ContainedIconButton>
     )

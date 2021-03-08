@@ -65,7 +65,7 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
     const { mode = 'edit' } = props;
 
     /* 
-    *   Animate progress
+    *   Animation refs
     */
 
     const nextFrame = React.useRef() as React.MutableRefObject<(() => void) | undefined>;
@@ -73,6 +73,10 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
 
     const timerProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
     const waveProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
+
+    /* 
+    *   Cassette handlers
+    */
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
         nextFrame.current = () => {
@@ -82,7 +86,7 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
         }
     }, []);
 
-    const onError = React.useCallback((error) => console.log(error), []);
+    const onError = React.useCallback((error) => console.error(error), []);
 
     /* 
     *   Cassette and analyser
