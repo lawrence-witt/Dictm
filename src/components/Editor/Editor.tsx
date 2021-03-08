@@ -3,33 +3,19 @@ import { useTransition } from 'react-spring';
 import { makeStyles } from '@material-ui/core/styles';
 
 import FocusDrawer from '../Drawers/FocusDrawer';
-import { EditorBar, EditorFrame, EditorContent } from './EditorLayout';
+import EditorBar from './Layout/Bar/Bar';
+import EditorFrame from './Layout/Frame/Frame';
+import EditorContent from './Layout/Content/Content';
 import CategoryEditor, { CategoryBarButtons } from './Panels/CategoryEditor';
 import ChooseEditor from './Panels/ChooseEditor';
 import NoteEditor, { NoteBarButtons } from './Panels/NoteEditor';
 import RecordingEditor, { RecordingBarButtons } from './Panels/RecordingEditor/RecordingEditor';
 
-/* TYPES */
+import { PanelTypes, EditorContentClasses, EditorPanel } from './Editor.types';
 
-type PanelTypes = 'cat' | 'choose' | 'note' | 'rec';
-
-type EditorContentClasses = 
-    'categoryEditorContent' | 
-    'noteEditorContent' |
-    'recordingEditorContent'
-;
-
-interface EditorPanel {
-    type: PanelTypes;
-    title: string;
-    disableGutters: boolean;
-    component: string;
-    className?: EditorContentClasses;
-    Buttons?: React.FC<any>,
-    Content: React.FC<any>
-}
-
-/* EDITOR VARIANTS */
+/* 
+*   Editor Variants
+*/
 
 const panels: Record<string, EditorPanel> = {
     category: {
@@ -68,9 +54,9 @@ const panels: Record<string, EditorPanel> = {
     }
 };
 
-/* EDITOR CONTROLLER */
-
-// Styled
+/* 
+*   Editor Controller
+*/
  
 const useStyles = makeStyles(theme => ({
     categoryEditorContent: {
@@ -91,9 +77,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-// Component
-
-const EditorController: React.FC = () => {
+const Editor: React.FC = () => {
     const [panel, setPanel] = React.useState(panels.recording);
     const { title, Buttons } = panel;
 
@@ -108,7 +92,7 @@ const EditorController: React.FC = () => {
     });
 
     return (
-        <FocusDrawer open={true}>
+        <FocusDrawer open={false}>
             <EditorBar title={title}>
                 {Buttons && <Buttons />}
             </EditorBar>
@@ -132,6 +116,4 @@ const EditorController: React.FC = () => {
     )
 };
 
-/* EXPORT */
-
-export default EditorController;
+export default Editor;

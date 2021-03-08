@@ -9,7 +9,7 @@ import NavMenu from './components/DashBoard/NavMenu/NavMenu';
 import RecordingCard from './components/Cards/RecordingCard';
 import NoteCard from './components/Cards/NoteCard';
 import CategoryCard from './components/Cards/CategoryCard';
-import Editor from './components/Editor/EditorController';
+import Editor from './components/Editor/Editor';
 
 import useToggle from './utils/hooks/useToggle';
 import CardGrid from './components/Layout/CardGrid';
