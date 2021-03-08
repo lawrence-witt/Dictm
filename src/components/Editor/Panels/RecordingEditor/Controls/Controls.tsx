@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
-import { useCassetteStatus, useCassetteControls, useCassetteGetters } from '../../../../utils/providers/CassetteProvider';
+import { ControlsProps } from './Controls.types';
 
 import {
     PrimaryAudioButton,
@@ -10,13 +10,7 @@ import {
     Replay5Button,
     Forward5Button,
     SaveButton
-} from '../../../Buttons/AudioButtons';
-
-// Types
-
-interface ControlsProps {
-    mode: 'play' | 'edit';
-}
+} from '../../../../Buttons/AudioButtons';
 
 // Styled
 
@@ -44,19 +38,22 @@ const useStyles = makeStyles<Theme, {addPseudo: boolean}>(theme =>
 // Component
 
 const Controls: React.FC<ControlsProps> = (props) => {
-    const { mode } = props;
+    const { 
+        mode,
+        status,
+        flags,
+        controls,
+        handleStart,
+        handleStop,
+        handleScan,
+        handleTimeout
+    } = props;
 
-    // Flags and Props
+    // Cassette
 
     const { 
-        connect, insert,
-        eject, addNode, removeNodes, 
-        record, play, pause, scanBy
-    } = useCassetteControls();
-    const {
-        context
-    } = useCassetteGetters();
-    const { status, flags } = useCassetteStatus();
+        connect, eject
+    } = controls;
 
     const isEditable = mode === 'edit';
     const isPlaying = status === "playing";
@@ -66,13 +63,11 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
 
-    // Audio Node Refs
-
-    const analyser = React.useRef(null) as React.MutableRefObject<AnalyserNode | null>;
-
-    // Handlers
+    // Handle connect and save
 
     const handleConnect = React.useCallback(async () => {
+        if (flags.hasStream) return;
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({audio: true});
             await connect(stream);
@@ -80,28 +75,19 @@ const Controls: React.FC<ControlsProps> = (props) => {
             console.log(err);
             // send to toast
         }
-    }, [connect]);
-
-    const handleRecord = React.useCallback(async () => {
-        analyser.current = context().createAnalyser();
-        analyser.current.fftSize = 1024;
-        await addNode(analyser.current, 0);
-        await record();
-    }, [addNode, record, context]);
-
-    const handlePause = React.useCallback(async () => {
-        await pause();
-
-        if (isRecording) {
-            if (analyser.current) await removeNodes([analyser.current]);
-            analyser.current = null;
-        }
-    }, [removeNodes, pause, isRecording]);
+    }, [flags.hasStream, connect]);
 
     const handleSave = React.useCallback(async () => {
         const file = await eject();
         console.log(file);
     }, [eject]);
+
+    // Handle scanning with buttons
+
+    const handleScanButton = React.useCallback(async (amnt: number) => {
+        await handleScan("by", amnt);
+        if (isPlaying) handleTimeout("set");
+    }, [isPlaying, handleScan, handleTimeout]);
 
     // Get Stream in Edit Mode
 
@@ -122,19 +108,42 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     return (
         <div className={classes.controlsContainer}>
-            {flags.hasData && <Replay5Button color="inherit" onClick={() => scanBy(-5)} disabled={!flags.canScan} />}
+            {flags.hasData && 
+                <Replay5Button 
+                    color="inherit" 
+                    onClick={() => handleScanButton(-5)} 
+                    disabled={!flags.canScan} 
+                />}
             {flags.hasData && isEditable && (
                 isPlaying ? 
-                <PauseButton color="inherit" onClick={() => handlePause()} disabled={!flags.canPause} /> :
-                <PlayButton color="inherit" onClick={() => play()} disabled={!flags.canPlay}/>
+                <PauseButton 
+                    color="inherit" 
+                    onClick={() => handleStop()} 
+                    disabled={!flags.canPause} 
+                /> :
+                <PlayButton 
+                    color="inherit" 
+                    onClick={() => handleStart('play')} 
+                    disabled={!flags.canPlay}
+                />
             )}
             <PrimaryAudioButton 
                 icon={primaryIcon}
-                onClick={() => flags.canPause ? handlePause() : isEditable ? handleRecord() : play()}
+                onClick={() => flags.canPause ? handleStop() : handleStart(isEditable ? 'record' : 'play')}
                 disabled={isEditable && isPlaying}
             />
-            {flags.hasData && isEditable && <SaveButton color="inherit" onClick={handleSave} disabled={!flags.canEject}/>}
-            {flags.hasData && <Forward5Button color="inherit" onClick={() => scanBy(5)} disabled={!flags.canScan}/>}
+            {flags.hasData && isEditable && 
+                <SaveButton 
+                    color="inherit" 
+                    onClick={handleSave} 
+                    disabled={!flags.canEject}
+                    />}
+            {flags.hasData && 
+                <Forward5Button 
+                    color="inherit" 
+                    onClick={() => handleScanButton(5)} 
+                    disabled={!flags.canScan}
+                />}
         </div>
     )
 }

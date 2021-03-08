@@ -2,14 +2,11 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { CassetteProgressCallback } from 'cassette-js';
-import { ProgressHandle } from './RecordingEditor.types';
+
+import { WaveFormProps } from './WaveForm.types';
 import WaveClass from './WaveForm.class';
 
-import { useCassetteControls, useCassetteStatus, useCassetteGetters } from '../../../../utils/providers/CassetteProvider';
-
-interface WaveFormProps {
-    progressHandle: React.RefObject<ProgressHandle>;
-}
+// Styles
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -62,22 +59,26 @@ const useStyles = makeStyles(theme => ({
 const waveFormOptions = {
     font: '11px Roboto',
     secondBuffer: 10,
-    secondWidth: 50
+    secondWidth: 50,
+    nullHeight: 2
 }
 
 const WaveForm: React.FC<WaveFormProps> = (props) => {
     const {
-        progressHandle
+        progressHandle,
+        status,
+        flags,
+        handleStop,
+        handleScan,
+        handleTimeout,
+        nodeMap
     } = props;
 
-    // Cassette Props
-
-    const { pause, play, scanTo } = useCassetteControls();
-    const { status, flags } = useCassetteStatus();
-    const { nodeMap } = useCassetteGetters();
+    // Cassette
 
     const isListening = status === "listening";
     const isRecording = status === "recording";
+    const isPlaying = status === "playing";
 
     // Style
 
@@ -96,37 +97,25 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     const durationRef = React.useRef(0);
 
     const shouldResume = React.useRef(false);
-    const resumeTimeout = React.useRef(null) as React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
 
-    // Set Initial Options
+    // Set initial WaveForm options
 
     React.useLayoutEffect(() => {
         if (waveClass.current) return;
 
         waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
-        waveClass.current.draw();
+        waveClass.current.init();
     }, []);
 
-    // Cancel Resume Timeout
+    // Handle scanning with scroll grab
 
-    React.useEffect(() => {
-        if(!flags.canPlay && resumeTimeout.current) {
-            clearTimeout(resumeTimeout.current);
-            resumeTimeout.current = null;
-        }
-    }, [flags.canPlay]);
-
-    // Handle Scroll Grab
-
-    const startScrollGrab = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const startScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (!flags.canScan) return;
 
-        if (resumeTimeout.current) { 
-            clearTimeout(resumeTimeout.current);
-            resumeTimeout.current = null;
-        }
-        if (flags.canPause) {
-            pause();
+        handleTimeout("clear");
+
+        if (isPlaying) {
+            handleStop();
             shouldResume.current = true;
         }
 
@@ -139,7 +128,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         document.body.style.userSelect = "none";
     }
 
-    const handleScrollGrab = async (e: React.MouseEvent) => {
+    const moveScrollGrab = (e: React.MouseEvent) => {
         if (!scrollCoords.current) return;
 
         const dx = e.clientX - scrollCoords.current.x;
@@ -149,7 +138,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         const clamped = Math.max(0, Math.min(rawScroll, maxScroll));
         const newProg = +((rawScroll/maxScroll) * durationRef.current).toFixed(2);
 
-        await scanTo(newProg);
+        handleScan("to", newProg);
         tapeRef.current.scrollLeft = clamped;
     }
 
@@ -157,10 +146,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         if (!scrollCoords.current) return;
 
         if (shouldResume.current) {
-            resumeTimeout.current = setTimeout(() => {
-                play();
-                shouldResume.current = false;
-            }, 1000);
+            handleTimeout("set");
         }
         scrollCoords.current = null;
 
@@ -168,7 +154,11 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         document.body.style.removeProperty("user-select");
     }
 
-    // Handle Cassette Tick
+    React.useEffect(() => {
+        if (isPlaying) shouldResume.current = false;
+    }, [isPlaying]);
+
+    // Handle animation tick
 
     const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
         progressRef.current = p;
@@ -207,7 +197,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
             <div 
                 className={classes.scrollGrab}
                 onMouseDown={startScrollGrab}
-                onMouseMove={handleScrollGrab}
+                onMouseMove={moveScrollGrab}
                 onMouseUp={stopScrollGrab}
                 onMouseLeave={stopScrollGrab}
             ></div>

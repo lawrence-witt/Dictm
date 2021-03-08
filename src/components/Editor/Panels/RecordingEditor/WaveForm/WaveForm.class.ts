@@ -1,25 +1,4 @@
-type WaveFormOptions = {
-    textStyle: string;
-    markStyle: string;
-    waveStyle: string;
-    font: string;
-    offsetWidth: number;
-    tapeHeight: number;
-    waveHeight: number;
-    markWidth: number;
-    secondBuffer: number;
-    secondWidth: number;
-    secondMarkHeight: number;
-    deciSecondMarkHeight: number;
-}
-
-interface Buffer {
-    secs: number;
-    decis: number;
-    buffer: number[];
-}
-
-type BufferMap = Map<string, Buffer>;
+import { WaveFormOptions, BufferMap } from './WaveForm.types';
 
 class WaveForm {
     private _canvas: HTMLCanvasElement;
@@ -34,6 +13,7 @@ class WaveForm {
     public offsetWidth = 15;
     public tapeHeight = 25;
     public waveHeight = 225;
+    public nullHeight = 0;
 
     public secondBuffer = 0;
 
@@ -46,7 +26,6 @@ class WaveForm {
     public get markGap(): number { return this.secondWidth/5; }
 
     // Draw Data
-    private _nullFrequency = 200;
     private _drawLen = 0;
     private _bufferMap: BufferMap = new Map();
 
@@ -187,6 +166,7 @@ class WaveForm {
 
             const secSlot = this._freqData[buffer.secs];
             if (!secSlot) break;
+            
             const deciSlot = this._freqData[buffer.secs][buffer.decis];
             const value = this._getMean(buffer.buffer);
 
@@ -209,12 +189,12 @@ class WaveForm {
 
         const fillStart = secondData.length;
         const fillRange = 10 - fillStart;
-        const filled = [...secondData, ...Array.from({length: fillRange}, () => this._nullFrequency)];
+        const filled = [...secondData, ...Array.from({length: fillRange}, () => this.nullHeight)];
 
         this._freqData[second] = filled;
 
         for (let i=0; i<fillRange; i++) {
-            this._drawDecisecond(second, fillStart + i, this._nullFrequency);
+            this._drawDecisecond(second, fillStart + i, this.nullHeight);
         }
     }
 
@@ -244,8 +224,8 @@ class WaveForm {
 
         // Fill and draw any missing deciseconds in this second
         for (let i=0; i<missingDeciseconds; i++) {
-            this._freqData[second].push(this._nullFrequency);
-            this._drawDecisecond(second, decisecondLen + i, this._nullFrequency);
+            this._freqData[second].push(this.nullHeight);
+            this._drawDecisecond(second, decisecondLen + i, this.nullHeight);
         }
     }
 
@@ -253,7 +233,7 @@ class WaveForm {
     *   Public Methods   *
     *\ * * * * * * * * * */ 
 
-    public draw(): void {
+    public init(): void {
         this._clearCanvas();
 
         this._drawLen = this._freqData.length + this.secondBuffer;
@@ -317,7 +297,7 @@ class WaveForm {
         const hintDecis = hint ? Math.floor(hint * 10) : 0;
 
         if (hint && (hintDecis > freqDecis)) {
-            this.buffer(hint, new Uint8Array(1).fill(this._nullFrequency));
+            this.buffer(hint, new Uint8Array(1).fill(this.nullHeight));
         }
 
         this._commitBuffer(() => true);

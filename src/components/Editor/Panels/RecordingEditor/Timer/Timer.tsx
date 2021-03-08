@@ -2,11 +2,9 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { ProgressHandle } from './RecordingEditor.types';
+import { TimerProps } from './Timer.types';
 
-interface TimerProps {
-    progressHandle: React.RefObject<ProgressHandle>;
-}
+// Styles
 
 const useStyles = makeStyles(theme => ({
     timerContainer: {
@@ -19,6 +17,8 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 300
     }
 }));
+
+// Component
 
 const Timer: React.FC<TimerProps> = ({ progressHandle }) => {
     const classes = useStyles();

@@ -2,9 +2,9 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { useCassetteStatus } from '../../../../utils/providers/CassetteProvider';
+import { FormProps } from './Form.types';
 
-import CustomSelect from '../../../Inputs/CustomSelect';
+import CustomSelect from '../../../../Inputs/CustomSelect';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -15,10 +15,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Form: React.FC = () => {
-    const classes = useStyles();
+const Form: React.FC<FormProps> = (props) => {
+    const {
+        flags
+    } = props;
 
-    const { flags } = useCassetteStatus();
+    const classes = useStyles();
 
     return flags.hasData ? (
         <form className={classes.form}>
