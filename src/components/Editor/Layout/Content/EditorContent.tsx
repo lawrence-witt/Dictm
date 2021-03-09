@@ -6,7 +6,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import { animated } from 'react-spring';
 
-import { EditorContentProps } from './Content.types';
+import { EditorContentProps } from './EditorContent.types';
 
 const useContentStyles = makeStyles<Theme, {disableGutters: boolean}>(theme => 
     createStyles({

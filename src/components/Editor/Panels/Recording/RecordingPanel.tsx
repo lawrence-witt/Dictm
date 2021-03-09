@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuButton from '../../../Buttons/MenuButton';
 import FlexSpace from '../../../Layout/FlexSpace';
 
-import { RecordingEditorProps, ProgressHandle } from './RecordingEditor.types';
+import { RecordingPanelProps, ProgressHandle } from './RecordingPanel.types';
 import Timer from './Timer/Timer';
 import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
@@ -20,7 +20,7 @@ import useCassette from '../../../../utils/hooks/useCassette';
 
 /* RECORDING BAR BUTTONS */
 
-const RecordingBarButtons: React.FC<RecordingEditorProps> = (props) => {
+const RecordingBarButtons: React.FC<RecordingPanelProps> = (props) => {
     const {
         mode = 'edit'
     } = props;
@@ -61,7 +61,7 @@ const RecordingBarButtons: React.FC<RecordingEditorProps> = (props) => {
 
 /* RECORDING EDITOR */
 
-const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
+const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     const { mode = 'edit' } = props;
 
     /* 
@@ -203,4 +203,4 @@ const RecordingEditor: React.FC<RecordingEditorProps> = (props) => {
 /* EXPORTS */
 
 export { RecordingBarButtons };
-export default RecordingEditor;
+export default RecordingPanel;

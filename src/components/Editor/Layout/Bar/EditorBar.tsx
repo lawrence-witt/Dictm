@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import DirectionButton from '../../../Buttons/DirectionButton';
 
-import { EditorBarProps } from './Bar.types';
+import { EditorBarProps } from './EditorBar.types';
 
 const useBarStyles = makeStyles(theme => ({
     drawerBar: {

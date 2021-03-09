@@ -3,15 +3,18 @@ import { useTransition } from 'react-spring';
 import { makeStyles } from '@material-ui/core/styles';
 
 import FocusDrawer from '../Drawers/FocusDrawer';
-import EditorBar from './Layout/Bar/Bar';
-import EditorFrame from './Layout/Frame/Frame';
-import EditorContent from './Layout/Content/Content';
-import CategoryEditor, { CategoryBarButtons } from './Panels/CategoryEditor';
-import ChooseEditor from './Panels/ChooseEditor';
-import NoteEditor, { NoteBarButtons } from './Panels/NoteEditor';
-import RecordingEditor, { RecordingBarButtons } from './Panels/RecordingEditor/RecordingEditor';
+import EditorBar from './Layout/Bar/EditorBar';
+import EditorFrame from './Layout/Frame/EditorFrame';
+import EditorContent from './Layout/Content/EditorContent';
 
-import { PanelTypes, EditorContentClasses, EditorPanel } from './Editor.types';
+import CategoryPanel, { CategoryBarButtons } from './Panels/CategoryPanel';
+import ChoosePanel from './Panels/ChoosePanel';
+import NotePanel, { NoteBarButtons } from './Panels/NotePanel';
+import RecordingPanel, { RecordingBarButtons } from './Panels/Recording/RecordingPanel';
+
+import Dialog from './Dialog/Dialog';
+
+import { EditorPanel } from './Editor.types';
 
 /* 
 *   Editor Variants
@@ -25,14 +28,14 @@ const panels: Record<string, EditorPanel> = {
         component: "form",
         className: "categoryEditorContent",
         Buttons: CategoryBarButtons,
-        Content: CategoryEditor
+        Content: CategoryPanel
     },
     choose: {
         type: 'choose',
         title: "Choose New Content",
         disableGutters: true,
         component: "ul",
-        Content: ChooseEditor
+        Content: ChoosePanel
     },
     note: {
         type: 'note',
@@ -41,7 +44,7 @@ const panels: Record<string, EditorPanel> = {
         component: "div",
         className: "noteEditorContent",
         Buttons: NoteBarButtons,
-        Content: NoteEditor
+        Content: NotePanel
     },
     recording: {
         type: 'rec',
@@ -50,7 +53,7 @@ const panels: Record<string, EditorPanel> = {
         component: "div",
         className: "recordingEditorContent",
         Buttons: RecordingBarButtons,
-        Content: RecordingEditor
+        Content: RecordingPanel
     }
 };
 
@@ -78,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Editor: React.FC = () => {
-    const [panel, setPanel] = React.useState(panels.recording);
+    const [panel, setPanel] = React.useState(panels.note);
     const { title, Buttons } = panel;
 
     const classes = useStyles();
@@ -92,7 +95,9 @@ const Editor: React.FC = () => {
     });
 
     return (
-        <FocusDrawer open={false}>
+        <FocusDrawer
+            open={false}
+        >
             <EditorBar title={title}>
                 {Buttons && <Buttons />}
             </EditorBar>
@@ -112,6 +117,16 @@ const Editor: React.FC = () => {
                     )
                 })}
             </EditorFrame>
+            <Dialog 
+                open={true}
+                schema={{
+                    type: 'save',
+                    props: {
+                        contentType: 'recording',
+                        newContent: false
+                    }
+                }}
+            />
         </FocusDrawer>
     )
 };

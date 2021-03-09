@@ -1,6 +1,6 @@
 import { CassetteProgressCallback } from 'cassette-js';
 
-export interface RecordingEditorProps {
+export interface RecordingPanelProps {
     mode: 'edit' | 'play';
 }
 
