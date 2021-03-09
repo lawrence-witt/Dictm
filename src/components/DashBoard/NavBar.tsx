@@ -5,7 +5,7 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Album from '@material-ui/icons/Album';
 import EventNote from '@material-ui/icons/EventNote';
 import Category from '@material-ui/icons/Category';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, fade } from '@material-ui/core/styles';
 
 type TabTypes = 'recordings' | 'note' | 'categories' | '';
 
@@ -24,8 +24,7 @@ const useNavStyles = makeStyles((theme) => ({
 const useActionStyles = makeStyles(theme => ({
     root: {
         maxWidth: 'unset',
-        color: theme.palette.common.white,
-        opacity: 0.7,
+        color: fade(theme.palette.common.white, 0.7),
         '&$selected': {
             opacity: 1,
             color: theme.palette.common.white

@@ -7,7 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Repeat from '@material-ui/icons/Repeat';
 import Search from '@material-ui/icons/Search';
 import Delete from '@material-ui/icons/Delete';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme, fade } from '@material-ui/core/styles';
 
 import MenuButton from '../../../Buttons/MenuButton';
 import FlexSpace from '../../../Layout/FlexSpace';
@@ -43,6 +43,12 @@ const useDefaultRowStyles = makeStyles<Theme, {
         },
         leftMostButton: {
             marginLeft: props => props.menuButtonHidden ? theme.spacing(1) : 0
+        },
+        toolIcon: {
+            fill: fade(theme.palette.common.white, 0.7)
+        },
+        toolIconSelected: {
+            fill: theme.palette.common.white
         }
     })
 ));
@@ -89,21 +95,27 @@ const DefaultRow: React.FC<DefaultRowProps> = (props) => {
             {children}
             <FlexSpace flex={1} />
             <IconButton
+                color="inherit"
                 className={rowClasses.leftMostButton}
-                color="inherit"
             >
-                <Repeat />
+                <Repeat 
+                    className={rowClasses.toolIcon}
+                />
             </IconButton>
             <IconButton
                 color="inherit"
             >
-                <Search />
+                <Search 
+                    className={rowClasses.toolIcon}
+                />
             </IconButton>
             <IconButton
-                color="inherit"
                 edge="end"
+                color="inherit"
             >
-                <Delete />
+                <Delete 
+                    className={rowClasses.toolIcon}
+                />
             </IconButton>
         </Toolbar>
         </AppBar>

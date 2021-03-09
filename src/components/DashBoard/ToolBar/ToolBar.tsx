@@ -17,10 +17,11 @@ const ToolBar: React.FC<ToolBarProps> = ({
         <ToolBarRow
             toggleMenu={toggleMenu}
         >
-            <DeleteTool 
+            {/* <SearchTool /> */}
+            {/* <DeleteTool 
                 contentType="recordings"
                 quantity={6}
-            />
+            /> */}
         </ToolBarRow>
     )
 };
