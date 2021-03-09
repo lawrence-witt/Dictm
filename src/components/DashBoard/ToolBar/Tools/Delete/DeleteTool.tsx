@@ -8,7 +8,15 @@ import { DeleteToolProps } from './DeleteTool.types';
 const useDeleteStyles = makeStyles(theme => ({
     root: {
         color: theme.palette.common.white,
-        borderColor: theme.palette.common.white
+        borderColor: theme.palette.common.white,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        display: 'block',
+
+        "& .MuiButton-label": {
+            textOverflow: 'ellipsis',
+            overflow: 'hidden'
+        }
     }
 }))
 

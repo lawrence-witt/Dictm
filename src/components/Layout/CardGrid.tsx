@@ -49,6 +49,8 @@ const useStyles = makeStyles(() =>
         fab: {
             position: 'sticky',
             justifySelf: 'end',
+            width: 50,
+            height: 50,
             bottom: 16,
             right: 16,
             marginTop: 16
