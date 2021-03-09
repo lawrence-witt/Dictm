@@ -3,7 +3,7 @@ import { hot } from 'react-hot-loader';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import PageBar from './components/DashBoard/PageBar';
+import ToolBar from './components/DashBoard/ToolBar/ToolBar';
 import NavBar from './components/DashBoard/NavBar';
 import NavMenu from './components/DashBoard/NavMenu/NavMenu';
 import RecordingCard from './components/Cards/RecordingCard';
@@ -43,7 +43,7 @@ const App: React.FC = (): React.ReactElement => {
                 toggleMenu={toggleMenu}
             />
             <div className={classes.pageBase}>
-                <PageBar
+                <ToolBar
                     toggleMenu={toggleMenu}
                 />
                 <CardGrid>

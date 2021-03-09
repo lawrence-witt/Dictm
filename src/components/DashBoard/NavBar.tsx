@@ -34,7 +34,7 @@ const useActionStyles = makeStyles(theme => ({
     selected: {}
 }));
 
-const TabBar: React.FC = () => {
+const NavBar: React.FC = () => {
     const navClasses = useNavStyles();
     const actClasses = useActionStyles();
 
@@ -81,4 +81,4 @@ const TabBar: React.FC = () => {
     );
 };
 
-export default TabBar;
+export default NavBar;

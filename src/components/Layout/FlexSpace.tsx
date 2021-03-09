@@ -7,7 +7,7 @@ interface FlexProp {
 
 const styles = createStyles({
     flexSpace: {
-        flex: ({flex}: FlexProp) => flex || 1
+        flex: ({flex}: FlexProp) => typeof flex === "undefined" ? 1 : flex
     }
 });
 

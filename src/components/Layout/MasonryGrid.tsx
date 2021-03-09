@@ -35,9 +35,9 @@ const getColumns = (
     let length: number;
 
     if (repeat === 'auto-fill') {
-        length = Math.floor(width/min); 
+        length = Math.floor(width/min) || 1;
     } else {
-        length = smallestOf(Math.floor(width/min), childCount);
+        length = smallestOf(Math.floor(width/min), childCount) || 1;
     }
 
     if (max !== '1fr') length = Math.floor(width/max) || 1;
@@ -57,7 +57,7 @@ const getColumns = (
 const Masonry: React.FC<MasonryGridProps> = (props) => {
     const {
         repeat = 'auto-fit',
-        min = 275,
+        min = 300,
         max = '1fr',
         gridClass = '',
         colClass = '',
