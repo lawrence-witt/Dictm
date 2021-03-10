@@ -1,0 +1,1 @@
+export type TabTypes = 'recordings' | 'note' | 'categories' | '';

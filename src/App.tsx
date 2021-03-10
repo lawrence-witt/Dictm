@@ -3,16 +3,16 @@ import { hot } from 'react-hot-loader';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import ToolBar from './components/DashBoard/ToolBar/ToolBar';
-import NavBar from './components/DashBoard/NavBar';
-import NavMenu from './components/DashBoard/NavMenu/NavMenu';
-import RecordingCard from './components/Cards/RecordingCard';
-import NoteCard from './components/Cards/NoteCard';
-import CategoryCard from './components/Cards/CategoryCard';
-import Editor from './components/Editor/Editor';
+import ToolBar from './components/organisms/ToolBar/ToolBar';
+import NavBar from './components/organisms/NavBar/NavBar';
+import NavMenu from './components/organisms/NavMenu/NavMenu';
+import RecordingCard from './components/molecules/Cards/RecordingCard';
+import NoteCard from './components/molecules/Cards/NoteCard';
+import CategoryCard from './components/molecules/Cards/CategoryCard';
+import Editor from './components/organisms/Editor/Editor';
 
 import useToggle from './utils/hooks/useToggle';
-import CardGrid from './components/Layout/CardGrid';
+import CardGrid from './components/molecules/Grids/CardGrid';
 
 const useStyles = makeStyles(() => ({
     fixedBase: {
