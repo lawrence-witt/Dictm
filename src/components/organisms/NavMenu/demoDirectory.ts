@@ -15,7 +15,7 @@ const demoDirectory: MenuItem[] = [
         primary: 'Recordings', 
         secondary: '',
         type: 'link',  
-        value: '/', 
+        value: '/recordings', 
         icon: 'album'
     },
     {

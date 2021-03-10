@@ -8,7 +8,7 @@ import store from './redux/store';
 import ThemeProvider from './utils/providers/ThemeProvider';
 import BreakpointsProvider from './utils/providers/BreakpointsProvider';
 
-import App from './App';
+import App from './components/views/App/App';
 
 const rootHtml = (
   <Router>

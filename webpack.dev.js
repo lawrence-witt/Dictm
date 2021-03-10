@@ -13,6 +13,9 @@ const lintPlugin = new ESLintPlugin({
 const config = {
     mode: "development",
     entry: "./src/index.tsx",
+    output: {
+        publicPath: '/'
+    },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"]
     },
@@ -33,7 +36,8 @@ const config = {
         ]
     },
     devServer: {
-        port: 3000
+        port: 3000,
+        historyApiFallback: true
     },
     devtool: 'inline-source-map',
     plugins: [htmlPlugin, lintPlugin]

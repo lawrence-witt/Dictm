@@ -3,16 +3,14 @@ import { hot } from 'react-hot-loader';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import ToolBar from './components/organisms/ToolBar/ToolBar';
-import NavBar from './components/organisms/NavBar/NavBar';
-import NavMenu from './components/organisms/NavMenu/NavMenu';
-import RecordingCard from './components/molecules/Cards/RecordingCard';
-import NoteCard from './components/molecules/Cards/NoteCard';
-import CategoryCard from './components/molecules/Cards/CategoryCard';
-import Editor from './components/organisms/Editor/Editor';
+import AppSwitch from '../../../routes/AppSwitch/AppSwitch';
 
-import useToggle from './utils/hooks/useToggle';
-import CardGrid from './components/molecules/Grids/CardGrid';
+import ToolBar from '../../organisms/ToolBar/ToolBar';
+import NavBar from '../../organisms/NavBar/NavBar';
+import NavMenu from '../../organisms/NavMenu/NavMenu';
+import Editor from '../../organisms/Editor/Editor';
+
+import useToggle from '../../../utils/hooks/useToggle';
 
 const useStyles = makeStyles(() => ({
     fixedBase: {
@@ -46,9 +44,7 @@ const App: React.FC = (): React.ReactElement => {
                 <ToolBar
                     toggleMenu={toggleMenu}
                 />
-                <CardGrid>
-                    {num.map((n, i) => <NoteCard title={'Note'} key={i} />)}
-                </CardGrid>
+                <AppSwitch />
                 <Editor />
                 <NavBar />
             </div>
