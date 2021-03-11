@@ -3,10 +3,6 @@ import Drawer, { DrawerProps } from '@material-ui/core/Drawer';
 import { makeStyles } from '@material-ui/core/styles';
 
 /* EDITOR DRAWER */
-/* 
-interface FocusDrawerProps extends DrawerProps {
-    forwardRef?: React.RefObject<HTMLDivElement>;
-} */
 
 // Styled
 
@@ -22,7 +18,6 @@ const useDrawerStyles = makeStyles(() => ({
 
 const FocusDrawer: React.FC<DrawerProps> = (props) => {
     const {
-        id,
         anchor = "right",
         elevation = 8,
         classes = {},
@@ -37,7 +32,6 @@ const FocusDrawer: React.FC<DrawerProps> = (props) => {
             anchor={anchor}
             elevation={elevation}
             classes={{...drawerClasses, ...classes}}
-            PaperProps={{id: id ? id : ''}}
             {...other}
         >
             {children}

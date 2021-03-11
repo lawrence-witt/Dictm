@@ -30,8 +30,7 @@ const useStyles = makeStyles(() => ({
 
 const App: React.FC = (): React.ReactElement => {
     const classes = useStyles();
-
-    const [num] = React.useState(new Array(10).fill(1));
+    
     const [isMenuOpen, toggleMenu] = useToggle(false);
 
     return (

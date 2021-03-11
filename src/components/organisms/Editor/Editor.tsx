@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useTransition } from 'react-spring';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -16,11 +17,20 @@ import Dialog from './Dialog/Dialog';
 
 import { EditorPanel } from './Editor.types';
 
+import useQueryMatch from '../../../utils/hooks/useQueryMatch';
+
 /* 
 *   Editor Variants
 */
 
 const panels: Record<string, EditorPanel> = {
+    choose: {
+        type: 'choose',
+        title: "Choose New Content",
+        disableGutters: true,
+        component: "ul",
+        Content: ChoosePanel
+    },
     category: {
         type: 'cat',
         title: "New Category",
@@ -29,13 +39,6 @@ const panels: Record<string, EditorPanel> = {
         className: "categoryEditorContent",
         Buttons: CategoryBarButtons,
         Content: CategoryPanel
-    },
-    choose: {
-        type: 'choose',
-        title: "Choose New Content",
-        disableGutters: true,
-        component: "ul",
-        Content: ChoosePanel
     },
     note: {
         type: 'note',
@@ -80,11 +83,41 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+/* 
+*   Editor queries
+*/
+
+const queries = {
+    edit: ["choose", "recording", "note", "category"],
+    id: []
+}
+
 const Editor: React.FC = () => {
-    const [panel, setPanel] = React.useState(panels.note);
+    const classes = useStyles();
+
+    // Editor visibility control
+
+    const location = useLocation();
+    const history = useHistory();
+    const editorMatches = useQueryMatch(queries);
+
+    const [isEditorOpen, setIsEditorOpen] = React.useState(editorMatches.edit ? true : false);
+
+    const [panel, setPanel] = React.useState(panels[editorMatches.edit || "choose"]);
     const { title, Buttons } = panel;
 
-    const classes = useStyles();
+    React.useEffect(() => {
+        const { edit, id } = editorMatches;
+
+        if (edit) {
+            setIsEditorOpen(true);
+            setPanel(panels[edit]);
+        } else {
+            setIsEditorOpen(false);
+        }
+    }, [editorMatches]);
+
+    // Editor transitions
 
     const panelTransition = useTransition(panel, {
         key: panel.type,
@@ -96,7 +129,8 @@ const Editor: React.FC = () => {
 
     return (
         <FocusDrawer
-            open={false}
+            open={isEditorOpen}
+            onClose={() => history.push(location.pathname)}
         >
             <EditorBar title={title}>
                 {Buttons && <Buttons />}
@@ -118,7 +152,7 @@ const Editor: React.FC = () => {
                 })}
             </EditorFrame>
             <Dialog 
-                open={true}
+                open={false}
                 schema={{
                     type: 'save',
                     props: {

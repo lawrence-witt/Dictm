@@ -19,12 +19,6 @@ const useDialogStyles = makeStyles(() => ({
     }
 }));
 
-const useBackDropStyles = makeStyles(() => ({
-    root: {
-        position: 'absolute'
-    }
-}));
-
 const Dialog: React.FC<DialogProps> = (props) => {
     const {
         open,
@@ -36,7 +30,7 @@ const Dialog: React.FC<DialogProps> = (props) => {
 
     return (
         <MuiDialog
-            open={true}
+            open={open}
             aria-describedby="editor-dialog-description"
             classes={classes}
             {...other}
