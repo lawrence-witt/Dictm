@@ -8,6 +8,8 @@ import Settings from '../../components/templates/Settings/Settings';
 
 import Routes from '../Routes/Routes';
 
+import { AppSwitchProps } from './AppSwitch.types';
+
 export const testCategories = {
     "abc": {
         media: []
@@ -38,9 +40,13 @@ const renderSettingsRoute = () => {
     return <Settings />;
 }
 
-const AppRouter: React.FC = () => {
+const AppSwitch: React.FC<AppSwitchProps> = (props) => {
+    const {
+        location
+    } = props;
+
     return (
-        <Switch>
+        <Switch location={location}>
             {Routes.map(({name, ...rest}) => (
                 <Route
                     key={name}
@@ -59,4 +65,4 @@ const AppRouter: React.FC = () => {
     )
 }
 
-export default AppRouter;
+export default AppSwitch;

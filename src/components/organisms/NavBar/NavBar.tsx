@@ -60,7 +60,7 @@ const NavBar: React.FC = () => {
                     value="recordings"
                     icon={<Album />}
                     classes={actClasses}
-                    onClick={() => pushHistory('/')}
+                    onClick={() => pushHistory('/recordings')}
                 />
                 <BottomNavigationAction
                     label="Notes"

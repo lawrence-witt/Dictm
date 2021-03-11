@@ -1,5 +1,7 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
+import { useLocation } from 'react-router-dom';
+import { a } from 'react-spring';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -11,6 +13,7 @@ import NavMenu from '../../organisms/NavMenu/NavMenu';
 import Editor from '../../organisms/Editor/Editor';
 
 import useToggle from '../../../utils/hooks/useToggle';
+import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
 
 const useStyles = makeStyles(() => ({
     fixedBase: {
@@ -25,13 +28,33 @@ const useStyles = makeStyles(() => ({
         minWidth: 300,
         display: 'flex',
         flexDirection: 'column'
+    },
+    templateBase: {
+        width: '100%',
+        height: '100%',
+        position: 'relative'
+    },
+    templateFrame: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute'
     }
 }));
 
 const App: React.FC = (): React.ReactElement => {
     const classes = useStyles();
-    
+
     const [isMenuOpen, toggleMenu] = useToggle(false);
+
+    const location = useLocation();
+    const left = true;
+
+    const templateTransition = useUniqueTransition("pathname", location, {
+        initial: {transform: "translateX(0%)"},
+        from: {transform: `translateX(${left ? 100 : -100}%)`},
+        enter: {transform: "translateX(0%)"},
+        leave: {transform: `translateX(${left ? -100 : 100}%)`}
+    });
 
     return (
         <div className={classes.fixedBase}>
@@ -43,7 +66,13 @@ const App: React.FC = (): React.ReactElement => {
                 <ToolBar
                     toggleMenu={toggleMenu}
                 />
-                <AppSwitch />
+                <div className={classes.templateBase}>
+                    {templateTransition((style, location) => (
+                        <a.div className={classes.templateFrame} style={style}>
+                            <AppSwitch location={location}/>
+                        </a.div>
+                    ))}
+                </div>
                 <Editor />
                 <NavBar />
             </div>
