@@ -1,6 +1,6 @@
 import { NoteModel } from '../../../_data/notesData';
 
-export const NOTE_ADDED = "dictm/notes/NOTE_ADDED";
+export const NOTE_ADDED = "dictm/media/notes/NOTE_ADDED";
 
 export interface NotesState {
     byId: Record<string, NoteModel>;

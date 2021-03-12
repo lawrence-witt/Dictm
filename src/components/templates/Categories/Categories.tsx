@@ -1,7 +1,8 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
+
 import { RootState } from '../../../redux/store';
+import { editorOperations } from '../../../redux/ducks/editor';
 
 import CardGrid from '../../molecules/Grids/CardGrid';
 import CategoryCard from '../../molecules/Cards/CategoryCard';
@@ -14,7 +15,11 @@ const mapState = (state: RootState) => ({
     categories: state.categories
 });
 
-const connector = connect(mapState);
+const mapDispatch = {
+    openEditor: editorOperations.openEditor
+}
+
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -24,15 +29,12 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const CategoriesTemplate: React.FC<ReduxProps> = (props) => {
     const {
-        categories
+        categories,
+        openEditor
     } = props;
 
-    const history = useHistory();
-
     const onFabClick = () => {
-        const base = history.location.pathname;
-
-        history.push(`${base}?edit=category&id=new`);
+        openEditor("category", "new");
     }
 
     return (

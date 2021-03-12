@@ -1,9 +1,9 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
-import { RootState } from '../../../redux/store';
 
+import { RootState } from '../../../redux/store';
 import { mediaSelectors } from '../../../redux/ducks/media';
+import { editorOperations } from '../../../redux/ducks/editor';
 
 import CardGrid from '../../molecules/Grids/CardGrid';
 import RecordingCard from '../../molecules/Cards/RecordingCard';
@@ -19,7 +19,11 @@ const mapState = (state: RootState, props: MediaTemplateProps) => ({
     mediaList: mediaSelectors.getMediaList(state, props)
 });
 
-const connector = connect(mapState);
+const mapDispatch = {
+    openEditor: editorOperations.openEditor
+}
+
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -30,22 +34,21 @@ type ReduxProps = ConnectedProps<typeof connector>;
 const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
     const {
         context,
-        mediaList
+        mediaList,
+        openEditor
     } = props;
 
-    const history = useHistory();
-
     const onFabClick = React.useCallback(() => {
-        const base = history.location.pathname;
-
-        const editType = {
-            recordings: "recording",
-            notes: "note",
-            category: "choose"
+        const editorType = {
+            recordings: "recording" as const,
+            notes: "note" as const,
+            category: "choose" as const
         }[context];
 
-        history.push(`${base}?edit=${editType + (editType !== "choose" ? "&id=new" : "")}`);
-    }, [context, history]);
+        const contentId = editorType === "choose" ? undefined : "new";
+
+        openEditor(editorType, contentId);
+    }, [context, openEditor]);
 
     return (
         <CardGrid

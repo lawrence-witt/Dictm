@@ -1,64 +1,36 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+
+import { RootState } from '../../../redux/store';
+import { editorOperations } from '../../../redux/ducks/editor';
 
 import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
 import EditorLayout from './Layout/Layout';
 
-import CategoryPanel, { CategoryBarButtons } from './Panels/CategoryPanel';
-import ChoosePanel from './Panels/ChoosePanel';
-import NotePanel, { NoteBarButtons } from './Panels/NotePanel';
-import RecordingPanel, { RecordingBarButtons } from './Panels/Recording/RecordingPanel';
-
 import Dialog from './Dialog/Dialog';
 
-import useQueryMatch from '../../../utils/hooks/useQueryMatch';
-
-import { EditorPanel } from './Editor.types';
+import { Panels } from './Editor.types';
 
 /* 
-*   Editor Variants
+*   Redux
 */
 
-const panels: Record<string, EditorPanel> = {
-    choose: {
-        type: 'choose',
-        title: "Choose New Content",
-        disableGutters: true,
-        component: "ul",
-        Content: ChoosePanel
-    },
-    category: {
-        type: 'cat',
-        title: "New Category",
-        disableGutters: false,
-        component: "form",
-        className: "categoryEditorContent",
-        Buttons: CategoryBarButtons,
-        Content: CategoryPanel
-    },
-    note: {
-        type: 'note',
-        title: "New Note",
-        disableGutters: false,
-        component: "div",
-        className: "noteEditorContent",
-        Buttons: NoteBarButtons,
-        Content: NotePanel
-    },
-    recording: {
-        type: 'rec',
-        title: "New Recording",
-        disableGutters: true,
-        component: "div",
-        className: "recordingEditorContent",
-        Buttons: RecordingBarButtons,
-        Content: RecordingPanel
-    }
-};
+const mapState = (state: RootState) => ({
+    editor: state.editor
+});
+
+const mapDispatch = {
+    closeEditor: editorOperations.closeEditor
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
 
 /* 
-*   Editor Controller
+*   Local
 */
  
 const useStyles = makeStyles(theme => ({
@@ -80,37 +52,38 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const queries = {
-    edit: ["choose", "recording", "note", "category"],
-    id: []
-}
+const Editor: React.FC<ReduxProps> = (props) => {
+    const {
+        editor,
+        closeEditor
+    } = props;
 
-const Editor: React.FC = () => {
     const classes = useStyles();
 
     // Editor visibility control
 
-    const history = useHistory();
-    const editorMatches = useQueryMatch(queries);
-
-    const [editorOpen, setEditorOpen] = React.useState(editorMatches.edit ? true : false);
-    const [panel, setPanel] = React.useState(panels[editorMatches.edit || "choose"]);
+    const [editorOpen, setEditorOpen] = React.useState(Boolean(editor.editorType));
+    const [panel, setPanel] = React.useState(Panels[editor.editorType || "choose"]);
 
     React.useEffect(() => {
-        const { edit, id } = editorMatches;
-
-        if (edit) {
+        if (editor.editorType) {
             setEditorOpen(true);
-            setPanel(panels[edit]);
+            setPanel(Panels[editor.editorType]);
         } else {
             setEditorOpen(false);
         }
-    }, [editorMatches]);
+    }, [editor.editorType]);
+
+    // Handle editor close
+
+    const onRequestEditorClosed = React.useCallback(() => {
+        closeEditor();
+    }, [closeEditor]);
 
     return (
         <FocusDrawer
             open={editorOpen}
-            onClose={() => history.push(location.pathname)}
+            onClose={onRequestEditorClosed}
             SlideProps={{
                 mountOnEnter: true,
                 unmountOnExit: true
@@ -134,4 +107,4 @@ const Editor: React.FC = () => {
     )
 };
 
-export default Editor;
+export default connector(Editor);

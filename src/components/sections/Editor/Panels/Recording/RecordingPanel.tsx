@@ -94,7 +94,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
 
     const cassette = useCassette(
         0.01,       // increment
-        true,       // floorOutput
+        true,       // floorTimerOutput
         onProgress, // progress callback
         undefined,  // status callback
         onError     // error callback

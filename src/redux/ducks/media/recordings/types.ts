@@ -1,6 +1,6 @@
 import { RecordingModel } from '../../../_data/recordingsData';
 
-export const RECORDING_ADDED = "dictm/notes/RECORDING_ADDED";
+export const RECORDING_ADDED = "dictm/media/recordings/RECORDING_ADDED";
 
 export interface RecordingsState {
     byId: Record<string, RecordingModel>;
