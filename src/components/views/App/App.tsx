@@ -7,10 +7,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import AppSwitch from '../../../routes/AppSwitch/AppSwitch';
 
-import ToolBar from '../../organisms/ToolBar/ToolBar';
-import NavBar from '../../organisms/NavBar/NavBar';
-import NavMenu from '../../organisms/NavMenu/NavMenu';
-import Editor from '../../organisms/Editor/Editor';
+import ToolBar from '../../sections/ToolBar/ToolBar';
+import NavBar from '../../sections/NavBar/NavBar';
+import NavMenu from '../../sections/NavMenu/NavMenu';
+import Editor from '../../sections/Editor/Editor';
 
 import useToggle from '../../../utils/hooks/useToggle';
 import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
