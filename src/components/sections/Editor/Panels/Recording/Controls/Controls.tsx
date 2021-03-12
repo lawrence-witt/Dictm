@@ -65,11 +65,14 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     // Handle connect and save
 
+    const streamRef = React.useRef(null) as React.MutableRefObject<MediaStream | null>;
+
     const handleConnect = React.useCallback(async () => {
         if (flags.hasStream) return;
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+            streamRef.current = stream;
             await connect(stream);
         } catch(err) {
             console.log(err);
@@ -89,12 +92,18 @@ const Controls: React.FC<ControlsProps> = (props) => {
         if (isPlaying) handleTimeout("set");
     }, [isPlaying, handleScan, handleTimeout]);
 
-    // Get Stream in Edit Mode
+    // Handle getting and releasing microphone stream
 
     React.useEffect(() => {
-        if (mode !== "edit") return;
+        if (mode !== "edit" || streamRef.current) return;
         handleConnect();
     }, [mode, handleConnect]);
+
+    React.useEffect(() => {
+        return () => {
+            if (streamRef.current) streamRef.current.getAudioTracks()[0].stop();
+        }
+    }, []);
 
     // Deduce primary icon type
 
