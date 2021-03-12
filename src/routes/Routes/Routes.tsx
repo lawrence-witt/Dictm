@@ -1,9 +1,15 @@
 import { CustomRouteProps } from './Routes.types';
 
-const MediaRoute: CustomRouteProps = {
-    name: "media",
+const RecordingsRoute: CustomRouteProps = {
+    name: "recordings",
     exact: true,
-    path: ["/recordings", "/notes"]
+    path: "/recordings"
+}
+
+const NotesRoute: CustomRouteProps = {
+    name: "notes",
+    exact: true,
+    path: "/notes"
 }
 
 const CategoriesRoute: CustomRouteProps = {
@@ -19,7 +25,8 @@ const SettingsRoute: CustomRouteProps = {
 }
 
 const Routes = [
-    MediaRoute,
+    RecordingsRoute,
+    NotesRoute,
     CategoriesRoute,
     SettingsRoute
 ]

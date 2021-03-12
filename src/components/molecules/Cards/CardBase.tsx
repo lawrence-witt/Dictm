@@ -21,7 +21,7 @@ interface CardBaseProps {
 interface CardBasePrimaryRowProps {
     title?: string;
     subTitle?: string;
-    date?: string;
+    createdDate?: string;
 }
 
 interface CardBaseActionSwitchProps {
@@ -127,7 +127,7 @@ const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
     const {
         title,
         subTitle,
-        date,
+        createdDate,
         children
     } = props;
 
@@ -137,7 +137,7 @@ const CardBasePrimaryRow: React.FC<CardBasePrimaryRowProps> = (props) => {
     const subtitleType = (
         <div className="subtitle">
             <Typography variant="caption" noWrap>{subTitle}</Typography>
-            {date && <Typography variant="caption" className="date">{date}</Typography>}
+            {createdDate && <Typography variant="caption" className="date">{createdDate}</Typography>}
         </div>
     );
 

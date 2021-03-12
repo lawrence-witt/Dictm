@@ -3,13 +3,25 @@ import Play from '@material-ui/icons/PlayArrow';
 
 import CardBase, { CardBasePrimaryRow, CardBaseActionSwitch } from './CardBase';
 
-const RecordingCard: React.FC = () => {
+interface RecordingCardProps {
+    title: string;
+    duration: number;
+    createdAt: number;
+}
+
+const RecordingCard: React.FC<RecordingCardProps> = (props) => {
+    const {
+        title,
+        duration,
+        createdAt
+    } = props;
+
     return (
         <CardBase>
             <CardBasePrimaryRow
-                title="Recording"
-                subTitle="00:02"
-                date="11 Nov 2020"
+                title={title}
+                subTitle={duration.toString()}
+                createdDate={createdAt.toString()}
             >
                 <CardBaseActionSwitch 
                     primaryIcon={Play}

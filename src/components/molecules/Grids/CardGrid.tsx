@@ -8,7 +8,7 @@ import MasonryGrid from './MasonryGrid';
 // Types
 
 interface CardGridProps {
-    onFabClick?: () => void;
+    onFabClick: () => void;
 }
 
 // Styled

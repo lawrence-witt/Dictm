@@ -6,6 +6,8 @@ import * as reducers from './ducks';
 const initialState = {};
 const rootReducer = combineReducers(reducers);
 
+export type RootState = ReturnType<typeof rootReducer>;
+
 const composeEnhancers = composeWithDevTools({
     serialize: {
         undefined: true

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Switch, Route, Redirect, RouteComponentProps } from 'react-router-dom';
 import { StaticContext } from 'react-router';
+import { connect, ConnectedProps } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 import Media from '../../components/templates/Media/Media';
 import Categories from '../../components/templates/Categories/Categories';
@@ -20,18 +22,38 @@ export const testCategories = {
     "keys": ["abc", "def"]
 }
 
-const renderMediaRoute = () => {
-    return <Media />;
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    categories: state.categories
+});
+
+const connector = connect(mapState);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const renderRecordingsRoute = () => {
+    return <Media context="recordings"/>;
+}
+
+const renderNotesRoute = () => {
+    return <Media context="notes"/>;
 }
 
 const renderCategoriesRoute = (
-    routeContext: typeof testCategories,
+    categories: RootState["categories"],
     routeProps: RouteComponentProps<any, StaticContext, unknown>
 ) => {
     const categoryId = routeProps.match.params.categoryId;
 
     if (!categoryId) return <Categories />;
-    if (categoryId in routeContext) return <Media />;
+    if (categories.byId[categoryId]) return <Media context="category" categoryId={categoryId}/>;
 
     return <Redirect to="/" />
 }
@@ -40,9 +62,10 @@ const renderSettingsRoute = () => {
     return <Settings />;
 }
 
-const AppSwitch: React.FC<AppSwitchProps> = (props) => {
+const AppSwitch: React.FC<AppSwitchProps & ReduxProps> = (props) => {
     const {
-        location
+        location,
+        categories
     } = props;
 
     return (
@@ -52,8 +75,9 @@ const AppSwitch: React.FC<AppSwitchProps> = (props) => {
                     key={name}
                     render={(routeProps) => {
                         return {
-                            media: renderMediaRoute,
-                            categories: () => renderCategoriesRoute(testCategories, routeProps),
+                            recordings: renderRecordingsRoute,
+                            notes: renderNotesRoute,
+                            categories: () => renderCategoriesRoute(categories, routeProps),
                             settings: renderSettingsRoute
                         }[name]();
                     }}
@@ -65,4 +89,4 @@ const AppSwitch: React.FC<AppSwitchProps> = (props) => {
     )
 }
 
-export default AppSwitch;
+export default connector(AppSwitch);

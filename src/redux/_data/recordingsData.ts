@@ -2,6 +2,7 @@ import { WavObject } from 'cassette-js';
 
 export interface RecordingModel {
     id: string;
+    contentType: "recording";
     userId: string;
     title: string;
     categoryId: string | null;
@@ -38,6 +39,7 @@ const mockData: RecordingModel[] = [
     {id: 'recording2', userId: 'user1', title: 'Recording 2', categoryId: null},
     {id: 'recording3', userId: 'user1', title: 'Recording 3', categoryId: null}
 ].map(data => Object.assign({}, data, {
+    contentType: "recording" as const,
     audioData: createMockAudioData(),
     waveData: createMockWaveData(),
     ...createMockTimeData()

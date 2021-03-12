@@ -1,7 +1,7 @@
 import {
-    USER_LOADED,
     UserState,
-    UserActionTypes
+    UserActionTypes,
+    USER_LOADED
 } from './types';
 
 const initialState: UserState = {

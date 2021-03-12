@@ -5,7 +5,10 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitch } from './CardBase';
 
 interface NoteCardProps {
-    title?: string;
+    title: string;
+    details: { wordCount: number; charCount: number; };
+    content: string;
+    createdAt: number;
 }
 
 const useStyles = makeStyles(theme => 
@@ -21,7 +24,10 @@ const useStyles = makeStyles(theme =>
 
 const NoteCard: React.FC<NoteCardProps> = (props) => {
     const {
-        title = ''
+        title,
+        details,
+        content,
+        createdAt
     } = props;
 
     const classes = useStyles();
@@ -30,8 +36,8 @@ const NoteCard: React.FC<NoteCardProps> = (props) => {
         <CardBase>
             <CardBasePrimaryRow
                 title={title}
-                subTitle="30 words / 275 chars"
-                date="23 Nov 2020"
+                subTitle={`${details.wordCount} words / ${details.charCount} chars`}
+                createdDate={createdAt.toString()}
             >
                 <CardBaseActionSwitch
                     primaryIcon={() => (
@@ -47,7 +53,7 @@ const NoteCard: React.FC<NoteCardProps> = (props) => {
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>
                 <Typography variant="caption" noWrap className={classes.caption}>
-                    My text preview for this note is much longer and will wrap to the next line
+                    {content}
                 </Typography>
             </CardBaseSecondaryRow>
         </CardBase>
