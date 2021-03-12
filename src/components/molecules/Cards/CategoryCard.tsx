@@ -2,11 +2,19 @@ import React from 'react';
 import Edit from '@material-ui/icons/Edit';
 import CardBase, { CardBasePrimaryRow, CardBaseActionSwitch } from './CardBase';
 
-const CategoryCard: React.FC = () => {
+interface CategoryCardProps {
+    title: string;
+}
+
+const CategoryCard: React.FC<CategoryCardProps> = (props) => {
+    const {
+        title
+    } = props;
+
     return (
         <CardBase>
             <CardBasePrimaryRow
-                title="Category"
+                title={title}
             >
                 <CardBaseActionSwitch 
                     primaryIcon={Edit}

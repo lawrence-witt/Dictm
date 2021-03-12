@@ -73,6 +73,7 @@ const CardGrid: React.FC<CardGridProps> = (props) => {
             <MasonryGrid
                 gridClass="card-grid"
                 colClass="card-col"
+                repeat="auto-fill"
             >
                 {children}
             </MasonryGrid>

@@ -77,7 +77,12 @@ const useCassette = (
 
     React.useEffect(() => {
         return () => {
-            cassette.current.flags.canUnlink && cassette.current.unlink()
+            if (cassette.current.flags.canUnlink) {
+                cassette.current.onProgress = null;
+                cassette.current.onStatus = null;
+                cassette.current.onError = null;
+                cassette.current.unlink();
+            }
         };
     }, []);
 
