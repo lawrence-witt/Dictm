@@ -1,7 +1,5 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
@@ -10,8 +8,6 @@ import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
 import EditorLayout from './Layout/Layout';
 
 import Dialog from './Dialog/Dialog';
-
-import { Panels } from './Editor.types';
 
 /* 
 *   Redux
@@ -32,25 +28,6 @@ type ReduxProps = ConnectedProps<typeof connector>;
 /* 
 *   Local
 */
- 
-const useStyles = makeStyles(theme => ({
-    categoryEditorContent: {
-        "& > *:not(:last-child)": {
-            marginBottom: theme.spacing(2)
-        }
-    },
-    noteEditorContent: {
-        display: 'flex',
-        flexDirection: 'column',
-        "& > *:not(:last-child)": {
-            marginBottom: theme.spacing(2)
-        }
-    },
-    recordingEditorContent: {
-        display: 'flex',
-        flexDirection: 'column'
-    }
-}));
 
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
@@ -58,21 +35,13 @@ const Editor: React.FC<ReduxProps> = (props) => {
         closeEditor
     } = props;
 
-    const classes = useStyles();
-
     // Editor visibility control
 
-    const [editorOpen, setEditorOpen] = React.useState(Boolean(editor.editorType));
-    const [panel, setPanel] = React.useState(Panels[editor.editorType || "choose"]);
+    const [editorOpen, setEditorOpen] = React.useState(Boolean(editor.contentModel));
 
     React.useEffect(() => {
-        if (editor.editorType) {
-            setEditorOpen(true);
-            setPanel(Panels[editor.editorType]);
-        } else {
-            setEditorOpen(false);
-        }
-    }, [editor.editorType]);
+        setEditorOpen(Boolean(editor.contentModel));
+    }, [editor.contentModel]);
 
     // Handle editor close
 
@@ -89,20 +58,24 @@ const Editor: React.FC<ReduxProps> = (props) => {
                 unmountOnExit: true
             }}
         >
-            <EditorLayout 
-                panel={panel}
-                className={panel.className ? classes[panel.className] : ""}
-            />
-            <Dialog 
-                open={false}
-                schema={{
-                    type: 'save',
-                    props: {
-                        contentType: 'recording',
-                        newContent: false
-                    }
-                }}
-            />
+            {editor.contentModel && (
+                <>
+                    <EditorLayout
+                        title={editor.editorTitle}
+                        model={editor.contentModel}
+                    />
+                    <Dialog 
+                        open={false}
+                        schema={{
+                            type: 'save',
+                            props: {
+                                contentType: 'recording',
+                                newContent: false
+                            }
+                        }}
+                    />
+                </>
+            )}
         </FocusDrawer>
     )
 };

@@ -33,4 +33,21 @@ const mockData: NoteModel[] = [
     ...createMockTimeData()
 }));
 
+export const generateNoteModel = (
+    userId: string
+): NoteModel => ({
+    id: "new",
+    contentType: "note",
+    userId,
+    title: "",
+    categoryId: null,
+    content: "",
+    details: {
+        wordCount: 0,
+        charCount: 0
+    },
+    lastModified: 0,
+    createdAt: 0
+});
+
 export default mockData;

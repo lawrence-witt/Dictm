@@ -6,8 +6,7 @@ import {
 } from './types';
 
 const initialState: EditorState = {
-    editorType: undefined,
-    contentId: undefined,
+    editorTitle: "",
     contentModel: undefined
 }
 
@@ -18,8 +17,7 @@ const editorReducer = (
     switch(action.type) {
         case EDITOR_OPENED:
             return {
-                editorType: action.payload.editorType,
-                contentId: action.payload.contentId,
+                editorTitle: action.payload.editorTitle,
                 contentModel: action.payload.contentModel
             }
         case EDITOR_CLOSED:

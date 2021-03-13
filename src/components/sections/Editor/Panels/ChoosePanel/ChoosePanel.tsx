@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const ChooseEditor: React.FC = () => {
+const ChoosePanel: React.FC = () => {
     const classes = useStyles();
 
     return (
@@ -29,4 +29,4 @@ const ChooseEditor: React.FC = () => {
     )
 };
 
-export default ChooseEditor;
+export default ChoosePanel;

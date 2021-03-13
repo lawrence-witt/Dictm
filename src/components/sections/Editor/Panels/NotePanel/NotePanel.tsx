@@ -4,7 +4,9 @@ import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-import CustomSelect from '../../../atoms/Inputs/CustomSelect';
+import CustomSelect from '../../../../atoms/Inputs/CustomSelect';
+
+import { NotePanelProps } from './NotePanel.types';
 
 /* NOTE BAR BUTTONS */
 
@@ -42,9 +44,13 @@ const useTextAreaStyles = makeStyles(theme => ({
             top: -theme.spacing(2)
         }
     }
-}))
+}));
 
-const NoteEditor: React.FC = () => {
+const NotePanel: React.FC<NotePanelProps> = (props) => {
+    const {
+        model
+    } = props;
+
     const textAreaClasses = useTextAreaStyles();
     const textAreaRef = React.useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -71,4 +77,4 @@ const NoteEditor: React.FC = () => {
 /* EXPORTS */
 
 export { NoteBarButtons };
-export default NoteEditor;
+export default NotePanel;

@@ -7,7 +7,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuButton from '../../../../atoms/Buttons/MenuButton';
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 
-import { RecordingPanelProps, ProgressHandle } from './RecordingPanel.types';
+import { RecordingBarButtonsProps, RecordingPanelProps, ProgressHandle } from './RecordingPanel.types';
 import Timer from './Timer/Timer';
 import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
@@ -20,10 +20,12 @@ import useCassette from '../../../../../utils/hooks/useCassette';
 
 /* RECORDING BAR BUTTONS */
 
-const RecordingBarButtons: React.FC<RecordingPanelProps> = (props) => {
+const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
     const {
-        mode = 'edit'
+        model
     } = props;
+
+    const mode = model.id === "new" ? "edit" : "play";
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const menuRef = React.useRef(null);
@@ -62,7 +64,11 @@ const RecordingBarButtons: React.FC<RecordingPanelProps> = (props) => {
 /* RECORDING EDITOR */
 
 const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
-    const { mode = 'edit' } = props;
+    const { 
+        model
+    } = props;
+
+    const mode = model.id === "new" ? "edit" : "play";
 
     /* 
     *   Animation refs
@@ -75,7 +81,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     const waveProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
 
     /* 
-    *   Cassette handlers
+    *   Cassette callbacks
     */
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
@@ -89,7 +95,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     const onError = React.useCallback((error) => console.error(error), []);
 
     /* 
-    *   Cassette and analyser
+    *   Cassette and audio refs
     */
 
     const cassette = useCassette(
@@ -100,16 +106,12 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
         onError     // error callback
     );
 
+    const stream = React.useRef(null) as React.MutableRefObject<MediaStream | null>;
     const analyser = React.useRef(null) as React.MutableRefObject<AnalyserNode | null>;
 
     /* 
-    *   Handle controls with side effects
+    *   Handle user initiated controls with side effects
     */
-
-    const handleFrame = React.useCallback(() => {
-        if (nextFrame.current) nextFrame.current();
-        frameLoop.current = demandAnimationFrame(handleFrame);
-    }, []);
 
     const handleStart = React.useCallback(async (type: 'record' | 'play') => {
         if (type === 'record') {
@@ -121,8 +123,13 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
             await cassette.controls.play();
         }
 
-        frameLoop.current = demandAnimationFrame(handleFrame);
-    }, [cassette.get, cassette.controls, handleFrame]);
+        const commitFrame = () => {
+            if (nextFrame.current) nextFrame.current();
+            frameLoop.current = demandAnimationFrame(commitFrame);
+        }
+
+        frameLoop.current = demandAnimationFrame(commitFrame);
+    }, [cassette.get, cassette.controls]);
 
     const handleStop = React.useCallback(async () => {
         await cassette.controls.pause();
@@ -140,6 +147,39 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
 
         if (nextFrame.current) demandAnimationFrame(nextFrame.current, true);
     }, [cassette.controls]);
+
+    const handleSave = React.useCallback(async () => {
+        const file = await cassette.controls.eject();
+        console.log(file);
+    }, [cassette.controls]);
+
+    /* 
+    *   Handle getting and releasing microphone stream
+    */
+
+    const handleConnect = React.useCallback(async () => {
+        if (cassette.flags.hasStream) return;
+
+        try {
+            const mic = await navigator.mediaDevices.getUserMedia({audio: true});
+            stream.current = mic;
+            await cassette.controls.connect(stream.current);
+        } catch(err) {
+            console.log(err);
+            // TODO: dispatch notificaion error
+        }
+    }, [cassette.flags, cassette.controls]);
+
+    React.useEffect(() => {
+        if (mode !== "edit" || stream.current) return;
+        handleConnect();
+    }, [mode, handleConnect]);
+
+    React.useEffect(() => {
+        return () => {
+            if (stream.current) stream.current.getAudioTracks()[0].stop();
+        }
+    }, []);
 
     /* 
     *   Handle play resume after scan control
@@ -182,18 +222,19 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
                 handleTimeout={handleTimeout}
             />
             <FlexSpace />
-            {mode === "edit" && 
+            {mode === "edit" && (
                 <Form 
                     flags={cassette.flags}
-                />}
+                />
+            )}
             <Controls 
                 mode={mode} 
                 status={cassette.status}
                 flags={cassette.flags}
-                controls={cassette.controls}
                 handleStart={handleStart}
                 handleStop={handleStop}
                 handleScan={handleScan}
+                handleSave={handleSave}
                 handleTimeout={handleTimeout}
             />
         </>

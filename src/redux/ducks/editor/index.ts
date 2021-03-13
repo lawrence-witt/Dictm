@@ -6,4 +6,9 @@ export {
     editorOperations
 };
 
+export {
+    EditorModelTypes,
+    EditorModels
+} from './types'
+
 export default reducer;

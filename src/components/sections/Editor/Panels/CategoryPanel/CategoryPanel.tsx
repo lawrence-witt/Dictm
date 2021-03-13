@@ -3,7 +3,9 @@ import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 
-import MediaAutocomplete, { MediaOptionProps } from '../../../atoms/Inputs/MediaAutocomplete';
+import MediaAutocomplete, { MediaOptionProps } from '../../../../atoms/Inputs/MediaAutocomplete';
+
+import { CategoryPanelProps } from './CategoryPanel.types';
 
 /* CATEGORY BAR BUTTONS */
 
@@ -32,7 +34,11 @@ const noteOptions: MediaOptionProps[] = [
     {title: 'My Other Note', isSelected: false}
 ];
 
-const CategoryEditor: React.FC = () => {
+const CategoryPanel: React.FC<CategoryPanelProps> = (props) => {
+    const {
+        model
+    } = props;
+
     const [recState, setRecState] = React.useState(recOptions);
     const [noteState, setNoteState] = React.useState(noteOptions);
 
@@ -63,4 +69,4 @@ const CategoryEditor: React.FC = () => {
 /* EXPORTS */
 
 export { CategoryBarButtons };
-export default CategoryEditor;
+export default CategoryPanel;

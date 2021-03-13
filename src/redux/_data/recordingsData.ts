@@ -45,4 +45,26 @@ const mockData: RecordingModel[] = [
     ...createMockTimeData()
 }));
 
+export const generateRecordingModel = (
+    userId: string
+): RecordingModel => ({
+    id: "new",
+    contentType: "recording",
+    userId,
+    title: "",
+    categoryId: null,
+    audioData: {
+        _v: 1,
+        _hL: 44,
+        bytes: new Uint8Array(10000),
+        duration: 10,
+        sampleRate: 48000,
+        lastModified: 0,
+        createdAt: 0
+    },
+    waveData: [],
+    lastModified: 0,
+    createdAt: 0
+});
+
 export default mockData;

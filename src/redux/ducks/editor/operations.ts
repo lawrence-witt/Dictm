@@ -2,6 +2,7 @@ import { ThunkAction } from 'redux-thunk';
 
 import * as types from './types';
 import * as actions from './actions';
+import * as helpers from './helpers';
 
 import { RootState } from '../../store';
 
@@ -10,10 +11,10 @@ import { RootState } from '../../store';
 *  Opens the editor modal.
 *
 *  Description 
-*  Validates the contentId parameter before allowing the editor modal to open.
-*  Adds the base editor state to sessionStorage to enable page reloading.
+*  Generates a new content model to match editorType if the contentId is "new".
+*  Otherwise validates contentId and extracts content model before commiting.
 *  
-*  @param {types.EditorType} editorType The type of editor panel which should be opened.
+*  @param {types.EditorTypes} editorType The type of editor panel which should be opened.
 *  @param {string} contentId Either a random string identifying the content or "new".
 *
 *  @returns {void}
@@ -22,35 +23,35 @@ import { RootState } from '../../store';
 type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
 
 export const openEditor = (
-    editorType: types.EditorType,
+    editorType: types.EditorModelTypes,
     contentId?: string
 ): OpenEditorThunkAction => (
     dispatch, 
     getState
 ): void => {
-    const contentModel = (() => {
-        if (!contentId || contentId === "new") return undefined;
+    const { user, media, categories } = getState();
 
-        const { media, categories } = getState();
-
-        switch (editorType) {
-            case "recording":
-                return media.recordings.byId[contentId];
-            case "note":
-                return media.notes.byId[contentId];
-            case "category":
-                return categories.byId[contentId];
-            default:
-                return undefined;
-        }
-    })();
-
-    if (contentId && contentId !== "new" && !contentModel) {
-        // dispatch a notification error
+    let editorTitle: string;
+    let editorModel: types.EditorModels;
+    
+    if (editorType === "choose" || contentId === "new") {
+        const { title, model } = helpers.generateContentModel(editorType, user.id);
+        editorTitle = title;
+        editorModel = model;
     } else {
-        // set editorType and contentId in sessionStorage
-        dispatch(actions.openEditor(editorType, contentId, contentModel));
+        const foundContentModel = helpers.findContentModel(media, categories, editorType, contentId);
+
+        if (!foundContentModel) {
+            // TODO: dispatch notification error
+            return;
+        }
+
+        editorTitle = foundContentModel.title;
+        editorModel = foundContentModel;
     }
+
+    // TODO: add editorType and contentId to sessionStorage
+    dispatch(actions.openEditor(editorTitle, editorModel));
 }
 
 /** 

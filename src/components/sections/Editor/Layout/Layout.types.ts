@@ -1,6 +1,22 @@
-import { EditorPanel } from "../Editor.types";
+import {
+    EditorModels
+} from '../../../../redux/ducks/editor';
 
 export interface EditorLayoutProps {
-    panel: EditorPanel;
-    className: string;
+    title: string;
+    model: EditorModels;
+}
+
+type EditorPanelClasses = 
+    'categoryEditorPanel' | 
+    'noteEditorPanel' |
+    'recordingEditorPanel'
+;
+
+export interface EditorPanel {
+    disableGutters: boolean;
+    as: string;
+    className?: EditorPanelClasses;
+    buttons: JSX.Element | null;
+    component: JSX.Element;
 }

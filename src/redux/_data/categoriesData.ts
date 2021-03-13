@@ -22,4 +22,17 @@ const mockData: CategoryModel[] = [
     ...createMockTimeData()
 }));
 
+export const generateCategoryModel = (
+    userId: string
+): CategoryModel => ({
+    id: "new",
+    contentType: "category",
+    userId,
+    title: "",
+    recordingIds: [],
+    noteIds: [],
+    lastModified: 0,
+    createdAt: 0
+});
+
 export default mockData;

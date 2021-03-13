@@ -42,18 +42,14 @@ const Controls: React.FC<ControlsProps> = (props) => {
         mode,
         status,
         flags,
-        controls,
         handleStart,
         handleStop,
         handleScan,
+        handleSave,
         handleTimeout
     } = props;
 
-    // Cassette
-
-    const { 
-        connect, eject
-    } = controls;
+    // Internal flags
 
     const isEditable = mode === 'edit';
     const isPlaying = status === "playing";
@@ -63,47 +59,12 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
 
-    // Handle connect and save
-
-    const streamRef = React.useRef(null) as React.MutableRefObject<MediaStream | null>;
-
-    const handleConnect = React.useCallback(async () => {
-        if (flags.hasStream) return;
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-            streamRef.current = stream;
-            await connect(stream);
-        } catch(err) {
-            console.log(err);
-            // send to toast
-        }
-    }, [flags.hasStream, connect]);
-
-    const handleSave = React.useCallback(async () => {
-        const file = await eject();
-        console.log(file);
-    }, [eject]);
-
     // Handle scanning with buttons
 
     const handleScanButton = React.useCallback(async (amnt: number) => {
         await handleScan("by", amnt);
         if (isPlaying) handleTimeout("set");
     }, [isPlaying, handleScan, handleTimeout]);
-
-    // Handle getting and releasing microphone stream
-
-    React.useEffect(() => {
-        if (mode !== "edit" || streamRef.current) return;
-        handleConnect();
-    }, [mode, handleConnect]);
-
-    React.useEffect(() => {
-        return () => {
-            if (streamRef.current) streamRef.current.getAudioTracks()[0].stop();
-        }
-    }, []);
 
     // Deduce primary icon type
 
@@ -127,7 +88,7 @@ const Controls: React.FC<ControlsProps> = (props) => {
                 isPlaying ? 
                 <PauseButton 
                     color="inherit" 
-                    onClick={() => handleStop()} 
+                    onClick={handleStop} 
                     disabled={!flags.canPause} 
                 /> :
                 <PlayButton 
