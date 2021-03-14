@@ -26,15 +26,15 @@ const createMediaList = (state: RootState, props: MediaTemplateProps) => {
 
             const category = state.categories.byId[props.categoryId];
 
-            const recordingsSlice = getMediaSlice(state.media.recordings, category.recordingIds);
-            const notesSlice = getMediaSlice(state.media.notes, category.noteIds);
+            const recordingsSlice = getMediaSlice(state.media.recordings, category.relationships.recordings.ids);
+            const notesSlice = getMediaSlice(state.media.notes, category.relationships.notes.ids);
             
             const byId = Object.assign({}, recordingsSlice.byId, notesSlice.byId);
             const allIds = [...recordingsSlice.allIds, ...notesSlice.allIds].sort((a, b) => {
                 const aModel = recordingsSlice.byId[a] || notesSlice.byId[a];
                 const bModel = recordingsSlice.byId[b] || notesSlice.byId[b];
 
-                return aModel.createdAt - bModel.createdAt;
+                return aModel.attributes.timestamps.created - bModel.attributes.timestamps.created;
             });
 
             return { byId, allIds };

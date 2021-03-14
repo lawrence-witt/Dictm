@@ -17,6 +17,8 @@ const useStyles = makeStyles(theme => ({
 
 const Form: React.FC<FormProps> = (props) => {
     const {
+        title,
+        category,
         flags
     } = props;
 
@@ -25,7 +27,8 @@ const Form: React.FC<FormProps> = (props) => {
     return flags.hasData ? (
         <form className={classes.form}>
             <TextField 
-                label="Title" 
+                label="Title"
+                value={title}
                 fullWidth
                 className={classes.textField}
             />

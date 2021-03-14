@@ -1,13 +1,14 @@
 import { CassetteProgressCallback } from 'cassette-js';
 
-import { RecordingModel } from '../../../../../redux/_data/recordingsData';
+import { EditorContexts } from '../../../../../redux/ducks/editor';
 
 export interface RecordingBarButtonsProps {
-    model: RecordingModel;
+    attributes: EditorContexts["recording"]["attributes"];
 }
 
 export interface RecordingPanelProps {
-    model: RecordingModel
+    attributes: EditorContexts["recording"]["attributes"];
+    model: EditorContexts["recording"]["data"]["edited"];
 }
 
 export interface ProgressHandle {

@@ -6,22 +6,26 @@ import CardBase, { CardBasePrimaryRow, CardBaseActionSwitch } from './CardBase';
 interface RecordingCardProps {
     title: string;
     duration: number;
-    createdAt: number;
+    created: number;
+    onCardClick: () => void;
 }
 
 const RecordingCard: React.FC<RecordingCardProps> = (props) => {
     const {
         title,
         duration,
-        createdAt
+        created,
+        onCardClick
     } = props;
 
     return (
-        <CardBase>
+        <CardBase
+            onCardClick={onCardClick}
+        >
             <CardBasePrimaryRow
                 title={title}
                 subTitle={duration.toString()}
-                createdDate={createdAt.toString()}
+                createdDate={created.toString()}
             >
                 <CardBaseActionSwitch 
                     primaryIcon={Play}

@@ -1,32 +1,48 @@
-import { WavObject } from 'cassette-js';
+import { nanoid } from 'nanoid';
+import { WavObject, blankWavObject } from 'cassette-js';
 
 export interface RecordingModel {
     id: string;
-    contentType: "recording";
-    userId: string;
-    title: string;
-    categoryId: string | null;
-    audioData: WavObject;
-    waveData: number[][];
-    lastModified: number;
-    createdAt: number;
+    type: "recording";
+    attributes: {
+        title: string;
+        timestamps: {
+            created: number;
+            modified: number;
+        }
+    };
+    data: {
+        audio: WavObject;
+        frequencies: number[][];
+    };
+    relationships: {
+        user: { id: string; };
+        category?: { id: string; };
+    };
 }
 
-const createMockTimeData = () => ({
-    lastModified: Date.now(),
-    createdAt: Date.now()
+const createMockStamps = () => ({
+    created: Date.now(),
+    modified: Date.now()
 });
 
-const createMockAudioData = () => ({
-    _v: 1,
-    _hL: 44,
-    bytes: new Uint8Array(10000),
-    duration: 10,
-    sampleRate: 48000,
-    ...createMockTimeData()
-});
+const createMockAudioData = (): WavObject => {
+    return Object.assign({}, {
+        ...blankWavObject,
+        data: {
+            ...blankWavObject.data,
+            bytes: new Uint8Array(10000),
+            duration: 10
+        },
+        attributes: {
+            timestamps: {
+                ...createMockStamps()
+            }
+        }
+    })
+}
 
-const createMockWaveData = () => {
+const createMockFrequenciesData = () => {
     return Array.from({
         length: 10}, () => Array.from(
             {length: 10}, () => Math.floor(Math.random() * 150)
@@ -34,37 +50,47 @@ const createMockWaveData = () => {
     );
 };
 
-const mockData: RecordingModel[] = [
-    {id: 'recording1', userId: 'user1', title: 'Recording 1', categoryId: null},
-    {id: 'recording2', userId: 'user1', title: 'Recording 2', categoryId: null},
-    {id: 'recording3', userId: 'user1', title: 'Recording 3', categoryId: null}
-].map(data => Object.assign({}, data, {
-    contentType: "recording" as const,
-    audioData: createMockAudioData(),
-    waveData: createMockWaveData(),
-    ...createMockTimeData()
-}));
-
-export const generateRecordingModel = (
-    userId: string
-): RecordingModel => ({
-    id: "new",
-    contentType: "recording",
-    userId,
-    title: "",
-    categoryId: null,
-    audioData: {
-        _v: 1,
-        _hL: 44,
-        bytes: new Uint8Array(10000),
-        duration: 10,
-        sampleRate: 48000,
-        lastModified: 0,
-        createdAt: 0
-    },
-    waveData: [],
-    lastModified: 0,
-    createdAt: 0
+const createMockData = () => ({
+    audio: createMockAudioData(),
+    frequencies: createMockFrequenciesData()
 });
+
+const generateMockRecordingModel = (
+    id: string,
+    title: string,
+    timestamps: { created: number, modified: number },
+    data: { audio: WavObject, frequencies: number[][] },
+    userId: string,
+    categoryId?: string
+): RecordingModel => ({
+    id,
+    type: "recording",
+    attributes: {
+        title,
+        timestamps
+    },
+    data,
+    relationships: {
+        user: {
+            id: userId
+        }
+    }
+});
+
+export const generateNewRecordingModel = (
+    userId: string
+): RecordingModel => generateMockRecordingModel(
+    nanoid(10),
+    "",
+    { created: 0, modified: 0 },
+    { audio: blankWavObject, frequencies: [] },
+    userId
+);
+
+const mockData = [
+    generateMockRecordingModel('recording1', 'Recording 1', createMockStamps(), createMockData(), 'user1'),
+    generateMockRecordingModel('recording2', 'Recording 2', createMockStamps(), createMockData(), 'user1'),
+    generateMockRecordingModel('recording3', 'Recording 3', createMockStamps(), createMockData(), 'user1')
+];
 
 export default mockData;

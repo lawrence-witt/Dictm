@@ -59,7 +59,11 @@ const CategoryPanel: React.FC<CategoryPanelProps> = (props) => {
 
     return (
         <>
-            <TextField label="Title" fullWidth/>
+            <TextField 
+                label="Title"
+                value={model.attributes.title} 
+                fullWidth
+            />
             <MediaAutocomplete options={recState} label={'Recordings'} type="rec" onChange={updateSelection}/>
             <MediaAutocomplete options={noteState} label={'Notes'} type="note" onChange={updateSelection} />
         </>

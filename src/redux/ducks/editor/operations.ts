@@ -12,7 +12,8 @@ import { RootState } from '../../store';
 *
 *  Description 
 *  Generates a new content model to match editorType if the contentId is "new".
-*  Otherwise validates contentId and extracts content model before commiting.
+*  Validates model was created or found, and generates an editor context.
+*  Saves the editorType and contentId to sessionStorage to facilitate page reloading.
 *  
 *  @param {types.EditorTypes} editorType The type of editor panel which should be opened.
 *  @param {string} contentId Either a random string identifying the content or "new".
@@ -24,34 +25,29 @@ type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorO
 
 export const openEditor = (
     editorType: types.EditorModelTypes,
-    contentId?: string
+    contentId: string
 ): OpenEditorThunkAction => (
     dispatch, 
     getState
 ): void => {
     const { user, media, categories } = getState();
 
-    let editorTitle: string;
-    let editorModel: types.EditorModels;
-    
-    if (editorType === "choose" || contentId === "new") {
-        const { title, model } = helpers.generateContentModel(editorType, user.id);
-        editorTitle = title;
-        editorModel = model;
+    const isNew = contentId === "new";
+    let model: types.EditorModels | undefined;
+
+    if (editorType === "choose" || isNew) {
+        model = helpers.generateContentModel(editorType, user.id);
     } else {
-        const foundContentModel = helpers.findContentModel(media, categories, editorType, contentId);
-
-        if (!foundContentModel) {
-            // TODO: dispatch notification error
-            return;
-        }
-
-        editorTitle = foundContentModel.title;
-        editorModel = foundContentModel;
+        model = helpers.findContentModel(media, categories, editorType, contentId);
     }
 
-    // TODO: add editorType and contentId to sessionStorage
-    dispatch(actions.openEditor(editorTitle, editorModel));
+    if (!model) {
+        // TODO: dispatch notification error
+        return;
+    }
+
+    // TODO: save editorType and contentId in sessionStorage
+    dispatch(actions.openEditor(helpers.generateEditorContext(model, isNew)));
 }
 
 /** 
@@ -59,8 +55,8 @@ export const openEditor = (
 *  Closes the editor modal.
 *
 *  Description 
-*  Reset the editor base state to undefined.
-*  Remove the base editor state from sessionStorage.
+*  Resets the editor base state to undefined.
+*  Removes the editorType and contentId from sessionStorage.
 */
 
 type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClosedAction>;
@@ -68,6 +64,6 @@ type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.Editor
 export const closeEditor = (): CloseEditorThunkAction => (
     dispatch
 ): void => {
-    // remove editorType and contentId in sessionStorage
+    // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.closeEditor());
 } 

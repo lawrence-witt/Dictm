@@ -13,7 +13,7 @@ import PrimaryCheckBox from '../../atoms/Inputs/PrimaryCheckbox';
 /* TYPES */
 
 interface CardBaseProps {
-    onCardAction?: () => void;
+    onCardClick: () => void;
     isSecondaryActive?: boolean;
     isCardFocussed?: boolean;
 }
@@ -66,7 +66,7 @@ const useBaseStyles = makeStyles<Theme, {isCardFocussed: boolean}>(theme =>
 
 const CardBase: React.FC<CardBaseProps> = (props) => {
     const {
-        onCardAction,
+        onCardClick,
         isCardFocussed = false,
         isSecondaryActive = false,
         children
@@ -79,7 +79,7 @@ const CardBase: React.FC<CardBaseProps> = (props) => {
             <ButtonBase 
                 className={classes.buttonBase} 
                 disabled={isSecondaryActive} 
-                onClick={onCardAction}
+                onClick={onCardClick}
             />
             {children}
         </Card>

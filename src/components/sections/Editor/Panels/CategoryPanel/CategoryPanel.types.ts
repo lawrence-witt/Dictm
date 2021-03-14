@@ -1,5 +1,5 @@
-import { CategoryModel } from '../../../../../redux/_data/categoriesData';
+import { EditorContexts } from '../../../../../redux/ducks/editor';
 
 export interface CategoryPanelProps {
-    model: CategoryModel;
+    model: EditorContexts["category"]["data"]["edited"];
 }

@@ -37,11 +37,11 @@ const Editor: React.FC<ReduxProps> = (props) => {
 
     // Editor visibility control
 
-    const [editorOpen, setEditorOpen] = React.useState(Boolean(editor.contentModel));
+    const [editorOpen, setEditorOpen] = React.useState(editor.isOpen);
 
     React.useEffect(() => {
-        setEditorOpen(Boolean(editor.contentModel));
-    }, [editor.contentModel]);
+        setEditorOpen(editor.isOpen);
+    }, [editor.isOpen]);
 
     // Handle editor close
 
@@ -58,11 +58,10 @@ const Editor: React.FC<ReduxProps> = (props) => {
                 unmountOnExit: true
             }}
         >
-            {editor.contentModel && (
+            {editor.context && (
                 <>
                     <EditorLayout
-                        title={editor.editorTitle}
-                        model={editor.contentModel}
+                        context={editor.context}
                     />
                     <Dialog 
                         open={false}

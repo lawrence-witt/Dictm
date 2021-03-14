@@ -1,5 +1,5 @@
-import { NoteModel } from '../../../../../redux/_data/notesData';
+import { EditorContexts } from '../../../../../redux/ducks/editor';
 
 export interface NotePanelProps {
-    model: NoteModel;
+    model: EditorContexts["note"]["data"]["edited"];
 }

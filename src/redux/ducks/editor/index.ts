@@ -1,14 +1,10 @@
 import reducer from './reducers';
 
-import * as editorOperations from './operations';
-
-export {
-    editorOperations
-};
+export * as editorOperations from './operations';
 
 export {
     EditorModelTypes,
-    EditorModels
+    EditorContexts
 } from './types'
 
 export default reducer;

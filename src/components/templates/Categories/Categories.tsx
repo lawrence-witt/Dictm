@@ -33,6 +33,10 @@ const CategoriesTemplate: React.FC<ReduxProps> = (props) => {
         openEditor
     } = props;
 
+    const onCardClick = (id: string) => {
+        openEditor("category", id);
+    }
+
     const onFabClick = () => {
         openEditor("category", "new");
     }
@@ -45,9 +49,10 @@ const CategoriesTemplate: React.FC<ReduxProps> = (props) => {
                 const category = categories.byId[id];
 
                 return (
-                    <CategoryCard 
+                    <CategoryCard
                         key={category.id}
-                        title={category.title}
+                        title={category.attributes.title}
+                        onCardClick={() => onCardClick(category.id)}
                     />
                 )
             })}

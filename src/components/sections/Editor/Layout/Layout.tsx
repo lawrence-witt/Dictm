@@ -34,22 +34,21 @@ const useEditorLayoutStyles = makeStyles(theme => ({
 
 const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
     const {
-        title,
-        model
+        context
     } = props;
 
     const classes = useEditorLayoutStyles();
 
-    const panelTransition = useTransition(model.contentType, {
-        key: model.contentType,
+    const panelTransition = useTransition(context.type, {
+        key: context.type,
         initial: { transform: 'translateX(0%)' },
         from: { transform: 'translateX(100%)'},
         enter: { transform: 'translateX(0%)'},
         leave: { transform: 'translateX(-100%)'}
     });
-
+    
     const Panel: EditorPanel = React.useMemo(() => {
-        switch (model.contentType) {
+        switch (context.type) {
             case "choose":
                 return {
                     as: "ul",
@@ -62,8 +61,17 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     as: "div",
                     className: "recordingEditorPanel",
                     disableGutters: true,
-                    buttons: <RecordingBarButtons model={model} />,
-                    component: <RecordingPanel model={model} />
+                    buttons: (
+                        <RecordingBarButtons 
+                            attributes={context.attributes} 
+                        />
+                    ),
+                    component: (
+                        <RecordingPanel
+                            attributes={context.attributes}
+                            model={context.data.edited} 
+                        />
+                    )
                 };
             case "note":
                 return {
@@ -71,7 +79,11 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     className: "noteEditorPanel",
                     disableGutters: false,
                     buttons: <NoteBarButtons />,
-                    component: <NotePanel model={model}/>
+                    component: (
+                        <NotePanel
+                            model={context.data.edited}
+                        />
+                    )
                 };
             case "category":
                 return {
@@ -79,14 +91,18 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     className: "categoryEditorPanel",
                     disableGutters: false,
                     buttons: <CategoryBarButtons />,
-                    component: <CategoryPanel model={model}/>
+                    component: (
+                        <CategoryPanel 
+                            model={context.data.edited}
+                        />
+                    )
                 };
         }
-    }, [model]);
+    }, [context]);
 
     return (
         <>
-            <EditorBar title={title}>
+            <EditorBar title={context.attributes.title}>
                 {Panel.buttons}
             </EditorBar>
             <EditorFrame>

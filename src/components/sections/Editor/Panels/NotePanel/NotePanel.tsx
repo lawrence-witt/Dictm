@@ -56,14 +56,19 @@ const NotePanel: React.FC<NotePanelProps> = (props) => {
 
     return (
         <>
-            <TextField 
-                label="Title" 
+            <TextField
+                label="Title"
+                value={model.attributes.title} 
                 fullWidth
             />
-            <CustomSelect label="Category" options={categories}/>
+            <CustomSelect 
+                label="Category"
+                options={categories}
+            />
             <TextField 
                 inputRef={textAreaRef}
-                label="Note" 
+                label="Note"
+                value={model.data.content}
                 multiline 
                 fullWidth 
                 classes={textAreaClasses}

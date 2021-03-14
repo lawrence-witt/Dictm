@@ -1,14 +1,5 @@
-import { combineReducers } from 'redux';
+import reducer from './reducers';
 
-import recordingsReducer from './recordings';
-import notesReducer from './notes';
+export * as mediaSelectors from './selectors';
 
-import * as mediaSelectors from './selectors';
-
-const mediaReducer = combineReducers({
-    recordings: recordingsReducer,
-    notes: notesReducer
-});
-
-export { mediaSelectors };
-export default mediaReducer;
+export default reducer;

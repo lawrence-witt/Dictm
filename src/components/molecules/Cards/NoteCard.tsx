@@ -6,9 +6,13 @@ import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitc
 
 interface NoteCardProps {
     title: string;
-    details: { wordCount: number; charCount: number; };
-    content: string;
-    createdAt: number;
+    data: {
+        content: string;
+        wordCount: number; 
+        charCount: number;
+    }
+    created: number;
+    onCardClick: () => void;
 }
 
 const useStyles = makeStyles(theme => 
@@ -25,19 +29,21 @@ const useStyles = makeStyles(theme =>
 const NoteCard: React.FC<NoteCardProps> = (props) => {
     const {
         title,
-        details,
-        content,
-        createdAt
+        data,
+        created,
+        onCardClick
     } = props;
 
     const classes = useStyles();
 
     return (
-        <CardBase>
+        <CardBase
+            onCardClick={onCardClick}
+        >
             <CardBasePrimaryRow
                 title={title}
-                subTitle={`${details.wordCount} words / ${details.charCount} chars`}
-                createdDate={createdAt.toString()}
+                subTitle={`${data.wordCount} words / ${data.charCount} chars`}
+                createdDate={created.toString()}
             >
                 <CardBaseActionSwitch
                     primaryIcon={() => (
@@ -53,7 +59,7 @@ const NoteCard: React.FC<NoteCardProps> = (props) => {
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>
                 <Typography variant="caption" noWrap className={classes.caption}>
-                    {content}
+                    {data.content}
                 </Typography>
             </CardBaseSecondaryRow>
         </CardBase>

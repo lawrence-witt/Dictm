@@ -1,11 +1,17 @@
 export interface UserModel {
     id: string;
-    name: string;
+    type: "user";
+    attributes: {
+        name: string;
+    }
 }
 
 const defaultUser: UserModel = {
     id: "user1",
-    name: "Lazarus"
+    type: "user",
+    attributes: {
+        name: "Lazarus"
+    }
 }
 
 export default defaultUser;

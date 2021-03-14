@@ -1,5 +1,5 @@
 import {
-    EditorModels,
+    EditorContexts,
     EDITOR_OPENED,
     EditorOpenedAction,
     EDITOR_CLOSED,
@@ -7,13 +7,11 @@ import {
 } from './types';
 
 export const openEditor = (
-    editorTitle: string,
-    contentModel: EditorModels
+    context: EditorContexts[keyof EditorContexts]
 ): EditorOpenedAction => ({
     type: EDITOR_OPENED,
     payload: {
-        editorTitle,
-        contentModel
+        context
     }
 });
 

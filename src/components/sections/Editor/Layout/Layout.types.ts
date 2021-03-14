@@ -1,10 +1,9 @@
 import {
-    EditorModels
+    EditorContexts
 } from '../../../../redux/ducks/editor';
 
 export interface EditorLayoutProps {
-    title: string;
-    model: EditorModels;
+    context: EditorContexts[keyof EditorContexts];
 }
 
 type EditorPanelClasses = 

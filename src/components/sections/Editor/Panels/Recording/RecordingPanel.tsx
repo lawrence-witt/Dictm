@@ -22,10 +22,8 @@ import useCassette from '../../../../../utils/hooks/useCassette';
 
 const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
     const {
-        model
+        attributes
     } = props;
-
-    const mode = model.id === "new" ? "edit" : "play";
 
     const [menuOpen, setMenuOpen] = React.useState(false);
     const menuRef = React.useRef(null);
@@ -44,7 +42,7 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
                 ref={menuRef}
                 onClick={toggleMenu}
                 color="inherit"
-                design="dots" 
+                design="dots"
                 edge="end"
             />
             <Menu
@@ -58,17 +56,16 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
         </>
     );
 
-    return mode === 'play' ? playButtons : null;
+    return attributes.mode === 'play' ? playButtons : null;
 };
 
 /* RECORDING EDITOR */
 
 const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
-    const { 
+    const {
+        attributes, 
         model
     } = props;
-
-    const mode = model.id === "new" ? "edit" : "play";
 
     /* 
     *   Animation refs
@@ -171,9 +168,9 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     }, [cassette.flags, cassette.controls]);
 
     React.useEffect(() => {
-        if (mode !== "edit" || stream.current) return;
+        if (attributes.mode === "play" || stream.current) return;
         handleConnect();
-    }, [mode, handleConnect]);
+    }, [attributes.mode, handleConnect]);
 
     React.useEffect(() => {
         return () => {
@@ -222,13 +219,15 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
                 handleTimeout={handleTimeout}
             />
             <FlexSpace />
-            {mode === "edit" && (
-                <Form 
+            {attributes.mode === "edit" && (
+                <Form
+                    title={model.attributes.title}
+                    category={model.relationships.category}
                     flags={cassette.flags}
                 />
             )}
             <Controls 
-                mode={mode} 
+                mode={attributes.mode} 
                 status={cassette.status}
                 flags={cassette.flags}
                 handleStart={handleStart}

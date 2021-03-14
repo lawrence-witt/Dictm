@@ -1,53 +1,80 @@
+import { nanoid } from 'nanoid';
+
 export interface NoteModel {
     id: string;
-    contentType: "note";
-    userId: string;
-    title: string;
-    categoryId: string | null;
-    content: string;
-    details: {
-        wordCount: number;
-        charCount: number;
+    type: "note";
+    attributes: {
+        title: string;
+        timestamps: {
+            created: number;
+            modified: number;
+        }
     };
-    lastModified: number;
-    createdAt: number;
+    data: {
+        content: string;
+        charCount: number;
+        wordCount: number;
+    }
+    relationships: {
+        user: { id: string; };
+        category?: { id: string; };
+    }
 }
 
-const createMockTimeData = () => ({
-    lastModified: Date.now(),
-    createdAt: Date.now()
-});
+const createMockStamps = () => {
+    const modified = Math.floor(Math.random() * 100000);
+    return {
+        created: modified - Math.floor(Math.random() * 100000),
+        modified
+    }
+}
 
-const createMockDetailsData = () => ({
-    wordCount: Math.floor(Math.random() * 50),
-    charCount: Math.floor(Math.random() * 300)
-})
+const createMockData = (content: string) => {
+    const wordCount = Math.floor(Math.random() * 100);
+    
+    return {
+        content,
+        charCount: Math.floor(Math.random() * 5) * wordCount,
+        wordCount
+    }
+}
 
-const mockData: NoteModel[] = [
-    {id: 'note1', userId: 'user1', title: 'Note1', categoryId: null, content: 'Content of Note1'},
-    {id: 'note2', userId: 'user1', title: 'Note2', categoryId: null, content: 'Content of Note2'},
-    {id: 'note3', userId: 'user1', title: 'Note3', categoryId: null, content: 'Content of Note3'},
-].map(data => Object.assign({}, data, {
-    contentType: "note" as const,
-    details: createMockDetailsData(),
-    ...createMockTimeData()
-}));
-
-export const generateNoteModel = (
-    userId: string
+const generateMockNoteModel = (
+    id: string,
+    title: string,
+    timestamps: { created: number, modified: number },
+    data: { content: string, charCount: number, wordCount: number },
+    userId: string,
+    categoryId?: string
 ): NoteModel => ({
-    id: "new",
-    contentType: "note",
-    userId,
-    title: "",
-    categoryId: null,
-    content: "",
-    details: {
-        wordCount: 0,
-        charCount: 0
+    id,
+    type: "note",
+    attributes: {
+        title,
+        timestamps
     },
-    lastModified: 0,
-    createdAt: 0
+    data,
+    relationships: {
+        user: {
+            id: userId
+        }
+    }
 });
+
+export const generateNewNoteModel = (
+    userId: string
+): NoteModel => generateMockNoteModel(
+    nanoid(10),
+    "",
+    { created: 0, modified: 0},
+    { content: "", charCount: 0, wordCount: 0 },
+    userId
+);
+
+const mockData = [
+    generateMockNoteModel('note1', 'Note 1', createMockStamps(), createMockData('Content of Note1'), "user1"),
+    generateMockNoteModel('note2', 'Note 2', createMockStamps(), createMockData('Content of Note2'), "user1"),
+    generateMockNoteModel('note3', 'Note 3', createMockStamps(), createMockData('Content of Note3'), "user1")
+]
 
 export default mockData;

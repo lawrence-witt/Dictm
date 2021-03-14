@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
 import { mediaSelectors } from '../../../redux/ducks/media';
-import { editorOperations } from '../../../redux/ducks/editor';
+import { editorOperations, EditorModelTypes } from '../../../redux/ducks/editor';
 
 import CardGrid from '../../molecules/Grids/CardGrid';
 import RecordingCard from '../../molecules/Cards/RecordingCard';
@@ -38,6 +38,10 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
         openEditor
     } = props;
 
+    const onCardClick = React.useCallback((type: EditorModelTypes, id: string) => {
+        openEditor(type, id);
+    }, [openEditor]);
+
     const onFabClick = React.useCallback(() => {
         const editorType = {
             recordings: "recording" as const,
@@ -45,9 +49,7 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
             category: "choose" as const
         }[context];
 
-        const contentId = editorType === "choose" ? undefined : "new";
-
-        openEditor(editorType, contentId);
+        openEditor(editorType, "new");
     }, [context, openEditor]);
 
     return (
@@ -57,20 +59,21 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
             {mediaList.allIds.map(id => {
                 const item = mediaList.byId[id];
 
-                return item.contentType === "recording" ? (
+                return item.type === "recording" ? (
                     <RecordingCard
                         key={item.id}
-                        title={item.title}
-                        duration={item.audioData.duration}
-                        createdAt={item.createdAt}
+                        title={item.attributes.title}
+                        duration={item.data.audio.data.duration}
+                        created={item.attributes.timestamps.created}
+                        onCardClick={() => onCardClick("recording", item.id)}
                     />
                 ) : (
                     <NoteCard
                         key={item.id}
-                        title={item.title}
-                        details={item.details}
-                        content={item.content}
-                        createdAt={item.createdAt}
+                        title={item.attributes.title}
+                        data={item.data}
+                        created={item.attributes.timestamps.created}
+                        onCardClick={() => onCardClick("note", item.id)}
                     />
                 );
             })}
