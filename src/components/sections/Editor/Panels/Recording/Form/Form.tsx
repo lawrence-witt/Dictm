@@ -34,7 +34,9 @@ const Form: React.FC<FormProps> = (props) => {
             />
             <CustomSelect 
                 label="Category"
+                selected={undefined}
                 options={[]}
+                onChange={() => ({})}
             />
         </form>
     ) : null;

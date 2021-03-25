@@ -17,7 +17,7 @@ export interface NoteModel {
     }
     relationships: {
         user: { id: string; };
-        category?: { id: string; };
+        category: { id: string; } | undefined;
     }
 }
 
@@ -57,7 +57,8 @@ const generateMockNoteModel = (
     relationships: {
         user: {
             id: userId
-        }
+        },
+        category: undefined
     }
 });
 

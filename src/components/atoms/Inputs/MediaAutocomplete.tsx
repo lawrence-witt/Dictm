@@ -89,7 +89,7 @@ const MediaAutocomplete: React.FC<MediaAutocompleteProps> = (props) => {
             classes={classes}
             multiple
             options={options}
-            value={options.filter(opt => opt.isSelected)}
+            value={options.filter(option => option.isSelected)}
             getOptionLabel={option => option.title}
             disableCloseOnSelect
             onChange={(event, value: MediaOptionProps[]) => onChange(type, value)}

@@ -4,7 +4,13 @@ import * as types from './types';
 import * as actions from './actions';
 import * as helpers from './helpers';
 
+import { RecordingModel } from '../../_data/recordingsData';
+
 import { RootState } from '../../store';
+
+/* 
+*   BASE EDITOR OPERATIONS
+*/
 
 /** 
 *  Summary 
@@ -82,4 +88,201 @@ export const clearEditor = (): ClearEditorThunkAction => (
 ): void => {
     // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.clearEditor());
+}
+
+/* 
+*   RECORDING EDITOR OPERATIONS
+*/
+
+/** 
+*  Summary
+*  Changes the editor mode between 'play' and 'edit'.
+*
+*  @param {"edit" | "play"} mode The new editor mode.
+*/
+
+type uREMThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorModeUpdatedAction>;
+
+export const updateRecordingEditorMode = (
+    mode: "edit" | "play"
+): uREMThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateRecordingEditorMode(mode));
+}
+
+/** 
+*  Summary
+*  Updates the title string for a Recording Model.
+*
+*  @param {string} title The new title for the model.
+*/
+
+type uRETThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorTitleUpdatedAction>;
+
+export const updateRecordingEditorTitle = (
+    title: string
+): uRETThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateRecordingEditorTitle(title));
+}
+
+/** 
+*  Summary
+*  Updates the category for a Recording Model.
+*
+*  @param {string | undefined} id The new category (or no category) the model should be assigned to.
+*/
+
+type uRECThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
+
+export const updateRecordingEditorCategory = (
+    id?: string
+): uRECThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateRecordingEditorCategory(id));
+}
+
+/** 
+*  Summary
+*  Updates the recording data for a Recording Model.
+*
+*  @param {object} data A data object containing the most recent audio/frequency capture.
+*/
+
+type uREDThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
+
+export const updateRecordingEditorData = (
+    data: RecordingModel["data"]
+): uREDThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateRecordingEditorData(data));
+}
+
+/* 
+*   NOTE EDITOR OPERATIONS
+*/
+
+/** 
+*  Summary
+*  Updates the title string for a Note Model.
+*
+*  @param {string} title The new title for the model.
+*/
+
+type uNETThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorTitleUpdatedAction>;
+
+export const updateNoteEditorTitle = (
+    title: string
+): uNETThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateNoteEditorTitle(title));
+}
+
+/** 
+*  Summary
+*  Updates the category for a Note Model.
+*
+*  @param {string | undefined} id The new category (or no category) the model should be assigned to.
+*/
+
+type uNECThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorCategoryUpdatedAction>;
+
+export const updateNoteEditorCategory = (
+    id?: string
+): uNECThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateNoteEditorCategory(id));
+}
+
+/** 
+*  Summary
+*  Updates the text data for a Note Model.
+*
+*  @param {object} content A string containing the content of the note.
+*/
+
+type uNEDThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
+
+export const updateNoteEditorData = (
+    content: string
+): uNEDThunkAction => (
+    dispatch
+): void => {
+    const wordCount = (() => {
+        const matches = content.match(/[\w\d\’\'-]+/gi);
+        return matches ? matches.length : 0;
+    })();
+
+    const fullData = {
+        content,
+        charCount: content.length,
+        wordCount
+    }
+
+    dispatch(actions.updateNoteEditorData(fullData));
+}
+
+/* 
+*   CATEGORY EDITOR OPERATIONS
+*/
+
+/** 
+*  Summary
+*  Updates the title string for a Category Model.
+*
+*  @param {string} title The new title for the model.
+*/
+
+type uCETThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorTitleUpdatedAction>;
+
+export const updateCategoryEditorTitle = (
+    title: string
+): uCETThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.updateCategoryEditorTitle(title));
+}
+
+/** 
+*  Summary
+*  Adds a resource id to the Category Model.
+*
+*  @param {"recording" | "note"} type The type of resource being added.
+*  @param {string} id The id of the resource. 
+*/
+
+type aCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdAddedAction>;
+
+export const addCategoryEditorId = (
+    type: "recording" | "note",
+    id: string
+): aCEIThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.addCategoryEditorId(type, id));
+}
+
+/**
+*  Summary
+*  Removes a resource id from the Category Model.
+*
+*  @param {"recording" | "note"} type The type of resource being removed.
+*  @param {string} id The id of the resource. 
+*/
+
+type rCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdRemovedAction>;
+
+export const removeCategoryEditorId = (
+    type: "recording" | "note",
+    id: string
+): rCEIThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.removeCategoryEditorId(type, id));
 }

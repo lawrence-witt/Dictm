@@ -44,7 +44,7 @@ export interface RecordingEditorTitleUpdatedAction {
 export interface RecordingEditorCategoryUpdatedAction {
     type: typeof RECORDING_EDITOR_CATEGORY_UPDATED;
     payload: {
-        id: string;
+        id?: string;
     }
 }
 
@@ -67,7 +67,7 @@ export interface NoteEditorTitleUpdatedAction {
 export interface NoteEditorCategoryUpdatedAction {
     type: typeof NOTE_EDITOR_CATEGORY_UPDATED;
     payload: {
-        categoryId: string;
+        id?: string;
     }
 }
 

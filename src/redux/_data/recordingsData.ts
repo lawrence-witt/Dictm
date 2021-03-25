@@ -17,7 +17,7 @@ export interface RecordingModel {
     };
     relationships: {
         user: { id: string; };
-        category?: { id: string; };
+        category: { id: string; } | undefined;
     };
 }
 
@@ -73,7 +73,8 @@ const generateMockRecordingModel = (
     relationships: {
         user: {
             id: userId
-        }
+        },
+        category: undefined
     }
 });
 

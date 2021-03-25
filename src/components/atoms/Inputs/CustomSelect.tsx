@@ -7,7 +7,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 interface CustomSelectProps {
     label: string;
+    selected: string | undefined;
     options: {id: number | string, title: string}[];
+    onChange: (id: string | undefined) => void;
 }
 
 const useSelectStyles = makeStyles(() => ({
@@ -21,10 +23,16 @@ const useSelectStyles = makeStyles(() => ({
 const CustomSelect: React.FC<CustomSelectProps> = (props) => {
     const {
         label,
-        options
+        selected,
+        options,
+        onChange
     } = props;
 
     const classes = useSelectStyles();
+
+    const onOptionChange = React.useCallback((ev: React.ChangeEvent<{value: unknown}>) => {
+        onChange(ev.target.value as string);
+    }, [onChange]);
 
     return (
         <FormControl fullWidth>
@@ -32,10 +40,12 @@ const CustomSelect: React.FC<CustomSelectProps> = (props) => {
                 {label}
             </InputLabel>
             <Select 
-                labelId="custom-select" 
-                value=""
+                labelId="custom-select"
+                value={selected || ""}
                 classes={classes}
+                onChange={onOptionChange}
             >
+                <MenuItem value={undefined}><em>None</em></MenuItem>
                 {options.map((opt) => (
                     <MenuItem key={opt.id} value={opt.id}>{opt.title}</MenuItem>
                 ))}

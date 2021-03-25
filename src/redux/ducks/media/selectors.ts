@@ -44,6 +44,4 @@ const createMediaList = (state: RootState, props: MediaTemplateProps) => {
     }
 };
 
-const getMediaList = createSelector(createMediaList, (mediaList) => mediaList);
-
-export { getMediaList };
+export const getMediaList = createSelector(createMediaList, (mediaList) => mediaList);

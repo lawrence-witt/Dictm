@@ -1,38 +1,13 @@
-import {
-    EditorContexts,
-    EditorState,
-
-    RecordingEditorActionTypes,
-    NoteEditorActionTypes,
-    CategoryEditorActionTypes,
-    EditorActionTypes,
-
-    EDITOR_OPENED,
-    EDITOR_CLOSED,
-    EDITOR_CLEARED,
-
-    RECORDING_EDITOR_MODE_UPDATED,
-    RECORDING_EDITOR_TITLE_UPDATED,
-    RECORDING_EDITOR_CATEGORY_UPDATED,
-    RECORDING_EDITOR_DATA_UPDATED,
-
-    NOTE_EDITOR_TITLE_UPDATED,
-    NOTE_EDITOR_CATEGORY_UPDATED,
-    NOTE_EDITOR_DATA_UPDATED,
-
-    CATEGORY_EDITOR_TITLE_UPDATED,
-    CATEGORY_EDITOR_ID_ADDED,
-    CATEGORY_EDITOR_ID_REMOVED
-} from './types';
+import * as types from './types';
 
 //  Choose Editor Reducer
 
 const chooseEditorReducer = (
-    state: EditorContexts["choose"] | undefined,
-    action: EditorActionTypes
-): EditorContexts["choose"] => {
+    state: types.EditorContexts["choose"] | undefined,
+    action: types.EditorActionTypes
+): types.EditorContexts["choose"] => {
     if (!state) {
-        if (action.type !== EDITOR_OPENED) {
+        if (action.type !== types.EDITOR_OPENED) {
             throw new Error('Choose Editor has not been initialised.');
         }
         if (action.payload.context.type !== "choose") {
@@ -48,11 +23,11 @@ const chooseEditorReducer = (
 // Recording Editor Reducer
 
 const recordingEditorReducer = (
-    state: EditorContexts["recording"] | undefined,
-    action: RecordingEditorActionTypes
-): EditorContexts["recording"] => {
+    state: types.EditorContexts["recording"] | undefined,
+    action: types.RecordingEditorActionTypes
+): types.EditorContexts["recording"] => {
     if (!state) {
-        if (action.type !== EDITOR_OPENED) {
+        if (action.type !== types.EDITOR_OPENED) {
             throw new Error('Recording Editor has not been initialised.');
         }
         if (action.payload.context.type !== "recording") {
@@ -63,10 +38,51 @@ const recordingEditorReducer = (
     }
 
     switch (action.type) {
-        case RECORDING_EDITOR_MODE_UPDATED:
-        case RECORDING_EDITOR_TITLE_UPDATED:
-        case RECORDING_EDITOR_CATEGORY_UPDATED:
-        case RECORDING_EDITOR_DATA_UPDATED:
+        case types.RECORDING_EDITOR_MODE_UPDATED:
+            return {
+                ...state,
+                mode: action.payload.mode
+            }
+        case types.RECORDING_EDITOR_TITLE_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        attributes: {
+                            ...state.data.editing.attributes,
+                            title: action.payload.title
+                        }
+                    }
+                }
+            }
+        case types.RECORDING_EDITOR_CATEGORY_UPDATED:
+            const id = action.payload.id;
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        relationships: {
+                            ...state.data.editing.relationships,
+                            category: id === undefined ? id : { id }
+                        }
+                    }
+                }
+            }
+        case types.RECORDING_EDITOR_DATA_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        data: action.payload.data
+                    }
+                }
+            }
         default:
             return state;
     }
@@ -75,11 +91,11 @@ const recordingEditorReducer = (
 // Note Editor Reducer
 
 const noteEditorReducer = (
-    state: EditorContexts["note"] | undefined,
-    action: NoteEditorActionTypes
-): EditorContexts["note"] => {
+    state: types.EditorContexts["note"] | undefined,
+    action: types.NoteEditorActionTypes
+): types.EditorContexts["note"] => {
     if (!state) {
-        if (action.type !== EDITOR_OPENED) {
+        if (action.type !== types.EDITOR_OPENED) {
             throw new Error('Note Editor has not been initialised.');
         }
         if (action.payload.context.type !== "note") {
@@ -90,9 +106,46 @@ const noteEditorReducer = (
     }
 
     switch (action.type) {
-        case NOTE_EDITOR_TITLE_UPDATED:
-        case NOTE_EDITOR_CATEGORY_UPDATED:
-        case NOTE_EDITOR_DATA_UPDATED:
+        case types.NOTE_EDITOR_TITLE_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        attributes: {
+                            ...state.data.editing.attributes,
+                            title: action.payload.title
+                        }
+                    }
+                }
+            }
+        case types.NOTE_EDITOR_CATEGORY_UPDATED:
+            const id = action.payload.id;
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        relationships: {
+                            ...state.data.editing.relationships,
+                            category: id === undefined ? id : { id }
+                        }
+                    }
+                }
+            }
+        case types.NOTE_EDITOR_DATA_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        data: action.payload.data
+                    }
+                }
+            }
         default:
             return state;
     }
@@ -101,11 +154,11 @@ const noteEditorReducer = (
 // Category Editor Reducer
 
 const categoryEditorReducer = (
-    state: EditorContexts["category"] | undefined,
-    action: CategoryEditorActionTypes
-): EditorContexts["category"] => {
+    state: types.EditorContexts["category"] | undefined,
+    action: types.CategoryEditorActionTypes
+): types.EditorContexts["category"] => {
     if (!state) {
-        if (action.type !== EDITOR_OPENED) {
+        if (action.type !== types.EDITOR_OPENED) {
             throw new Error('Category Editor has not been initialised.');
         }
         if (action.payload.context.type !== "category") {
@@ -116,9 +169,64 @@ const categoryEditorReducer = (
     }
 
     switch (action.type) {
-        case CATEGORY_EDITOR_TITLE_UPDATED:
-        case CATEGORY_EDITOR_ID_ADDED:
-        case CATEGORY_EDITOR_ID_REMOVED:
+        case types.CATEGORY_EDITOR_TITLE_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        attributes: {
+                            ...state.data.editing.attributes,
+                            title: action.payload.title
+                        }
+                    }
+                }
+            }
+        case types.CATEGORY_EDITOR_ID_ADDED: {
+            const resourceType = action.payload.type === "recording" ? "recordings" : "notes";
+
+            const oldRelationships = state.data.editing.relationships;
+            const newRelationships = {
+                ...oldRelationships,
+                [resourceType]: {
+                    ids: [...oldRelationships[resourceType].ids, action.payload.id]
+                }
+            }
+
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        relationships: newRelationships
+                    }
+                }
+            }
+        }
+        case types.CATEGORY_EDITOR_ID_REMOVED: {
+            const resourceType = action.payload.type === "recording" ? "recordings" : "notes";
+
+            const oldRelationships = state.data.editing.relationships;
+            const newRelationships = {
+                ...oldRelationships,
+                [resourceType]: {
+                    ids: oldRelationships[resourceType].ids.filter(id => id !== action.payload.id)
+                }
+            }
+
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        relationships: newRelationships
+                    }
+                }
+            }
+        }
         default:
             return state;
     }
@@ -133,7 +241,7 @@ const contextReducerMap = {
     category: categoryEditorReducer
 }
 
-const initialEditorState: EditorState = {
+const initialEditorState: types.EditorState = {
     attributes: {
         title: "",
         isOpen: false,
@@ -152,10 +260,10 @@ const initialEditorState: EditorState = {
 
 const editorReducer = (
     state = initialEditorState,
-    action: EditorActionTypes
-): EditorState => {
+    action: types.EditorActionTypes
+): types.EditorState => {
     switch(action.type) {
-        case EDITOR_OPENED: {
+        case types.EDITOR_OPENED: {
             if (state.context) throw new Error('Editor already has a context in state.')
 
             const contextReducer = contextReducerMap[action.payload.context.type];
@@ -170,7 +278,7 @@ const editorReducer = (
                 context: contextReducer(state.context, action)
             }
         }
-        case EDITOR_CLOSED:
+        case types.EDITOR_CLOSED:
             return {
                 ...state,
                 attributes: {
@@ -178,12 +286,12 @@ const editorReducer = (
                     isOpen: false
                 }
             };
-        case EDITOR_CLEARED:
+        case types.EDITOR_CLEARED:
             return initialEditorState;
-        case RECORDING_EDITOR_MODE_UPDATED:
-        case RECORDING_EDITOR_TITLE_UPDATED:
-        case RECORDING_EDITOR_CATEGORY_UPDATED:
-        case RECORDING_EDITOR_MODE_UPDATED:
+        case types.RECORDING_EDITOR_MODE_UPDATED:
+        case types.RECORDING_EDITOR_TITLE_UPDATED:
+        case types.RECORDING_EDITOR_CATEGORY_UPDATED:
+        case types.RECORDING_EDITOR_MODE_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "recording") {
                 throw new Error(`Recording Editor action cannot be executed on ${state.context.type} context.`);
@@ -193,9 +301,9 @@ const editorReducer = (
                 ...state,
                 context: recordingEditorReducer(state.context, action)
             }
-        case NOTE_EDITOR_TITLE_UPDATED:
-        case NOTE_EDITOR_CATEGORY_UPDATED:
-        case NOTE_EDITOR_DATA_UPDATED:
+        case types.NOTE_EDITOR_TITLE_UPDATED:
+        case types.NOTE_EDITOR_CATEGORY_UPDATED:
+        case types.NOTE_EDITOR_DATA_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "note") {
                 throw new Error(`Note Editor action cannot be executed on ${state.context.type} context.`);
@@ -205,9 +313,9 @@ const editorReducer = (
                 ...state,
                 context: noteEditorReducer(state.context, action)
             }
-        case CATEGORY_EDITOR_TITLE_UPDATED:
-        case CATEGORY_EDITOR_ID_ADDED:
-        case CATEGORY_EDITOR_ID_REMOVED:
+        case types.CATEGORY_EDITOR_TITLE_UPDATED:
+        case types.CATEGORY_EDITOR_ID_ADDED:
+        case types.CATEGORY_EDITOR_ID_REMOVED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "category") {
                 throw new Error(`Category Editor action cannot be executed on ${state.context.type} context.`);

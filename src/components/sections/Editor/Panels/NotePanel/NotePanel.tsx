@@ -1,8 +1,14 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
 import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
+
+import { RootState } from '../../../../../redux/store';
+import { categorySelectors } from '../../../../../redux/ducks/categories';
+import { editorOperations } from '../../../../../redux/ducks/editor';
 
 import CustomSelect from '../../../../atoms/Inputs/CustomSelect';
 
@@ -25,10 +31,23 @@ const NoteBarButtons: React.FC = () => {
 
 /* NOTE EDITOR */
 
-const categories = [
-    {id: 1, title: 'My Category'},
-    {id: 2, title: 'My Other Category'}
-];
+/* Redux */
+
+const mapState = (state: RootState) => ({
+    categoryTitles: categorySelectors.getCategoryTitles(state.categories)
+});
+
+const mapDispatch = {
+    updateTitle: editorOperations.updateNoteEditorTitle,
+    updateCategory: editorOperations.updateNoteEditorCategory,
+    updateData: editorOperations.updateNoteEditorData
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* Local */
 
 const useTextAreaStyles = makeStyles(theme => ({
     root: {
@@ -46,13 +65,29 @@ const useTextAreaStyles = makeStyles(theme => ({
     }
 }));
 
-const NotePanel: React.FC<NotePanelProps> = (props) => {
+const NotePanel: React.FC<NotePanelProps & ReduxProps> = (props) => {
     const {
-        model
+        model,
+        categoryTitles,
+        updateTitle,
+        updateCategory,
+        updateData
     } = props;
 
     const textAreaClasses = useTextAreaStyles();
     const textAreaRef = React.useRef() as React.MutableRefObject<HTMLInputElement>;
+
+    const onTitleChange = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
+        updateTitle(ev.target.value);
+    }, [updateTitle]);
+
+    const onCategoryChange = React.useCallback((id: string | undefined) => {
+        updateCategory(id);
+    }, [updateCategory]);
+
+    const onTextChange = React.useCallback((ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+        updateData(ev.target.value);
+    }, [updateData]);
 
     return (
         <>
@@ -60,12 +95,15 @@ const NotePanel: React.FC<NotePanelProps> = (props) => {
                 label="Title"
                 value={model.attributes.title} 
                 fullWidth
+                onChange={onTitleChange}
             />
             <CustomSelect 
                 label="Category"
-                options={categories}
+                selected={model.relationships.category?.id}
+                options={categoryTitles}
+                onChange={onCategoryChange}
             />
-            <TextField 
+            <TextField
                 inputRef={textAreaRef}
                 label="Note"
                 value={model.data.content}
@@ -73,6 +111,7 @@ const NotePanel: React.FC<NotePanelProps> = (props) => {
                 fullWidth 
                 classes={textAreaClasses}
                 InputProps={{disableUnderline: true}}
+                onChange={onTextChange}
                 onClick={() => textAreaRef.current.focus()}
             />
         </>
@@ -82,4 +121,4 @@ const NotePanel: React.FC<NotePanelProps> = (props) => {
 /* EXPORTS */
 
 export { NoteBarButtons };
-export default NotePanel;
+export default connector(NotePanel);
