@@ -1,8 +1,10 @@
 import {
     EditorContexts
 } from '../../../../redux/ducks/editor';
+import { EditorState } from '../../../../redux/ducks/editor/types';
 
 export interface EditorLayoutProps {
+    attributes: EditorState["attributes"];
     context: EditorContexts[keyof EditorContexts];
 }
 

@@ -18,7 +18,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    closeEditor: editorOperations.closeEditor
+    closeEditor: editorOperations.closeEditor,
+    clearEditor: editorOperations.clearEditor
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -32,16 +33,17 @@ type ReduxProps = ConnectedProps<typeof connector>;
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
         editor,
-        closeEditor
+        closeEditor,
+        clearEditor
     } = props;
 
     // Editor visibility control
 
-    const [editorOpen, setEditorOpen] = React.useState(editor.isOpen);
+    const [editorOpen, setEditorOpen] = React.useState(editor.attributes.isOpen);
 
     React.useEffect(() => {
-        setEditorOpen(editor.isOpen);
-    }, [editor.isOpen]);
+        setEditorOpen(editor.attributes.isOpen);
+    }, [editor.attributes.isOpen]);
 
     // Handle editor close
 
@@ -55,12 +57,14 @@ const Editor: React.FC<ReduxProps> = (props) => {
             onClose={onRequestEditorClosed}
             SlideProps={{
                 mountOnEnter: true,
-                unmountOnExit: true
+                unmountOnExit: true,
+                onExited: clearEditor
             }}
         >
             {editor.context && (
                 <>
                     <EditorLayout
+                        attributes={editor.attributes}
                         context={editor.context}
                     />
                     <Dialog 

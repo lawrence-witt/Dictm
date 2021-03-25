@@ -17,8 +17,6 @@ import { RootState } from '../../store';
 *  
 *  @param {types.EditorTypes} editorType The type of editor panel which should be opened.
 *  @param {string} contentId Either a random string identifying the content or "new".
-*
-*  @returns {void}
 */
 
 type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
@@ -45,9 +43,11 @@ export const openEditor = (
         // TODO: dispatch notification error
         return;
     }
+    
+    const { title, context } = helpers.generateEditorContext(model, isNew);
 
     // TODO: save editorType and contentId in sessionStorage
-    dispatch(actions.openEditor(helpers.generateEditorContext(model, isNew)));
+    dispatch(actions.openEditor(title, isNew, context));
 }
 
 /** 
@@ -55,8 +55,7 @@ export const openEditor = (
 *  Closes the editor modal.
 *
 *  Description 
-*  Resets the editor base state to undefined.
-*  Removes the editorType and contentId from sessionStorage.
+*  Sets the editor isOpen state to false.
 */
 
 type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClosedAction>;
@@ -64,6 +63,23 @@ type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.Editor
 export const closeEditor = (): CloseEditorThunkAction => (
     dispatch
 ): void => {
-    // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.closeEditor());
-} 
+}
+
+/** 
+*  Summary
+*  Clears the editor modal.
+*
+*  Description
+*  Resets the editor to its initialState.
+*  Removes the editorType and contentId from sessionStorage.
+*/
+
+type ClearEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClearedAction>;
+
+export const clearEditor = (): ClearEditorThunkAction => (
+    dispatch
+): void => {
+    // TODO: remove editorType and contentId in sessionStorage
+    dispatch(actions.clearEditor());
+}

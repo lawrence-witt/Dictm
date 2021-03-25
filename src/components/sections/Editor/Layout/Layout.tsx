@@ -34,6 +34,7 @@ const useEditorLayoutStyles = makeStyles(theme => ({
 
 const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
     const {
+        attributes,
         context
     } = props;
 
@@ -63,13 +64,13 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     disableGutters: true,
                     buttons: (
                         <RecordingBarButtons 
-                            attributes={context.attributes} 
+                            mode={context.mode} 
                         />
                     ),
                     component: (
                         <RecordingPanel
-                            attributes={context.attributes}
-                            model={context.data.edited} 
+                            mode={context.mode}
+                            model={context.data.editing} 
                         />
                     )
                 };
@@ -81,7 +82,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     buttons: <NoteBarButtons />,
                     component: (
                         <NotePanel
-                            model={context.data.edited}
+                            model={context.data.editing}
                         />
                     )
                 };
@@ -93,7 +94,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     buttons: <CategoryBarButtons />,
                     component: (
                         <CategoryPanel 
-                            model={context.data.edited}
+                            model={context.data.editing}
                         />
                     )
                 };
@@ -102,7 +103,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
 
     return (
         <>
-            <EditorBar title={context.attributes.title}>
+            <EditorBar title={attributes.title}>
                 {Panel.buttons}
             </EditorBar>
             <EditorFrame>

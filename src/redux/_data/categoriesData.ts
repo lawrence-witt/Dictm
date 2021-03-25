@@ -56,7 +56,7 @@ export const generateNewCategoryModel = (
 
 const mockData = [
     generateMockCategoryModel('category1', 'Category 1', createMockStamps(), [], [], 'user1'),
-    generateMockCategoryModel('category1', 'Category 2', createMockStamps(), [], [], 'user1')
+    generateMockCategoryModel('category2', 'Category 2', createMockStamps(), [], [], 'user1')
 ]
 
 export default mockData;

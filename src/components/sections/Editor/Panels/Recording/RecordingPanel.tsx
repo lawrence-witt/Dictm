@@ -22,7 +22,7 @@ import useCassette from '../../../../../utils/hooks/useCassette';
 
 const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
     const {
-        attributes
+        mode
     } = props;
 
     const [menuOpen, setMenuOpen] = React.useState(false);
@@ -56,14 +56,14 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
         </>
     );
 
-    return attributes.mode === 'play' ? playButtons : null;
+    return mode === 'play' ? playButtons : null;
 };
 
 /* RECORDING EDITOR */
 
 const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     const {
-        attributes, 
+        mode, 
         model
     } = props;
 
@@ -168,9 +168,9 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     }, [cassette.flags, cassette.controls]);
 
     React.useEffect(() => {
-        if (attributes.mode === "play" || stream.current) return;
+        if (mode === "play" || stream.current) return;
         handleConnect();
-    }, [attributes.mode, handleConnect]);
+    }, [mode, handleConnect]);
 
     React.useEffect(() => {
         return () => {
@@ -219,7 +219,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
                 handleTimeout={handleTimeout}
             />
             <FlexSpace />
-            {attributes.mode === "edit" && (
+            {mode === "edit" && (
                 <Form
                     title={model.attributes.title}
                     category={model.relationships.category}
@@ -227,7 +227,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
                 />
             )}
             <Controls 
-                mode={attributes.mode} 
+                mode={mode} 
                 status={cassette.status}
                 flags={cassette.flags}
                 handleStart={handleStart}

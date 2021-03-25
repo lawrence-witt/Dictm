@@ -2,99 +2,114 @@ import { RecordingModel } from '../../_data/recordingsData';
 import { NoteModel } from '../../_data/notesData';
 import { CategoryModel } from '../../_data/categoriesData';
 
-export const EDITOR_OPENED = "dictm/editor/EDITOR_OPENED";
-export const EDITOR_CLOSED = "dictm/editor/EDITOR_CLOSED";
-
-export type ContentModelTypes = "recording" | "note" | "category";
-export type ContentModels = RecordingModel | NoteModel | CategoryModel;
-
-export type EditorModelTypes = "choose" | ContentModelTypes;
-export type EditorModels = { type: "choose" } | ContentModels;
-
 /* 
-*   Editor Contexts
+*   ACTIONS
 */
 
-type EditorContext<
-    Type extends EditorModelTypes, 
-    Attributes = void, 
-    Data = void, 
-    Dialogs = void
-> = {
-    type: Type;
-    attributes: Attributes;
-    data: Data;
-    dialogs: Dialogs;
-};
+// Action Constants
 
-interface TitleAttribute {
-    title: string;
-}
+export const EDITOR_OPENED                      = "dictm/editor/EDITOR_OPENED";
+export const EDITOR_CLOSED                      = "dictm/editor/EDITOR_CLOSED";
+export const EDITOR_CLEARED                     = "dictm/editor/EDITOR_CLEARED";
 
-interface IsNewAttribute {
-    isNew: boolean;
-}
+export const RECORDING_EDITOR_MODE_UPDATED      = "dictm/editor/recording/MODE_UPDATED";
+export const RECORDING_EDITOR_TITLE_UPDATED     = "dictm/editor/recording/TITLE_UPDATED";
+export const RECORDING_EDITOR_CATEGORY_UPDATED  = "dictm/editor/recording/CATEGORY_UPDATED";
+export const RECORDING_EDITOR_DATA_UPDATED      = "dictm/editor/recording/DATA_UPDATED";
 
-interface ModeAttribute {
-    mode: "edit" | "play";
-}
+export const NOTE_EDITOR_TITLE_UPDATED          = "dictm/editor/note/TITLE_UPDATED";
+export const NOTE_EDITOR_CATEGORY_UPDATED       = "dictm/editor/note/CATEGORY_UPDATED";
+export const NOTE_EDITOR_DATA_UPDATED           = "dictm/editor/note/DATA_UPDATED";
 
-type Data<M> = {
-    original: M;
-    edited: M;
-}
+export const CATEGORY_EDITOR_TITLE_UPDATED      = "dictm/editor/category/TITLE_UPDATED";
+export const CATEGORY_EDITOR_ID_ADDED           = "dictm/editor/category/ID_ADDED";
+export const CATEGORY_EDITOR_ID_REMOVED         = "dictm/editor/category/ID_REMOVED";
 
-type Dialog<K extends string> = {
-    [key in K]: {
-        isOpen: boolean;
+// Recording Context Action Types
+
+export interface RecordingEditorModeUpdatedAction {
+    type: typeof RECORDING_EDITOR_MODE_UPDATED;
+    payload: {
+        mode: "edit" | "play";
     }
 }
 
-export type EditorChooseContext = EditorContext<
-    "choose", 
-    TitleAttribute
->;
-
-export type EditorRecordingContext = EditorContext<
-    "recording", 
-    TitleAttribute & IsNewAttribute & ModeAttribute,
-    Data<RecordingModel>,
-    Dialog<"save"> & Dialog<"details">
->;
-
-export type EditorNoteContext = EditorContext<
-    "note",
-    TitleAttribute & IsNewAttribute,
-    Data<NoteModel>,
-    Dialog<"save">
->;
-
-export type EditorCategoryContext = EditorContext<
-    "category",
-    TitleAttribute & IsNewAttribute,
-    Data<CategoryModel>,
-    Dialog<"save">
->;
-
-export interface EditorContexts {
-    choose: EditorChooseContext;
-    recording: EditorRecordingContext;
-    note: EditorNoteContext;
-    category: EditorCategoryContext;
+export interface RecordingEditorTitleUpdatedAction {
+    type: typeof RECORDING_EDITOR_TITLE_UPDATED;
+    payload: {
+        title: string;
+    }
 }
 
-/* 
-*   Reducer Types
-*/
-
-export interface EditorState {
-    isOpen: boolean;
-    context?: EditorContexts[keyof EditorContexts];
+export interface RecordingEditorCategoryUpdatedAction {
+    type: typeof RECORDING_EDITOR_CATEGORY_UPDATED;
+    payload: {
+        id: string;
+    }
 }
+
+export interface RecordingEditorDataUpdatedAction {
+    type: typeof RECORDING_EDITOR_DATA_UPDATED;
+    payload: {
+        data: RecordingModel["data"];
+    }
+}
+
+// Note Context Action Types
+
+export interface NoteEditorTitleUpdatedAction {
+    type: typeof NOTE_EDITOR_TITLE_UPDATED;
+    payload: {
+        title: string;
+    }
+}
+
+export interface NoteEditorCategoryUpdatedAction {
+    type: typeof NOTE_EDITOR_CATEGORY_UPDATED;
+    payload: {
+        categoryId: string;
+    }
+}
+
+export interface NoteEditorDataUpdatedAction {
+    type: typeof NOTE_EDITOR_DATA_UPDATED;
+    payload: {
+        data: NoteModel["data"];
+    }
+}
+
+// Category Context Action Types
+
+export interface CategoryEditorTitleUpdatedAction {
+    type: typeof CATEGORY_EDITOR_TITLE_UPDATED;
+    payload: {
+        title: string;
+    }
+}
+
+export interface CategoryEditorIdAddedAction {
+    type: typeof CATEGORY_EDITOR_ID_ADDED;
+    payload: {
+        type: "recording" | "note";
+        id: string;
+    }
+}
+
+export interface CategoryEditorIdRemovedAction {
+    type: typeof CATEGORY_EDITOR_ID_REMOVED;
+    payload: {
+        type: "recording" | "note";
+        id: string;
+    }
+}
+
+// Editor Action Types
 
 export interface EditorOpenedAction {
     type: typeof EDITOR_OPENED;
     payload: {
+        title: string;
+        isNew: boolean;
         context: EditorContexts[keyof EditorContexts];
     }
 }
@@ -103,6 +118,93 @@ export interface EditorClosedAction {
     type: typeof EDITOR_CLOSED;
 }
 
-export type EditorActionTypes = 
+export interface EditorClearedAction {
+    type: typeof EDITOR_CLEARED;
+}
+
+// Unionised Action Types
+
+export type RecordingEditorActionTypes =
     EditorOpenedAction |
-    EditorClosedAction;
+    RecordingEditorModeUpdatedAction |
+    RecordingEditorTitleUpdatedAction |
+    RecordingEditorCategoryUpdatedAction |
+    RecordingEditorDataUpdatedAction;
+
+export type NoteEditorActionTypes =
+    EditorOpenedAction |
+    NoteEditorTitleUpdatedAction |
+    NoteEditorCategoryUpdatedAction |
+    NoteEditorDataUpdatedAction;
+
+export type CategoryEditorActionTypes =
+    EditorOpenedAction |
+    CategoryEditorTitleUpdatedAction |
+    CategoryEditorIdAddedAction |
+    CategoryEditorIdRemovedAction;
+
+export type EditorActionTypes =
+    RecordingEditorActionTypes |
+    NoteEditorActionTypes |
+    CategoryEditorActionTypes |
+    EditorClosedAction |
+    EditorClearedAction;
+
+/* 
+*   STATES
+*/
+
+// Unionised Model Types
+
+export type ContentModelTypes = "recording" | "note" | "category";
+export type ContentModels = RecordingModel | NoteModel | CategoryModel;
+
+export type EditorModelTypes = "choose" | ContentModelTypes;
+export type EditorModels = { type: "choose" } | ContentModels;
+
+// Context Reducers
+
+interface EditorContext<Model extends ContentModels> {
+    type: Model["type"];
+    data: {
+        original: Model;
+        editing: Model;
+    }
+}
+
+export interface ChooseEditorContext {
+    type: "choose";
+}
+
+export interface RecordingEditorContext extends EditorContext<RecordingModel> {
+    mode: "edit" | "play";
+}
+
+export type NoteEditorContext = EditorContext<NoteModel>;
+
+export type CategoryEditorContext = EditorContext<CategoryModel>;
+
+export type EditorContexts = {
+    choose: ChooseEditorContext;
+    recording: RecordingEditorContext;
+    note: NoteEditorContext;
+    category: CategoryEditorContext;
+};
+
+// Editor Reducer
+
+type Dialog<K extends string> = {
+    [key in K]: {
+        isOpen: boolean;
+    }
+}
+
+export interface EditorState {
+    attributes: {
+        title: string;
+        isOpen: boolean;
+        isNew: boolean;
+    };
+    context?: EditorContexts[keyof EditorContexts];
+    dialogs: Dialog<"save"> & Dialog<"details">;
+}

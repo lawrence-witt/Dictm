@@ -50,12 +50,7 @@ export const findContentModel = (
 */
 
 const generateChooseContext = (): EditorContexts["choose"] => ({
-    type: "choose",
-    attributes: {
-        title: "Choose New Content"
-    },
-    data: undefined,
-    dialogs: undefined
+    type: "choose"
 });
 
 const generateRecordingContext = (
@@ -63,62 +58,30 @@ const generateRecordingContext = (
     model: RecordingModel
 ): EditorContexts["recording"] => ({
     type: "recording",
-    attributes: {
-        title: isNew ? "New Recording" : model.attributes.title,
-        isNew,
-        mode: isNew ? "edit" : "play"
-    },
+    mode: isNew ? "edit" : "play",
     data: {
         original: model,
-        edited: model
-    },
-    dialogs: {
-        save: {
-            isOpen: false
-        },
-        details: {
-            isOpen: false
-        }
+        editing: model
     }
 });
 
 const generateNoteContext = (
-    isNew: boolean,
     model: NoteModel
 ): EditorContexts["note"] => ({
     type: "note",
-    attributes: {
-        title: isNew ? "New Note" : model.attributes.title,
-        isNew
-    },
     data: {
         original: model,
-        edited: model
-    },
-    dialogs: {
-        save: {
-            isOpen: false
-        }
+        editing: model
     }
 });
 
 const generateCategoryContext = (
-    isNew: boolean,
     model: CategoryModel
 ): EditorContexts["category"] => ({
     type: "category",
-    attributes: {
-        title: isNew ? "New Category" : model.attributes.title,
-        isNew
-    },
     data: {
         original: model,
-        edited: model
-    },
-    dialogs: {
-        save: {
-            isOpen: false
-        }
+        editing: model
     }
 });
 
@@ -126,15 +89,28 @@ const generateCategoryContext = (
 export function generateEditorContext(
     model: EditorModels,
     isNew: boolean
-): EditorContexts[keyof EditorContexts] {
+): {
+    title: string; 
+    context: EditorContexts[keyof EditorContexts]
+} {
+    const title = (() => {
+        if (model.type === "choose") return "Choose New Content";
+
+        return {
+            recording: isNew ? "New Recording" : model.attributes.title,
+            note: isNew ? "New Note" : model.attributes.title,
+            category: isNew ? "New Category" : model.attributes.title
+        }[model.type]
+    })();
+
     switch(model.type) {
         case "choose":
-            return generateChooseContext();
+            return {title, context: generateChooseContext()};
         case "recording":
-            return generateRecordingContext(isNew, model);
+            return {title, context: generateRecordingContext(isNew, model)};
         case "note":
-            return generateNoteContext(isNew, model);
+            return {title, context: generateNoteContext(model)};
         case "category":
-            return generateCategoryContext(isNew, model);
+            return {title, context: generateCategoryContext(model)};
     }
 }
