@@ -309,11 +309,11 @@ class WaveForm {
     *\ * * * * * * * * * * * * * */ 
 
     get frequencyData(): number[][] {
-        return this._freqData;
+        return this._freqData.slice(0).map(deci => deci.slice(0));
     }
 
     set frequencyData(data: number[][]) {
-        this._freqData = data;
+        this._freqData = data.slice(0).map(deci => deci.slice(0));
     }
 }
 

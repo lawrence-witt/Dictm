@@ -1,4 +1,4 @@
-import { ProgressHandle } from '../RecordingPanel.types';
+import { WaveHandle } from '../RecordingPanel.types';
 
 import {
     CassetteStatus,
@@ -9,7 +9,7 @@ import {
 // Component
 
 export interface WaveFormProps {
-    progressHandle: React.RefObject<ProgressHandle>;
+    waveHandle: React.RefObject<WaveHandle>;
     status: CassetteStatus;
     flags: CassettePublicFlags;
     handleStop: () => Promise<void>;

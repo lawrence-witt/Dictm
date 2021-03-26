@@ -11,6 +11,11 @@ export interface RecordingPanelProps {
     model: EditorContexts["recording"]["data"]["editing"];
 }
 
-export interface ProgressHandle {
+export interface TimerHandle {
     increment: CassetteProgressCallback;
+}
+
+export interface WaveHandle {
+    increment: CassetteProgressCallback;
+    flush: () => number[][];
 }

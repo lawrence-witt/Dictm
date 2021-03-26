@@ -20,7 +20,11 @@ const useStyles = makeStyles(theme => ({
 
 // Component
 
-const Timer: React.FC<TimerProps> = ({ progressHandle }) => {
+const Timer: React.FC<TimerProps> = (props) => {
+    const {
+        timerHandle
+    } = props;
+
     const classes = useStyles();
 
     const minRef = React.useRef<HTMLSpanElement>(null);
@@ -38,7 +42,7 @@ const Timer: React.FC<TimerProps> = ({ progressHandle }) => {
         if (csRef.current) csRef.current.innerHTML = addZero(Math.floor(d.getMilliseconds() / 10));
     }, []);
 
-    React.useImperativeHandle(progressHandle, () => ({
+    React.useImperativeHandle(timerHandle, () => ({
         increment
     }), [increment]);
 

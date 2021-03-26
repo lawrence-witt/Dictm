@@ -291,7 +291,7 @@ const editorReducer = (
         case types.RECORDING_EDITOR_MODE_UPDATED:
         case types.RECORDING_EDITOR_TITLE_UPDATED:
         case types.RECORDING_EDITOR_CATEGORY_UPDATED:
-        case types.RECORDING_EDITOR_MODE_UPDATED:
+        case types.RECORDING_EDITOR_DATA_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "recording") {
                 throw new Error(`Recording Editor action cannot be executed on ${state.context.type} context.`);

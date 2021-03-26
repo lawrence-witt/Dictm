@@ -1,5 +1,5 @@
-import { ProgressHandle } from '../RecordingPanel.types';
+import { TimerHandle } from '../RecordingPanel.types';
 
 export interface TimerProps {
-    progressHandle: React.RefObject<ProgressHandle>;
+    timerHandle: React.RefObject<TimerHandle>;
 }

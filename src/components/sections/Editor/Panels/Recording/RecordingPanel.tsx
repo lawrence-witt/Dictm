@@ -4,10 +4,14 @@ import EditIcon from '@material-ui/icons/Edit';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 
+import { connect, ConnectedProps } from 'react-redux';
+
+import { editorOperations } from '../../../../../redux/ducks/editor';
+
 import MenuButton from '../../../../atoms/Buttons/MenuButton';
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 
-import { RecordingBarButtonsProps, RecordingPanelProps, ProgressHandle } from './RecordingPanel.types';
+import { RecordingBarButtonsProps, RecordingPanelProps, TimerHandle, WaveHandle } from './RecordingPanel.types';
 import Timer from './Timer/Timer';
 import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
@@ -61,10 +65,27 @@ const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
 
 /* RECORDING EDITOR */
 
-const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    updateData: editorOperations.updateRecordingEditorData
+}
+
+const connector = connect(null, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     const {
         mode, 
-        model
+        model,
+        updateData
     } = props;
 
     /* 
@@ -74,8 +95,12 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     const nextFrame = React.useRef() as React.MutableRefObject<(() => void) | undefined>;
     const frameLoop = React.useRef() as React.MutableRefObject<ReturnType<typeof demandAnimationFrame>>;
 
-    const timerProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
-    const waveProgressHandle = React.useRef() as React.MutableRefObject<ProgressHandle>;
+    /* 
+    *   Imperative handle refs
+    */
+
+    const timerHandle = React.useRef() as React.MutableRefObject<TimerHandle>;
+    const waveHandle = React.useRef() as React.MutableRefObject<WaveHandle>;
 
     /* 
     *   Cassette callbacks
@@ -83,8 +108,8 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
         nextFrame.current = () => {
-            timerProgressHandle.current.increment(progress, duration);
-            waveProgressHandle.current.increment(progress, duration);
+            timerHandle.current.increment(progress, duration);
+            waveHandle.current.increment(progress, duration);
             nextFrame.current = undefined;
         }
     }, []);
@@ -135,8 +160,15 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
         if (analyser.current) {
             await cassette.controls.removeNodes([analyser.current]);
             analyser.current = null;
+
+            const audioData = cassette.get.wavData();
+            const frequencyData = waveHandle.current.flush();
+
+            if (!audioData) throw new Error('Could not retrieve audio data.');
+
+            updateData({audio: audioData, frequencies: frequencyData});
         }
-    }, [cassette.controls]);
+    }, [cassette.controls, cassette.get, updateData]);
 
     const handleScan = React.useCallback(async (type: 'to' | 'by', secs: number) => {
         if (type === "to") await cassette.controls.scanTo(secs);
@@ -207,10 +239,10 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
     return (
         <>
             <Timer 
-                progressHandle={timerProgressHandle}
+                timerHandle={timerHandle}
             />
             <WaveForm
-                progressHandle={waveProgressHandle}
+                waveHandle={waveHandle}
                 status={cassette.status}
                 flags={cassette.flags}
                 nodeMap={cassette.get.nodeMap}
@@ -222,7 +254,7 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
             {mode === "edit" && (
                 <Form
                     title={model.attributes.title}
-                    category={model.relationships.category}
+                    category={model.relationships.category?.id}
                     flags={cassette.flags}
                 />
             )}
@@ -243,4 +275,4 @@ const RecordingPanel: React.FC<RecordingPanelProps> = (props) => {
 /* EXPORTS */
 
 export { RecordingBarButtons };
-export default RecordingPanel;
+export default connector(RecordingPanel);

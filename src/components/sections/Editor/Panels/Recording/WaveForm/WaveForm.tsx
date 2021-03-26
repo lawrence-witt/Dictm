@@ -65,7 +65,7 @@ const waveFormOptions = {
 
 const WaveForm: React.FC<WaveFormProps> = (props) => {
     const {
-        progressHandle,
+        waveHandle,
         status,
         flags,
         handleStop,
@@ -158,7 +158,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         if (isPlaying) shouldResume.current = false;
     }, [isPlaying]);
 
-    // Handle animation tick
+    // Expose control methods to parent
 
     const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
         progressRef.current = p;
@@ -179,9 +179,15 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         }
     }, [isRecording, nodeMap]);
 
-    React.useImperativeHandle(progressHandle, () => ({
-        increment
-    }), [increment]);
+    const flush = React.useCallback(() => {
+        waveClass.current.flush(progressRef.current);
+        return waveClass.current.frequencyData;
+    }, []);
+
+    React.useImperativeHandle(waveHandle, () => ({
+        increment,
+        flush
+    }), [increment, flush]);
 
     React.useEffect(() => {
         if (isListening) waveClass.current.flush(progressRef.current);

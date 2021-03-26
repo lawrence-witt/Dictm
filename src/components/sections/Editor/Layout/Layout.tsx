@@ -8,10 +8,10 @@ import EditorContent from './Content/EditorContent';
 
 import { EditorLayoutProps, EditorPanel } from './Layout.types';
 
-import ChoosePanel from '../Panels/ChoosePanel/ChoosePanel';
+import ChoosePanel from '../Panels/Choose/ChoosePanel';
 import RecordingPanel, { RecordingBarButtons } from '../Panels/Recording/RecordingPanel';
-import NotePanel, { NoteBarButtons } from '../Panels/NotePanel/NotePanel';
-import CategoryPanel, { CategoryBarButtons } from '../Panels/CategoryPanel/CategoryPanel';
+import NotePanel, { NoteBarButtons } from '../Panels/Note/NotePanel';
+import CategoryPanel, { CategoryBarButtons } from '../Panels/Category/CategoryPanel';
 
 const useEditorLayoutStyles = makeStyles(theme => ({
     categoryEditorPanel: {
