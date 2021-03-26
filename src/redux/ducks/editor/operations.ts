@@ -251,38 +251,19 @@ export const updateCategoryEditorTitle = (
 
 /** 
 *  Summary
-*  Adds a resource id to the Category Model.
+*  Upates the resource ids for a particular type on a Category Model.
 *
-*  @param {"recording" | "note"} type The type of resource being added.
-*  @param {string} id The id of the resource. 
+*  @param {"recording" | "note"} type The type of resource being updated.
+*  @param {string} ids An array containing the new resource ids.
 */
 
-type aCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdAddedAction>;
+type uCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;
 
-export const addCategoryEditorId = (
-    type: "recording" | "note",
-    id: string
-): aCEIThunkAction => (
+export const updateCategoryEditorIds = (
+    type: "recordings" | "notes",
+    ids: string[]
+): uCEIThunkAction => (
     dispatch
 ): void => {
-    dispatch(actions.addCategoryEditorId(type, id));
-}
-
-/**
-*  Summary
-*  Removes a resource id from the Category Model.
-*
-*  @param {"recording" | "note"} type The type of resource being removed.
-*  @param {string} id The id of the resource. 
-*/
-
-type rCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdRemovedAction>;
-
-export const removeCategoryEditorId = (
-    type: "recording" | "note",
-    id: string
-): rCEIThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.removeCategoryEditorId(type, id));
+    dispatch(actions.updateCategoryEditorIds(type, ids));
 }

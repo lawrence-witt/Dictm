@@ -22,8 +22,7 @@ export const NOTE_EDITOR_CATEGORY_UPDATED       = "dictm/editor/note/CATEGORY_UP
 export const NOTE_EDITOR_DATA_UPDATED           = "dictm/editor/note/DATA_UPDATED";
 
 export const CATEGORY_EDITOR_TITLE_UPDATED      = "dictm/editor/category/TITLE_UPDATED";
-export const CATEGORY_EDITOR_ID_ADDED           = "dictm/editor/category/ID_ADDED";
-export const CATEGORY_EDITOR_ID_REMOVED         = "dictm/editor/category/ID_REMOVED";
+export const CATEGORY_EDITOR_IDS_UPDATED        = "dictm/editor/category/IDS_UPDATED";
 
 // Recording Context Action Types
 
@@ -87,19 +86,11 @@ export interface CategoryEditorTitleUpdatedAction {
     }
 }
 
-export interface CategoryEditorIdAddedAction {
-    type: typeof CATEGORY_EDITOR_ID_ADDED;
+export interface CategoryEditorIdsUpdatedAction {
+    type: typeof CATEGORY_EDITOR_IDS_UPDATED;
     payload: {
-        type: "recording" | "note";
-        id: string;
-    }
-}
-
-export interface CategoryEditorIdRemovedAction {
-    type: typeof CATEGORY_EDITOR_ID_REMOVED;
-    payload: {
-        type: "recording" | "note";
-        id: string;
+        type: "recordings" | "notes";
+        ids: string[];
     }
 }
 
@@ -140,8 +131,7 @@ export type NoteEditorActionTypes =
 export type CategoryEditorActionTypes =
     EditorOpenedAction |
     CategoryEditorTitleUpdatedAction |
-    CategoryEditorIdAddedAction |
-    CategoryEditorIdRemovedAction;
+    CategoryEditorIdsUpdatedAction;
 
 export type EditorActionTypes =
     RecordingEditorActionTypes |

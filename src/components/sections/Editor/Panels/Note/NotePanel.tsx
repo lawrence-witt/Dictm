@@ -34,7 +34,7 @@ const NoteBarButtons: React.FC = () => {
 /* Redux */
 
 const mapState = (state: RootState) => ({
-    categoryTitles: categorySelectors.getCategoryTitles(state.categories)
+    categoryTitles: categorySelectors.getCategoriesByTitle(state.categories)
 });
 
 const mapDispatch = {

@@ -112,24 +112,13 @@ export const updateCategoryEditorTitle = (
     }
 });
 
-export const addCategoryEditorId = (
-    type: "recording" | "note",
-    id: string
-): types.CategoryEditorIdAddedAction => ({
-    type: types.CATEGORY_EDITOR_ID_ADDED,
+export const updateCategoryEditorIds = (
+    type: "recordings" | "notes",
+    ids: string[]
+): types.CategoryEditorIdsUpdatedAction => ({
+    type: types.CATEGORY_EDITOR_IDS_UPDATED,
     payload: {
         type,
-        id
-    }
-});
-
-export const removeCategoryEditorId = (
-    type: "recording" | "note",
-    id: string
-): types.CategoryEditorIdRemovedAction => ({
-    type: types.CATEGORY_EDITOR_ID_REMOVED,
-    payload: {
-        type,
-        id
+        ids
     }
 });

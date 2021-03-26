@@ -183,50 +183,22 @@ const categoryEditorReducer = (
                     }
                 }
             }
-        case types.CATEGORY_EDITOR_ID_ADDED: {
-            const resourceType = action.payload.type === "recording" ? "recordings" : "notes";
-
-            const oldRelationships = state.data.editing.relationships;
-            const newRelationships = {
-                ...oldRelationships,
-                [resourceType]: {
-                    ids: [...oldRelationships[resourceType].ids, action.payload.id]
-                }
-            }
-
+        case types.CATEGORY_EDITOR_IDS_UPDATED:
             return {
                 ...state,
                 data: {
                     ...state.data,
                     editing: {
                         ...state.data.editing,
-                        relationships: newRelationships
+                        relationships: {
+                            ...state.data.editing.relationships,
+                            [action.payload.type]: {
+                                ids: action.payload.ids
+                            }
+                        }
                     }
                 }
             }
-        }
-        case types.CATEGORY_EDITOR_ID_REMOVED: {
-            const resourceType = action.payload.type === "recording" ? "recordings" : "notes";
-
-            const oldRelationships = state.data.editing.relationships;
-            const newRelationships = {
-                ...oldRelationships,
-                [resourceType]: {
-                    ids: oldRelationships[resourceType].ids.filter(id => id !== action.payload.id)
-                }
-            }
-
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: newRelationships
-                    }
-                }
-            }
-        }
         default:
             return state;
     }
@@ -314,8 +286,7 @@ const editorReducer = (
                 context: noteEditorReducer(state.context, action)
             }
         case types.CATEGORY_EDITOR_TITLE_UPDATED:
-        case types.CATEGORY_EDITOR_ID_ADDED:
-        case types.CATEGORY_EDITOR_ID_REMOVED:
+        case types.CATEGORY_EDITOR_IDS_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "category") {
                 throw new Error(`Category Editor action cannot be executed on ${state.context.type} context.`);

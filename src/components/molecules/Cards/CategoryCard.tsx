@@ -15,13 +15,14 @@ const CategoryCard: React.FC<CategoryCardProps> = (props) => {
 
     return (
         <CardBase
-            onCardClick={onCardClick}
+            onCardClick={() => console.log('navigate to category')}
         >
             <CardBasePrimaryRow
                 title={title}
             >
                 <CardBaseActionSwitch 
                     primaryIcon={Edit}
+                    onPrimaryAction={onCardClick}
                     isSecondaryActive={false}
                     isSecondarySelected={false}
                 />

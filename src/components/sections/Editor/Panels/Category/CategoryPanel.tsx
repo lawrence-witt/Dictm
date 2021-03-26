@@ -3,7 +3,13 @@ import IconButton from '@material-ui/core/IconButton';
 import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 
-import MediaAutocomplete, { MediaOptionProps } from '../../../../atoms/Inputs/MediaAutocomplete';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../../../redux/store';
+import { editorOperations } from '../../../../../redux/ducks/editor';
+import { mediaSelectors } from '../../../../../redux/ducks/media';
+
+import MediaAutocomplete, { MediaOption } from '../../../../atoms/Inputs/MediaAutocomplete';
 
 import { CategoryPanelProps } from './CategoryPanel.types';
 
@@ -24,38 +30,44 @@ const CategoryBarButtons: React.FC = () => {
 
 /* CATEGORY EDITOR */
 
-const recOptions: MediaOptionProps[] = [
-    {title: 'My Rec', isSelected: false, assignedCategory: 'A really long category name of Guitar Recordings'},
-    {title: 'My Other Rec', isSelected: false}
-]
+/* 
+*   Redux
+*/
 
-const noteOptions: MediaOptionProps[] = [
-    {title: 'My Note', isSelected: false, assignedCategory: 'Presentation'},
-    {title: 'My Other Note', isSelected: false}
-];
+const mapState = (state: RootState) => ({
+    recordingOptions: mediaSelectors.getMediaByTitleAndCategory(state, "recordings"),
+    noteOptions: mediaSelectors.getMediaByTitleAndCategory(state, "notes")
+});
 
-const CategoryPanel: React.FC<CategoryPanelProps> = (props) => {
+const mapDispatch = {
+    updateTitle: editorOperations.updateCategoryEditorTitle,
+    updateIds: editorOperations.updateCategoryEditorIds
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const CategoryPanel: React.FC<CategoryPanelProps & ReduxProps> = (props) => {
     const {
-        model
+        model,
+        recordingOptions,
+        noteOptions,
+        updateTitle,
+        updateIds
     } = props;
 
-    const [recState, setRecState] = React.useState(recOptions);
-    const [noteState, setNoteState] = React.useState(noteOptions);
+    const onTitleChange = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
+        updateTitle(ev.target.value);
+    }, [updateTitle])
 
-    const updateSelection = React.useCallback((type: string, newSelected: MediaOptionProps[]) => {
-        const update = (prevState: MediaOptionProps[], newSelected: MediaOptionProps[]) => ( 
-            prevState.map(option => ({
-                ...option, 
-                isSelected: newSelected.some(newOpt => newOpt.title === option.title)
-            }))
-        );
-
-        if (type === 'rec') {
-            setRecState(s => update(s, newSelected));
-        } else if (type === 'note') {
-            setNoteState(s => update(s, newSelected));
-        }
-    }, []);
+    const onAutocompleteChange = React.useCallback((type: "recordings" | "notes", newSelected: MediaOption[]) => {
+        updateIds(type, newSelected.map(option => option.id));
+    }, [updateIds]);
 
     return (
         <>
@@ -63,9 +75,20 @@ const CategoryPanel: React.FC<CategoryPanelProps> = (props) => {
                 label="Title"
                 value={model.attributes.title} 
                 fullWidth
+                onChange={onTitleChange}
             />
-            <MediaAutocomplete options={recState} label={'Recordings'} type="rec" onChange={updateSelection}/>
-            <MediaAutocomplete options={noteState} label={'Notes'} type="note" onChange={updateSelection} />
+            <MediaAutocomplete
+                options={recordingOptions}
+                values={model.relationships.recordings.ids} 
+                label='Recordings'
+                onChange={(newSelected) => onAutocompleteChange("recordings", newSelected)}
+            />
+            <MediaAutocomplete 
+                options={noteOptions}
+                values={model.relationships.notes.ids}
+                label='Notes'
+                onChange={(newSelected) => onAutocompleteChange("notes", newSelected)} 
+            />
         </>
     );
 };
@@ -73,4 +96,4 @@ const CategoryPanel: React.FC<CategoryPanelProps> = (props) => {
 /* EXPORTS */
 
 export { CategoryBarButtons };
-export default CategoryPanel;
+export default connector(CategoryPanel);

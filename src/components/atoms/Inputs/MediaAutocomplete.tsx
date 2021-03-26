@@ -10,17 +10,24 @@ import PrimaryCheckBox from './PrimaryCheckbox';
 
 /* TYPES */
 
-export interface MediaOptionProps {
+export interface MediaOption {
+    id: string;
     title: string;
+    category: {
+        id: string;
+        title: string;
+    } | undefined;
+}
+
+interface MediaOptionProps extends MediaOption {
     isSelected: boolean;
-    assignedCategory?: string;
 }
 
 interface MediaAutocompleteProps {
-    options: MediaOptionProps[];
+    options: MediaOption[];
+    values: string[];
     label: string;
-    type: string;
-    onChange: (type: string, newSelected: MediaOptionProps[]) => void;
+    onChange: (newSelected: MediaOption[]) => void;
 }
 
 /* MEDIA OPTION */
@@ -44,9 +51,9 @@ const useOptionStyles = makeStyles(theme => ({
 
 const MediaOption: React.FC<MediaOptionProps> = (props) => {
     const {
-        title = "",
-        isSelected = false,
-        assignedCategory = undefined
+        title,
+        isSelected,
+        category
     } = props;
 
     const classes = useOptionStyles();
@@ -56,8 +63,8 @@ const MediaOption: React.FC<MediaOptionProps> = (props) => {
             <PrimaryCheckBox checked={isSelected} className={classes.control} edge="start"/>
             <Typography>{title}</Typography>
             <div className={classes.grow}></div>
-            {assignedCategory && (
-                <Tooltip title={`Currently assigned to ${assignedCategory}`} arrow>
+            {category && (
+                <Tooltip title={`Currently assigned to ${category.title}`} arrow>
                     <CategoryIcon className={classes.icon}/>
                 </Tooltip>
             )}
@@ -77,8 +84,8 @@ const useAutocompleteStyles = makeStyles(theme => ({
 const MediaAutocomplete: React.FC<MediaAutocompleteProps> = (props) => {
     const {
         options,
+        values,
         label,
-        type,
         onChange
     } = props;
 
@@ -89,16 +96,12 @@ const MediaAutocomplete: React.FC<MediaAutocompleteProps> = (props) => {
             classes={classes}
             multiple
             options={options}
-            value={options.filter(option => option.isSelected)}
+            value={options.filter(option => values.includes(option.id))}
             getOptionLabel={option => option.title}
             disableCloseOnSelect
-            onChange={(event, value: MediaOptionProps[]) => onChange(type, value)}
-            renderOption={(option) => (
-                <MediaOption 
-                    title={option.title} 
-                    isSelected={option.isSelected}
-                    assignedCategory={option.assignedCategory}
-                />
+            onChange={(event, value: MediaOption[]) => onChange(value)}
+            renderOption={option => (
+                <MediaOption {...option} isSelected={values.includes(option.id)}/>
             )}
             renderInput={params => (
                 <TextField {...params} label={label}/>
