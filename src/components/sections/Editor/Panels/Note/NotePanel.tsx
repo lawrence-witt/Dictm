@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
-import IconButton from '@material-ui/core/IconButton';
-import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -13,23 +11,6 @@ import { editorOperations } from '../../../../../redux/ducks/editor';
 import CustomSelect from '../../../../atoms/Inputs/CustomSelect';
 
 import { NotePanelProps } from './NotePanel.types';
-
-/* NOTE BAR BUTTONS */
-
-const NoteBarButtons: React.FC = () => {
-    return (
-        <>
-            <IconButton 
-                color="inherit"
-                edge="end"
-            >
-                <SaveIcon />
-            </IconButton>
-        </>
-    )
-};
-
-/* NOTE EDITOR */
 
 /* Redux */
 
@@ -118,7 +99,4 @@ const NotePanel: React.FC<NotePanelProps & ReduxProps> = (props) => {
     )
 };
 
-/* EXPORTS */
-
-export { NoteBarButtons };
 export default connector(NotePanel);

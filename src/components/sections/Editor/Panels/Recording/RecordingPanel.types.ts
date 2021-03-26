@@ -2,7 +2,7 @@ import { CassetteProgressCallback } from 'cassette-js';
 
 import { EditorContexts } from '../../../../../redux/ducks/editor';
 
-export interface RecordingBarButtonsProps {
+export interface RecordingPanelButtonsProps {
     mode: "edit" | "play";
 }
 

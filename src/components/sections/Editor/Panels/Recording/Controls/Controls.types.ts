@@ -7,6 +7,7 @@ export interface ControlsProps {
     mode: 'play' | 'edit';
     status: CassetteStatus;
     flags: CassettePublicFlags;
+    canSave: boolean;
     handleStart: (type: 'record' | 'play') => Promise<void>;
     handleStop: () => Promise<void>;
     handleScan: (type: 'to' | 'by', secs: number) => Promise<void>;

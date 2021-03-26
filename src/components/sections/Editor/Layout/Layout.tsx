@@ -9,9 +9,17 @@ import EditorContent from './Content/EditorContent';
 import { EditorLayoutProps, EditorPanel } from './Layout.types';
 
 import ChoosePanel from '../Panels/Choose/ChoosePanel';
-import RecordingPanel, { RecordingBarButtons } from '../Panels/Recording/RecordingPanel';
-import NotePanel, { NoteBarButtons } from '../Panels/Note/NotePanel';
-import CategoryPanel, { CategoryBarButtons } from '../Panels/Category/CategoryPanel';
+
+import RecordingPanel from '../Panels/Recording/RecordingPanel';
+import RecordingPanelButtons from '../Panels/Recording/RecordingPanel.buttons';
+
+import NotePanel from '../Panels/Note/NotePanel';
+import NotePanelButtons from '../Panels/Note/NotePanel.buttons';
+
+import CategoryPanel from '../Panels/Category/CategoryPanel';
+import CategoryPanelButtons from '../Panels/Category/CategoryPanel.buttons';
+
+// Styles
 
 const useEditorLayoutStyles = makeStyles(theme => ({
     categoryEditorPanel: {
@@ -31,6 +39,8 @@ const useEditorLayoutStyles = makeStyles(theme => ({
         flexDirection: 'column'
     }
 }));
+
+// Component
 
 const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
     const {
@@ -63,7 +73,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     className: "recordingEditorPanel",
                     disableGutters: true,
                     buttons: (
-                        <RecordingBarButtons 
+                        <RecordingPanelButtons 
                             mode={context.mode} 
                         />
                     ),
@@ -79,7 +89,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     as: "div",
                     className: "noteEditorPanel",
                     disableGutters: false,
-                    buttons: <NoteBarButtons />,
+                    buttons: <NotePanelButtons />,
                     component: (
                         <NotePanel
                             model={context.data.editing}
@@ -91,7 +101,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
                     as: "form",
                     className: "categoryEditorPanel",
                     disableGutters: false,
-                    buttons: <CategoryBarButtons />,
+                    buttons: <CategoryPanelButtons />,
                     component: (
                         <CategoryPanel 
                             model={context.data.editing}

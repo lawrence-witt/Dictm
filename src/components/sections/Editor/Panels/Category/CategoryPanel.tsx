@@ -1,6 +1,4 @@
 import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import SaveIcon from '@material-ui/icons/Save';
 import TextField from '@material-ui/core/TextField';
 
 import { connect, ConnectedProps } from 'react-redux';
@@ -12,23 +10,6 @@ import { mediaSelectors } from '../../../../../redux/ducks/media';
 import MediaAutocomplete, { MediaOption } from '../../../../atoms/Inputs/MediaAutocomplete';
 
 import { CategoryPanelProps } from './CategoryPanel.types';
-
-/* CATEGORY BAR BUTTONS */
-
-const CategoryBarButtons: React.FC = () => {
-    return (
-        <>
-            <IconButton 
-                color="inherit"
-                edge="end"
-            >
-                <SaveIcon />
-            </IconButton>
-        </>
-    )
-};
-
-/* CATEGORY EDITOR */
 
 /* 
 *   Redux
@@ -93,7 +74,4 @@ const CategoryPanel: React.FC<CategoryPanelProps & ReduxProps> = (props) => {
     );
 };
 
-/* EXPORTS */
-
-export { CategoryBarButtons };
 export default connector(CategoryPanel);

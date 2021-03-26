@@ -42,6 +42,7 @@ const Controls: React.FC<ControlsProps> = (props) => {
         mode,
         status,
         flags,
+        canSave,
         handleStart,
         handleStop,
         handleScan,
@@ -106,8 +107,8 @@ const Controls: React.FC<ControlsProps> = (props) => {
                 <SaveButton 
                     color="inherit" 
                     onClick={handleSave} 
-                    disabled={!flags.canEject}
-                    />}
+                    disabled={!flags.canEject || !canSave}
+                />}
             {flags.hasData && 
                 <Forward5Button 
                     color="inherit" 

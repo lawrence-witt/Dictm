@@ -1,17 +1,12 @@
 import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import EditIcon from '@material-ui/icons/Edit';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-
 import { connect, ConnectedProps } from 'react-redux';
 
-import { editorOperations } from '../../../../../redux/ducks/editor';
+import { RootState } from '../../../../../redux/store';
+import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
 
-import MenuButton from '../../../../atoms/Buttons/MenuButton';
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 
-import { RecordingBarButtonsProps, RecordingPanelProps, TimerHandle, WaveHandle } from './RecordingPanel.types';
+import { RecordingPanelProps, TimerHandle, WaveHandle } from './RecordingPanel.types';
 import Timer from './Timer/Timer';
 import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
@@ -22,58 +17,19 @@ import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe
 
 import useCassette from '../../../../../utils/hooks/useCassette';
 
-/* RECORDING BAR BUTTONS */
-
-const RecordingBarButtons: React.FC<RecordingBarButtonsProps> = (props) => {
-    const {
-        mode
-    } = props;
-
-    const [menuOpen, setMenuOpen] = React.useState(false);
-    const menuRef = React.useRef(null);
-
-    const closeMenu = React.useCallback(() => setMenuOpen(false), []);
-    const toggleMenu = React.useCallback(() => setMenuOpen(s => !s), []);
-
-    const playButtons = (
-        <>
-            <IconButton
-                color="inherit"
-            >
-                <EditIcon />
-            </IconButton>
-            <MenuButton
-                ref={menuRef}
-                onClick={toggleMenu}
-                color="inherit"
-                design="dots"
-                edge="end"
-            />
-            <Menu
-                open={menuOpen}
-                anchorEl={menuRef.current}
-                onClose={closeMenu}
-            >
-                <MenuItem onClick={closeMenu}>Details</MenuItem>
-                <MenuItem onClick={closeMenu}>Download</MenuItem>
-            </Menu>
-        </>
-    );
-
-    return mode === 'play' ? playButtons : null;
-};
-
-/* RECORDING EDITOR */
-
 /* 
 *   Redux
 */
+
+const mapState = (state: RootState) => ({
+    canSave: editorSelectors.getSaveAvailability(state)
+});
 
 const mapDispatch = {
     updateData: editorOperations.updateRecordingEditorData
 }
 
-const connector = connect(null, mapDispatch);
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -85,6 +41,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     const {
         mode, 
         model,
+        canSave,
         updateData
     } = props;
 
@@ -135,6 +92,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle user initiated controls with side effects
     */
 
+    // Start recording or playing and begin animation loop
+
     const handleStart = React.useCallback(async (type: 'record' | 'play') => {
         if (type === 'record') {
             analyser.current = cassette.get.context().createAnalyser();
@@ -153,6 +112,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         frameLoop.current = demandAnimationFrame(commitFrame);
     }, [cassette.get, cassette.controls]);
 
+    // Stop recording or playing and persist new data to store
+
     const handleStop = React.useCallback(async () => {
         await cassette.controls.pause();
         cancelAnimationFrame(frameLoop.current);
@@ -170,12 +131,16 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         }
     }, [cassette.controls, cassette.get, updateData]);
 
+    // Scan the available tape and force animation
+
     const handleScan = React.useCallback(async (type: 'to' | 'by', secs: number) => {
         if (type === "to") await cassette.controls.scanTo(secs);
         if (type === "by") await cassette.controls.scanBy(secs);
 
         if (nextFrame.current) demandAnimationFrame(nextFrame.current, true);
     }, [cassette.controls]);
+
+    // Clean up editing file and commit to store
 
     const handleSave = React.useCallback(async () => {
         const file = await cassette.controls.eject();
@@ -262,6 +227,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
                 mode={mode} 
                 status={cassette.status}
                 flags={cassette.flags}
+                canSave={canSave}
                 handleStart={handleStart}
                 handleStop={handleStop}
                 handleScan={handleScan}
@@ -272,7 +238,4 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     )
 };
 
-/* EXPORTS */
-
-export { RecordingBarButtons };
 export default connector(RecordingPanel);
