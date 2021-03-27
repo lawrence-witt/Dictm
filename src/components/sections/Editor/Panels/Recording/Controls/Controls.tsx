@@ -8,9 +8,10 @@ import {
     PlayButton,
     PauseButton,
     Replay5Button,
-    Forward5Button,
-    SaveButton
+    Forward5Button
 } from '../../../../../atoms/Buttons/AudioButtons';
+
+import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 
 // Styled
 

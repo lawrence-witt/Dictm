@@ -6,6 +6,7 @@ import * as helpers from './helpers';
 
 import { RootState } from '../../store';
 import { categoryOperations } from '../categories';
+import { recordingOperations } from '../media/recordings';
 import { noteOperations } from '../media/notes';
 
 import { RecordingModel } from '../../_data/recordingsData';
@@ -148,7 +149,7 @@ export const updateRecordingEditorCategory = (
 type uRECThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
 
 /** 
-*  Summary
+*  Summary:
 *  Updates the recording data for a Recording Model.
 *
 *  @param {object} data A data object containing the most recent audio/frequency capture.
@@ -163,6 +164,48 @@ export const updateRecordingEditorData = (
 }
 
 type uREDThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
+
+/** 
+*  Summary:
+*  Saves the currently editing Recording Model.
+*
+*  Description
+*  Updates any categories it has been added to or removed from.
+*  Persists or overwrites the Recording depending on its isNew status.
+*/
+
+export const saveRecordingEditorModel = (): sREMThunkAction => (
+    dispatch,
+    getState
+): void => {
+    const { editor } = getState();
+
+    if (!editor.context || editor.context.type !== "recording") {
+        throw new Error('Recording Editor context has not been initialised.');
+    }
+
+    const { data } = editor.context;
+    
+    const originalCategory = data.original.relationships.category?.id;
+    const editingCategory = data.editing.relationships.category?.id;
+
+    if (originalCategory !== editingCategory) {
+        originalCategory &&
+            dispatch(categoryOperations.removeCategoryIds(originalCategory, "recordings", [data.editing.id]));
+        editingCategory &&
+            dispatch(categoryOperations.addCategoryIds(editingCategory, "recordings", [data.editing.id]));
+    }
+
+    if (editor.attributes.isNew) {
+        dispatch(recordingOperations.createRecording(helpers.stampContentModel(data.editing)));
+    } else {
+        dispatch(recordingOperations.overwriteRecording(helpers.stampContentModel(data.editing)));
+    }
+
+    dispatch(openEditor("recording", data.editing.id));
+}
+
+type sREMThunkAction = ThunkAction<void, RootState, unknown, any>;
 
 /* 
 *   NOTE EDITOR OPERATIONS

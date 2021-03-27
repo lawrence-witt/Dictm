@@ -4,7 +4,6 @@ import PlayIcon from '@material-ui/icons/PlayArrow';
 import Replay5Icon from '@material-ui/icons/Replay5';
 import Forward5Icon from '@material-ui/icons/Forward5';
 import PauseIcon from '@material-ui/icons/Pause';
-import SaveIcon from '@material-ui/icons/Save';
 import RecordIcon from '@material-ui/icons/FiberManualRecord';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
@@ -92,14 +91,6 @@ const Forward5Button: React.FC<IconButtonProps> = (props) => (
     </IconButton>
 );
 
-/* SAVE BUTTON */
-
-const SaveButton: React.FC<IconButtonProps> = (props) => (
-    <IconButton {...props}>
-        <SaveIcon />
-    </IconButton>
-);
-
 /* EXPORTS */
 
 export {
@@ -107,6 +98,5 @@ export {
     PlayButton,
     PauseButton,
     Replay5Button,
-    Forward5Button,
-    SaveButton
+    Forward5Button
 };

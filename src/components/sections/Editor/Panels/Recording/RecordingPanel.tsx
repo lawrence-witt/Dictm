@@ -26,7 +26,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    updateData: editorOperations.updateRecordingEditorData
+    updateData: editorOperations.updateRecordingEditorData,
+    saveRecording: editorOperations.saveRecordingEditorModel
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -42,7 +43,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         mode, 
         model,
         canSave,
-        updateData
+        updateData,
+        saveRecording
     } = props;
 
     /* 
@@ -140,12 +142,12 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (nextFrame.current) demandAnimationFrame(nextFrame.current, true);
     }, [cassette.controls]);
 
-    // Clean up editing file and commit to store
+    // Commit the recording model
 
     const handleSave = React.useCallback(async () => {
-        const file = await cassette.controls.eject();
-        console.log(file);
-    }, [cassette.controls]);
+        saveRecording();
+        handleScan("to", 0);
+    }, [saveRecording, handleScan]);
 
     /* 
     *   Handle getting and releasing microphone stream

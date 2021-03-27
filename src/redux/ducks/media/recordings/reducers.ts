@@ -1,12 +1,8 @@
-import {
-    RecordingsState,
-    RecordingsActionTypes,
-    RECORDING_ADDED
-} from './types';
+import * as types from './types';
 
 import mockRecordingsData from '../../../_data/recordingsData';
 
-const initialState: RecordingsState = mockRecordingsData.reduce((state: RecordingsState, rec) => {
+const initialState: types.RecordingsState = mockRecordingsData.reduce((state: types.RecordingsState, rec) => {
     state.byId[rec.id] = rec;
     state.allIds.push(rec.id);
     return state;
@@ -14,10 +10,10 @@ const initialState: RecordingsState = mockRecordingsData.reduce((state: Recordin
 
 const recordingsReducer = (
     state = initialState, 
-    action: RecordingsActionTypes
-): RecordingsState => {
+    action: types.RecordingsActionTypes
+): types.RecordingsState => {
     switch(action.type) {
-        case RECORDING_ADDED:
+        case types.RECORDING_CREATED:
             const { recording } = action.payload;
 
             return {
@@ -27,6 +23,44 @@ const recordingsReducer = (
                 },
                 allIds: [recording.id, ...state.allIds]
             }
+        case types.RECORDING_OVERWRITTEN: {
+            const { recording } = action.payload;
+
+            return {
+                ...state,
+                byId: {
+                    ...state.byId,
+                    [recording.id]: recording
+                }
+            }
+        }
+        case types.RECORDING_CATEGORY_UPDATED: {
+            const { id, categoryId } = action.payload;
+
+            return {
+                ...state,
+                byId: {
+                    ...state.byId,
+                    [id]: {
+                        ...state.byId[id],
+                        relationships: {
+                            ...state.byId[id].relationships,
+                            category: categoryId ? { id: categoryId } : undefined
+                        }
+                    }
+                }
+            }
+        }
+        case types.RECORDING_DELETED: {
+            const { id } = action.payload;
+
+            const clone = {...state};
+
+            delete clone.byId[id];
+            clone.allIds = clone.allIds.filter(i => i !== id);
+
+            return clone;
+        }
         default:
             return state;
     }
