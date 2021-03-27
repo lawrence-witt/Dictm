@@ -217,7 +217,8 @@ const initialEditorState: types.EditorState = {
     attributes: {
         title: "",
         isOpen: false,
-        isNew: false
+        isNew: false,
+        isSaving: false
     },
     context: undefined,
     dialogs: {
@@ -244,10 +245,27 @@ const editorReducer = (
                     title: action.payload.title,
                     isOpen: true,
                     isNew: action.payload.isNew,
+                    isSaving: false
                 },
                 context: contextReducer(undefined, action)
             }
         }
+        case types.EDITOR_SET_SAVING:
+            return {
+                ...state,
+                attributes: {
+                    ...state.attributes,
+                    isSaving: true
+                }
+            }
+        case types.EDITOR_UNSET_SAVING:
+            return {
+                ...state,
+                attributes: {
+                    ...state.attributes,
+                    isSaving: false
+                }
+            }
         case types.EDITOR_CLOSED:
             return {
                 ...state,

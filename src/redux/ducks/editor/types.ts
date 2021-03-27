@@ -9,6 +9,8 @@ import { CategoryModel } from '../../_data/categoriesData';
 // Action Constants
 
 export const EDITOR_OPENED                      = "dictm/editor/EDITOR_OPENED";
+export const EDITOR_SET_SAVING                  = "dictm/editor/EDITOR_SET_SAVING";
+export const EDITOR_UNSET_SAVING                = "dictm/editor/EDITOR_UNSET_SAVING";
 export const EDITOR_CLOSED                      = "dictm/editor/EDITOR_CLOSED";
 export const EDITOR_CLEARED                     = "dictm/editor/EDITOR_CLEARED";
 
@@ -105,6 +107,14 @@ export interface EditorOpenedAction {
     }
 }
 
+export interface EditorSetSavingAction {
+    type: typeof EDITOR_SET_SAVING;
+}
+
+export interface EditorUnsetSavingAction {
+    type: typeof EDITOR_UNSET_SAVING;
+}
+
 export interface EditorClosedAction {
     type: typeof EDITOR_CLOSED;
 }
@@ -137,6 +147,8 @@ export type EditorActionTypes =
     RecordingEditorActionTypes |
     NoteEditorActionTypes |
     CategoryEditorActionTypes |
+    EditorSetSavingAction |
+    EditorUnsetSavingAction |
     EditorClosedAction |
     EditorClearedAction;
 
@@ -194,6 +206,7 @@ export interface EditorState {
         title: string;
         isOpen: boolean;
         isNew: boolean;
+        isSaving: boolean;
     };
     context?: EditorContexts[keyof EditorContexts];
     dialogs: Dialog<"save"> & Dialog<"details">;

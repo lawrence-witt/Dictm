@@ -20,6 +20,14 @@ export const openEditor = (
     }
 });
 
+export const setEditorSaving = (): types.EditorSetSavingAction => ({
+    type: types.EDITOR_SET_SAVING
+});
+
+export const unsetEditorSaving = (): types.EditorUnsetSavingAction => ({
+    type: types.EDITOR_UNSET_SAVING
+});
+
 export const closeEditor = (): types.EditorClosedAction => ({
     type: types.EDITOR_CLOSED
 });

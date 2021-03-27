@@ -8,9 +8,9 @@ const stringArraysEqual = (arr1: string[], arr2: string[]) => {
 }
 
 export const getSaveAvailability = createSelector((state: RootState) => {
-    const { context } = state.editor;
+    const { attributes, context } = state.editor;
 
-    if (!context || context.type === "choose") return false;
+    if (attributes.isSaving || !context || context.type === "choose") return false;
 
     const checkTitleDifferent = () => {
         const originalTitle = context.data.original.attributes.title;

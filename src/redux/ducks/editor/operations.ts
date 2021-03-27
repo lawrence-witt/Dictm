@@ -178,6 +178,8 @@ export const saveRecordingEditorModel = (): sREMThunkAction => (
     dispatch,
     getState
 ): void => {
+    dispatch(actions.setEditorSaving());
+
     const { editor } = getState();
 
     if (!editor.context || editor.context.type !== "recording") {
@@ -286,6 +288,8 @@ export const saveNoteEditorModel = (): sNEMThunkAction => (
     dispatch,
     getState
 ): void => {
+    dispatch(actions.setEditorSaving());
+
     const { editor } = getState();
 
     if (!editor.context || editor.context.type !== "note") {
