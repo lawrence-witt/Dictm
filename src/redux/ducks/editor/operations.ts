@@ -198,10 +198,12 @@ export const saveRecordingEditorModel = (): sREMThunkAction => (
             dispatch(categoryOperations.addCategoryIds(editingCategory, "recordings", [data.editing.id]));
     }
 
+    const stamped = helpers.stampContentModel(data.editing);
+
     if (editor.attributes.isNew) {
-        dispatch(recordingOperations.createRecording(helpers.stampContentModel(data.editing)));
+        dispatch(recordingOperations.createRecording(stamped));
     } else {
-        dispatch(recordingOperations.overwriteRecording(helpers.stampContentModel(data.editing)));
+        dispatch(recordingOperations.overwriteRecording(stamped));
     }
 
     dispatch(openEditor("recording", data.editing.id));
@@ -308,10 +310,12 @@ export const saveNoteEditorModel = (): sNEMThunkAction => (
             dispatch(categoryOperations.addCategoryIds(editingCategory, "notes", [data.editing.id]));
     }
 
+    const stamped = helpers.stampContentModel(data.editing);
+
     if (editor.attributes.isNew) {
-        dispatch(noteOperations.createNote(helpers.stampContentModel(data.editing)));
+        dispatch(noteOperations.createNote(stamped));
     } else {
-        dispatch(noteOperations.overwriteNote(helpers.stampContentModel(data.editing)));
+        dispatch(noteOperations.overwriteNote(stamped));
     }
 
     dispatch(openEditor("note", data.editing.id));
@@ -358,3 +362,82 @@ export const updateCategoryEditorIds = (
 }
 
 type uCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;
+
+/** 
+*  Summary:
+*  Saves the currently editing Category Model.
+*
+*  Description
+*  Updates any media models that have been added to or removed from it.
+*  Persists or overwrites the Category depending on its isNew status.
+*/
+
+// TODO: batch the other model updates
+
+export const saveCategoryEditorModel = (): sCEMThunkAction => (
+    dispatch,
+    getState
+): void => {
+    dispatch(actions.setEditorSaving());
+
+    const { editor, media } = getState();
+
+    if (!editor.context || editor.context.type !== "category") {
+        throw new Error('Category Editor context has not been initialised.');
+    }
+
+    const { data } = editor.context;
+
+    const originalRecordingIds = data.original.relationships.recordings.ids;
+    const originalNoteIds = data.original.relationships.notes.ids;
+    const editingRecordingIds = data.editing.relationships.recordings.ids;
+    const editingNoteIds = data.editing.relationships.notes.ids;
+
+    originalRecordingIds.forEach(id => {
+        if (!editingRecordingIds.includes(id)) {
+            dispatch(recordingOperations.updateRecordingCategory(id, undefined));
+        }
+    });
+
+    originalNoteIds.forEach(id => {
+        if (!editingNoteIds.includes(id)) {
+            dispatch(noteOperations.updateNoteCategory(id, undefined));
+        }
+    });
+
+    editingRecordingIds.forEach(id => {
+        if (!originalRecordingIds.includes(id)) {
+            const assignedCategory = media.recordings.byId[id].relationships.category;
+
+            if (assignedCategory) {
+                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "recordings", [id]));
+            }
+
+            dispatch(recordingOperations.updateRecordingCategory(id, data.editing.id));
+        }
+    });
+
+    editingNoteIds.forEach(id => {
+        if (!originalNoteIds.includes(id)) {
+            const assignedCategory = media.notes.byId[id].relationships.category;
+
+            if (assignedCategory) {
+                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "notes", [id]));
+            }
+
+            dispatch(noteOperations.updateNoteCategory(id, data.editing.id));
+        }
+    });
+
+    const stamped = helpers.stampContentModel(data.editing);
+
+    if (editor.attributes.isNew) {
+        dispatch(categoryOperations.createCategory(stamped));
+    } else {
+        dispatch(categoryOperations.overwriteCategory(stamped));
+    }
+
+    dispatch(openEditor("category", data.editing.id));
+}
+
+type sCEMThunkAction = ThunkAction<void, RootState, unknown, any>;
