@@ -4,9 +4,11 @@ import * as types from './types';
 import * as actions from './actions';
 import * as helpers from './helpers';
 
-import { RecordingModel } from '../../_data/recordingsData';
-
 import { RootState } from '../../store';
+import { categoryOperations } from '../categories';
+import { noteOperations } from '../media/notes';
+
+import { RecordingModel } from '../../_data/recordingsData';
 
 /* 
 *   BASE EDITOR OPERATIONS
@@ -24,8 +26,6 @@ import { RootState } from '../../store';
 *  @param {types.EditorTypes} editorType The type of editor panel which should be opened.
 *  @param {string} contentId Either a random string identifying the content or "new".
 */
-
-type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
 
 export const openEditor = (
     editorType: types.EditorModelTypes,
@@ -56,6 +56,8 @@ export const openEditor = (
     dispatch(actions.openEditor(title, isNew, context));
 }
 
+type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
+
 /** 
 *  Summary 
 *  Closes the editor modal.
@@ -64,13 +66,13 @@ export const openEditor = (
 *  Sets the editor isOpen state to false.
 */
 
-type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClosedAction>;
-
 export const closeEditor = (): CloseEditorThunkAction => (
     dispatch
 ): void => {
     dispatch(actions.closeEditor());
 }
+
+type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClosedAction>;
 
 /** 
 *  Summary
@@ -81,14 +83,14 @@ export const closeEditor = (): CloseEditorThunkAction => (
 *  Removes the editorType and contentId from sessionStorage.
 */
 
-type ClearEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClearedAction>;
-
 export const clearEditor = (): ClearEditorThunkAction => (
     dispatch
 ): void => {
     // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.clearEditor());
 }
+
+type ClearEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClearedAction>;
 
 /* 
 *   RECORDING EDITOR OPERATIONS
@@ -101,8 +103,6 @@ export const clearEditor = (): ClearEditorThunkAction => (
 *  @param {"edit" | "play"} mode The new editor mode.
 */
 
-type uREMThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorModeUpdatedAction>;
-
 export const updateRecordingEditorMode = (
     mode: "edit" | "play"
 ): uREMThunkAction => (
@@ -111,14 +111,14 @@ export const updateRecordingEditorMode = (
     dispatch(actions.updateRecordingEditorMode(mode));
 }
 
+type uREMThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorModeUpdatedAction>;
+
 /** 
 *  Summary
 *  Updates the title string for a Recording Model.
 *
 *  @param {string} title The new title for the model.
 */
-
-type uRETThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorTitleUpdatedAction>;
 
 export const updateRecordingEditorTitle = (
     title: string
@@ -128,14 +128,14 @@ export const updateRecordingEditorTitle = (
     dispatch(actions.updateRecordingEditorTitle(title));
 }
 
+type uRETThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorTitleUpdatedAction>;
+
 /** 
 *  Summary
 *  Updates the category for a Recording Model.
 *
 *  @param {string | undefined} id The new category (or no category) the model should be assigned to.
 */
-
-type uRECThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
 
 export const updateRecordingEditorCategory = (
     id?: string
@@ -145,14 +145,14 @@ export const updateRecordingEditorCategory = (
     dispatch(actions.updateRecordingEditorCategory(id));
 }
 
+type uRECThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
+
 /** 
 *  Summary
 *  Updates the recording data for a Recording Model.
 *
 *  @param {object} data A data object containing the most recent audio/frequency capture.
 */
-
-type uREDThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
 
 export const updateRecordingEditorData = (
     data: RecordingModel["data"]
@@ -161,6 +161,8 @@ export const updateRecordingEditorData = (
 ): void => {
     dispatch(actions.updateRecordingEditorData(data));
 }
+
+type uREDThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
 
 /* 
 *   NOTE EDITOR OPERATIONS
@@ -173,8 +175,6 @@ export const updateRecordingEditorData = (
 *  @param {string} title The new title for the model.
 */
 
-type uNETThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorTitleUpdatedAction>;
-
 export const updateNoteEditorTitle = (
     title: string
 ): uNETThunkAction => (
@@ -183,14 +183,14 @@ export const updateNoteEditorTitle = (
     dispatch(actions.updateNoteEditorTitle(title));
 }
 
+type uNETThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorTitleUpdatedAction>;
+
 /** 
 *  Summary
 *  Updates the category for a Note Model.
 *
 *  @param {string | undefined} id The new category (or no category) the model should be assigned to.
 */
-
-type uNECThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorCategoryUpdatedAction>;
 
 export const updateNoteEditorCategory = (
     id?: string
@@ -200,14 +200,14 @@ export const updateNoteEditorCategory = (
     dispatch(actions.updateNoteEditorCategory(id));
 }
 
+type uNECThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorCategoryUpdatedAction>;
+
 /** 
 *  Summary
 *  Updates the text data for a Note Model.
 *
 *  @param {object} content A string containing the content of the note.
 */
-
-type uNEDThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
 
 export const updateNoteEditorData = (
     content: string
@@ -228,18 +228,60 @@ export const updateNoteEditorData = (
     dispatch(actions.updateNoteEditorData(fullData));
 }
 
+type uNEDThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
+
+/** 
+*  Summary:
+*  Saves the currently editing Note Model.
+*
+*  Description
+*  Updates any categories it has been added to or removed from.
+*  Persists or overwrites the Note depending on its isNew status.
+*/
+
+export const saveNoteEditorModel = (): sNEMThunkAction => (
+    dispatch,
+    getState
+): void => {
+    const { editor } = getState();
+
+    if (!editor.context || editor.context.type !== "note") {
+        throw new Error('Note Editor context has not been initialised.');
+    }
+
+    const { data } = editor.context;
+    
+    const originalCategory = data.original.relationships.category?.id;
+    const editingCategory = data.editing.relationships.category?.id;
+
+    if (originalCategory !== editingCategory) {
+        originalCategory &&
+            dispatch(categoryOperations.removeCategoryIds(originalCategory, "notes", [data.editing.id]));
+        editingCategory &&
+            dispatch(categoryOperations.addCategoryIds(editingCategory, "notes", [data.editing.id]));
+    }
+
+    if (editor.attributes.isNew) {
+        dispatch(noteOperations.createNote(helpers.stampContentModel(data.editing)));
+    } else {
+        dispatch(noteOperations.overwriteNote(helpers.stampContentModel(data.editing)));
+    }
+
+    dispatch(openEditor("note", data.editing.id));
+}
+
+type sNEMThunkAction = ThunkAction<void, RootState, unknown, any>;
+
 /* 
 *   CATEGORY EDITOR OPERATIONS
 */
 
 /** 
-*  Summary
+*  Summary: 
 *  Updates the title string for a Category Model.
 *
 *  @param {string} title The new title for the model.
 */
-
-type uCETThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorTitleUpdatedAction>;
 
 export const updateCategoryEditorTitle = (
     title: string
@@ -249,15 +291,15 @@ export const updateCategoryEditorTitle = (
     dispatch(actions.updateCategoryEditorTitle(title));
 }
 
+type uCETThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorTitleUpdatedAction>;
+
 /** 
-*  Summary
+*  Summary:
 *  Upates the resource ids for a particular type on a Category Model.
 *
 *  @param {"recording" | "note"} type The type of resource being updated.
 *  @param {string} ids An array containing the new resource ids.
 */
-
-type uCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;
 
 export const updateCategoryEditorIds = (
     type: "recordings" | "notes",
@@ -267,3 +309,5 @@ export const updateCategoryEditorIds = (
 ): void => {
     dispatch(actions.updateCategoryEditorIds(type, ids));
 }
+
+type uCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;

@@ -11,11 +11,15 @@ import SaveButton from '../../../../atoms/Buttons/SaveButton';
 *   Redux
 */
 
-const mapButtonState = (state: RootState) => ({
+const mapState = (state: RootState) => ({
     canSave: editorSelectors.getSaveAvailability(state)
 });
 
-const connector = connect(mapButtonState);
+const mapDispatch = {
+    saveNote: editorOperations.saveNoteEditorModel
+};
+
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -25,13 +29,15 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const NotePanelButtons: React.FC<ReduxProps> = (props) => {
     const {
-        canSave
+        canSave,
+        saveNote,
     } = props;
 
     return (
         <SaveButton
             color="inherit"
             disabled={!canSave}
+            onClick={saveNote}
         />
     )
 };

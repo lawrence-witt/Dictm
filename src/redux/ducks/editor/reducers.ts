@@ -236,8 +236,6 @@ const editorReducer = (
 ): types.EditorState => {
     switch(action.type) {
         case types.EDITOR_OPENED: {
-            if (state.context) throw new Error('Editor already has a context in state.')
-
             const contextReducer = contextReducerMap[action.payload.context.type];
 
             return {
@@ -247,7 +245,7 @@ const editorReducer = (
                     isOpen: true,
                     isNew: action.payload.isNew,
                 },
-                context: contextReducer(state.context, action)
+                context: contextReducer(undefined, action)
             }
         }
         case types.EDITOR_CLOSED:

@@ -12,17 +12,17 @@ export const EDITOR_OPENED                      = "dictm/editor/EDITOR_OPENED";
 export const EDITOR_CLOSED                      = "dictm/editor/EDITOR_CLOSED";
 export const EDITOR_CLEARED                     = "dictm/editor/EDITOR_CLEARED";
 
-export const RECORDING_EDITOR_MODE_UPDATED      = "dictm/editor/recording/MODE_UPDATED";
-export const RECORDING_EDITOR_TITLE_UPDATED     = "dictm/editor/recording/TITLE_UPDATED";
-export const RECORDING_EDITOR_CATEGORY_UPDATED  = "dictm/editor/recording/CATEGORY_UPDATED";
-export const RECORDING_EDITOR_DATA_UPDATED      = "dictm/editor/recording/DATA_UPDATED";
+export const RECORDING_EDITOR_MODE_UPDATED      = "dictm/editor/recording/RECORDING_MODE_UPDATED";
+export const RECORDING_EDITOR_TITLE_UPDATED     = "dictm/editor/recording/RECORDING_TITLE_UPDATED";
+export const RECORDING_EDITOR_CATEGORY_UPDATED  = "dictm/editor/recording/RECORDING_CATEGORY_UPDATED";
+export const RECORDING_EDITOR_DATA_UPDATED      = "dictm/editor/recording/RECORDING_DATA_UPDATED";
 
-export const NOTE_EDITOR_TITLE_UPDATED          = "dictm/editor/note/TITLE_UPDATED";
-export const NOTE_EDITOR_CATEGORY_UPDATED       = "dictm/editor/note/CATEGORY_UPDATED";
-export const NOTE_EDITOR_DATA_UPDATED           = "dictm/editor/note/DATA_UPDATED";
+export const NOTE_EDITOR_TITLE_UPDATED          = "dictm/editor/note/NOTE_TITLE_UPDATED";
+export const NOTE_EDITOR_CATEGORY_UPDATED       = "dictm/editor/note/NOTE_CATEGORY_UPDATED";
+export const NOTE_EDITOR_DATA_UPDATED           = "dictm/editor/note/NOTE_DATA_UPDATED";
 
-export const CATEGORY_EDITOR_TITLE_UPDATED      = "dictm/editor/category/TITLE_UPDATED";
-export const CATEGORY_EDITOR_IDS_UPDATED        = "dictm/editor/category/IDS_UPDATED";
+export const CATEGORY_EDITOR_TITLE_UPDATED      = "dictm/editor/category/CATEGORY_TITLE_UPDATED";
+export const CATEGORY_EDITOR_IDS_UPDATED        = "dictm/editor/category/CATEGORY_IDS_UPDATED";
 
 // Recording Context Action Types
 

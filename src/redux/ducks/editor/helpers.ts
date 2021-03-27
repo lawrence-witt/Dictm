@@ -6,7 +6,7 @@ import { generateNewNoteModel, NoteModel } from '../../_data/notesData';
 import { generateNewCategoryModel, CategoryModel } from '../../_data/categoriesData';
 
 /* 
-*   Create and Find Content Models
+*   Create and find content models
 */
 
 export const generateContentModel = (
@@ -46,7 +46,24 @@ export const findContentModel = (
 }
 
 /* 
-*   Create Editor Contexts
+*   Timestamp models on editor save
+*/
+
+export const stampContentModel = <M extends ContentModels>(
+    model: M
+): M => ({
+    ...model,
+    attributes: {
+        ...model.attributes,
+        timestamps: {
+            created: (c => c === 0 ? Date.now() : c)(model.attributes.timestamps.created),
+            modified: Date.now()
+        }
+    }
+});
+
+/* 
+*   Create editor contexts
 */
 
 const generateChooseContext = (): EditorContexts["choose"] => ({
