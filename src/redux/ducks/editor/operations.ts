@@ -5,11 +5,6 @@ import * as actions from './actions';
 import * as helpers from './helpers';
 
 import { RootState } from '../../store';
-import { categoryOperations } from '../categories';
-import { recordingOperations } from '../media/recordings';
-import { noteOperations } from '../media/notes';
-
-import { RecordingModel } from '../../_data/recordingsData';
 
 /* 
 *   BASE EDITOR OPERATIONS
@@ -32,7 +27,7 @@ export const openEditor = (
     editorType: types.EditorModelTypes,
     contentId: string
 ): OpenEditorThunkAction => (
-    dispatch, 
+    dispatch,
     getState
 ): void => {
     const { user, media, categories } = getState();
@@ -58,6 +53,32 @@ export const openEditor = (
 }
 
 type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
+
+/** 
+*  Summary:
+*  Sets the editor isSaving flag to true.
+*/
+
+export const setEditorSaving = (): SetEditorSavingThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.setEditorSaving());
+}
+
+type SetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.EditorSetSavingAction>;
+
+/** 
+*  Summary:
+*  Sets the editor isSaving flag to false.
+*/
+
+export const unsetEditorSaving = (): UnsetEditorSavingThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.unsetEditorSaving());
+}
+
+type UnsetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.EditorUnsetSavingAction>;
 
 /** 
 *  Summary 
@@ -92,352 +113,3 @@ export const clearEditor = (): ClearEditorThunkAction => (
 }
 
 type ClearEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClearedAction>;
-
-/* 
-*   RECORDING EDITOR OPERATIONS
-*/
-
-/** 
-*  Summary
-*  Changes the editor mode between 'play' and 'edit'.
-*
-*  @param {"edit" | "play"} mode The new editor mode.
-*/
-
-export const updateRecordingEditorMode = (
-    mode: "edit" | "play"
-): uREMThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateRecordingEditorMode(mode));
-}
-
-type uREMThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorModeUpdatedAction>;
-
-/** 
-*  Summary
-*  Updates the title string for a Recording Model.
-*
-*  @param {string} title The new title for the model.
-*/
-
-export const updateRecordingEditorTitle = (
-    title: string
-): uRETThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateRecordingEditorTitle(title));
-}
-
-type uRETThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorTitleUpdatedAction>;
-
-/** 
-*  Summary
-*  Updates the category for a Recording Model.
-*
-*  @param {string | undefined} id The new category (or no category) the model should be assigned to.
-*/
-
-export const updateRecordingEditorCategory = (
-    id?: string
-): uRECThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateRecordingEditorCategory(id));
-}
-
-type uRECThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
-
-/** 
-*  Summary:
-*  Updates the recording data for a Recording Model.
-*
-*  @param {object} data A data object containing the most recent audio/frequency capture.
-*/
-
-export const updateRecordingEditorData = (
-    data: RecordingModel["data"]
-): uREDThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateRecordingEditorData(data));
-}
-
-type uREDThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
-
-/** 
-*  Summary:
-*  Saves the currently editing Recording Model.
-*
-*  Description
-*  Updates any categories it has been added to or removed from.
-*  Persists or overwrites the Recording depending on its isNew status.
-*/
-
-export const saveRecordingEditorModel = (): sREMThunkAction => (
-    dispatch,
-    getState
-): void => {
-    dispatch(actions.setEditorSaving());
-
-    const { editor } = getState();
-
-    if (!editor.context || editor.context.type !== "recording") {
-        throw new Error('Recording Editor context has not been initialised.');
-    }
-
-    const { data } = editor.context;
-    
-    const originalCategory = data.original.relationships.category?.id;
-    const editingCategory = data.editing.relationships.category?.id;
-
-    if (originalCategory !== editingCategory) {
-        originalCategory &&
-            dispatch(categoryOperations.removeCategoryIds(originalCategory, "recordings", [data.editing.id]));
-        editingCategory &&
-            dispatch(categoryOperations.addCategoryIds(editingCategory, "recordings", [data.editing.id]));
-    }
-
-    const stamped = helpers.stampContentModel(data.editing);
-
-    if (editor.attributes.isNew) {
-        dispatch(recordingOperations.createRecording(stamped));
-    } else {
-        dispatch(recordingOperations.overwriteRecording(stamped));
-    }
-
-    dispatch(openEditor("recording", data.editing.id));
-}
-
-type sREMThunkAction = ThunkAction<void, RootState, unknown, any>;
-
-/* 
-*   NOTE EDITOR OPERATIONS
-*/
-
-/** 
-*  Summary
-*  Updates the title string for a Note Model.
-*
-*  @param {string} title The new title for the model.
-*/
-
-export const updateNoteEditorTitle = (
-    title: string
-): uNETThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateNoteEditorTitle(title));
-}
-
-type uNETThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorTitleUpdatedAction>;
-
-/** 
-*  Summary
-*  Updates the category for a Note Model.
-*
-*  @param {string | undefined} id The new category (or no category) the model should be assigned to.
-*/
-
-export const updateNoteEditorCategory = (
-    id?: string
-): uNECThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateNoteEditorCategory(id));
-}
-
-type uNECThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorCategoryUpdatedAction>;
-
-/** 
-*  Summary
-*  Updates the text data for a Note Model.
-*
-*  @param {object} content A string containing the content of the note.
-*/
-
-export const updateNoteEditorData = (
-    content: string
-): uNEDThunkAction => (
-    dispatch
-): void => {
-    const wordCount = (() => {
-        const matches = content.match(/[\w\d\’\'-]+/gi);
-        return matches ? matches.length : 0;
-    })();
-
-    const fullData = {
-        content,
-        charCount: content.length,
-        wordCount
-    }
-
-    dispatch(actions.updateNoteEditorData(fullData));
-}
-
-type uNEDThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
-
-/** 
-*  Summary:
-*  Saves the currently editing Note Model.
-*
-*  Description
-*  Updates any categories it has been added to or removed from.
-*  Persists or overwrites the Note depending on its isNew status.
-*/
-
-export const saveNoteEditorModel = (): sNEMThunkAction => (
-    dispatch,
-    getState
-): void => {
-    dispatch(actions.setEditorSaving());
-
-    const { editor } = getState();
-
-    if (!editor.context || editor.context.type !== "note") {
-        throw new Error('Note Editor context has not been initialised.');
-    }
-
-    const { data } = editor.context;
-    
-    const originalCategory = data.original.relationships.category?.id;
-    const editingCategory = data.editing.relationships.category?.id;
-
-    if (originalCategory !== editingCategory) {
-        originalCategory &&
-            dispatch(categoryOperations.removeCategoryIds(originalCategory, "notes", [data.editing.id]));
-        editingCategory &&
-            dispatch(categoryOperations.addCategoryIds(editingCategory, "notes", [data.editing.id]));
-    }
-
-    const stamped = helpers.stampContentModel(data.editing);
-
-    if (editor.attributes.isNew) {
-        dispatch(noteOperations.createNote(stamped));
-    } else {
-        dispatch(noteOperations.overwriteNote(stamped));
-    }
-
-    dispatch(openEditor("note", data.editing.id));
-}
-
-type sNEMThunkAction = ThunkAction<void, RootState, unknown, any>;
-
-/* 
-*   CATEGORY EDITOR OPERATIONS
-*/
-
-/** 
-*  Summary: 
-*  Updates the title string for a Category Model.
-*
-*  @param {string} title The new title for the model.
-*/
-
-export const updateCategoryEditorTitle = (
-    title: string
-): uCETThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateCategoryEditorTitle(title));
-}
-
-type uCETThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorTitleUpdatedAction>;
-
-/** 
-*  Summary:
-*  Upates the resource ids for a particular type on a Category Model.
-*
-*  @param {"recording" | "note"} type The type of resource being updated.
-*  @param {string} ids An array containing the new resource ids.
-*/
-
-export const updateCategoryEditorIds = (
-    type: "recordings" | "notes",
-    ids: string[]
-): uCEIThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateCategoryEditorIds(type, ids));
-}
-
-type uCEIThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;
-
-/** 
-*  Summary:
-*  Saves the currently editing Category Model.
-*
-*  Description
-*  Updates any media models that have been added to or removed from it.
-*  Persists or overwrites the Category depending on its isNew status.
-*/
-
-// TODO: batch the other model updates
-
-export const saveCategoryEditorModel = (): sCEMThunkAction => (
-    dispatch,
-    getState
-): void => {
-    dispatch(actions.setEditorSaving());
-
-    const { editor, media } = getState();
-
-    if (!editor.context || editor.context.type !== "category") {
-        throw new Error('Category Editor context has not been initialised.');
-    }
-
-    const { data } = editor.context;
-
-    const originalRecordingIds = data.original.relationships.recordings.ids;
-    const originalNoteIds = data.original.relationships.notes.ids;
-    const editingRecordingIds = data.editing.relationships.recordings.ids;
-    const editingNoteIds = data.editing.relationships.notes.ids;
-
-    originalRecordingIds.forEach(id => {
-        if (!editingRecordingIds.includes(id)) {
-            dispatch(recordingOperations.updateRecordingCategory(id, undefined));
-        }
-    });
-
-    originalNoteIds.forEach(id => {
-        if (!editingNoteIds.includes(id)) {
-            dispatch(noteOperations.updateNoteCategory(id, undefined));
-        }
-    });
-
-    editingRecordingIds.forEach(id => {
-        if (!originalRecordingIds.includes(id)) {
-            const assignedCategory = media.recordings.byId[id].relationships.category;
-
-            if (assignedCategory) {
-                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "recordings", [id]));
-            }
-
-            dispatch(recordingOperations.updateRecordingCategory(id, data.editing.id));
-        }
-    });
-
-    editingNoteIds.forEach(id => {
-        if (!originalNoteIds.includes(id)) {
-            const assignedCategory = media.notes.byId[id].relationships.category;
-
-            if (assignedCategory) {
-                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "notes", [id]));
-            }
-
-            dispatch(noteOperations.updateNoteCategory(id, data.editing.id));
-        }
-    });
-
-    const stamped = helpers.stampContentModel(data.editing);
-
-    if (editor.attributes.isNew) {
-        dispatch(categoryOperations.createCategory(stamped));
-    } else {
-        dispatch(categoryOperations.overwriteCategory(stamped));
-    }
-
-    dispatch(openEditor("category", data.editing.id));
-}
-
-type sCEMThunkAction = ThunkAction<void, RootState, unknown, any>;

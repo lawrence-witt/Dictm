@@ -3,7 +3,8 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
+import { editorSelectors } from '../../../../../redux/ducks/editor';
+import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
 
 import SaveButton from '../../../../atoms/Buttons/SaveButton';
 
@@ -16,7 +17,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    saveNote: editorOperations.saveNoteEditorModel
+    saveNote: noteEditorOperations.saveNoteEditorModel
 };
 
 const connector = connect(mapState, mapDispatch);

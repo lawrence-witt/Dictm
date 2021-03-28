@@ -3,7 +3,8 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
+import { editorSelectors } from '../../../../../redux/ducks/editor';
+import { categoryEditorOperations } from '../../../../../redux/ducks/editor/category';
 
 import SaveButton from '../../../../atoms/Buttons/SaveButton';
 
@@ -16,7 +17,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    saveCategory: editorOperations.saveCategoryEditorModel
+    saveCategory: categoryEditorOperations.saveCategoryEditorModel
 }
 
 const connector = connect(mapState, mapDispatch);

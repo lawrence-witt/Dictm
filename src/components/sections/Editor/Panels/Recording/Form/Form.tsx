@@ -6,7 +6,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../../redux/store';
 import { categorySelectors } from '../../../../../../redux/ducks/categories';
-import { editorOperations } from '../../../../../../redux/ducks/editor';
+import { recordingEditorOperations } from '../../../../../../redux/ducks/editor/recording';
 
 import { FormProps } from './Form.types';
 
@@ -21,8 +21,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    updateTitle: editorOperations.updateRecordingEditorTitle,
-    updateCategory: editorOperations.updateRecordingEditorCategory,
+    updateTitle: recordingEditorOperations.updateRecordingEditorTitle,
+    updateCategory: recordingEditorOperations.updateRecordingEditorCategory,
 }
 
 const connector = connect(mapState, mapDispatch);

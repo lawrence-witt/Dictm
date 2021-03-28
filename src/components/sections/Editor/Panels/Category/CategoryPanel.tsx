@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorOperations } from '../../../../../redux/ducks/editor';
+import { categoryEditorOperations } from '../../../../../redux/ducks/editor/category';
 import { mediaSelectors } from '../../../../../redux/ducks/media';
 
 import MediaAutocomplete, { MediaOption } from '../../../../atoms/Inputs/MediaAutocomplete';
@@ -21,8 +21,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    updateTitle: editorOperations.updateCategoryEditorTitle,
-    updateIds: editorOperations.updateCategoryEditorIds
+    updateTitle: categoryEditorOperations.updateCategoryEditorTitle,
+    updateIds: categoryEditorOperations.updateCategoryEditorIds
 }
 
 const connector = connect(mapState, mapDispatch);

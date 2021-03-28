@@ -59,8 +59,7 @@ const useCassette = (
     }, []);
 
     const defaultOnError = React.useCallback((error: unknown) => {
-        //setError(error);
-        console.log(error);
+        setError(error);
     }, []);
 
     // Mounting and Unmounting

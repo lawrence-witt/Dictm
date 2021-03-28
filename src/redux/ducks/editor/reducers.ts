@@ -1,11 +1,15 @@
 import * as types from './types';
 
+import recordingEditorReducer, { recordingTypes } from './recording';
+import noteEditorReducer, { noteTypes } from './note';
+import categoryEditorReducer, { categoryTypes } from './category';
+
 //  Choose Editor Reducer
 
 const chooseEditorReducer = (
-    state: types.EditorContexts["choose"] | undefined,
+    state: types.ChooseEditorContext | undefined,
     action: types.EditorActionTypes
-): types.EditorContexts["choose"] => {
+): types.ChooseEditorContext => {
     if (!state) {
         if (action.type !== types.EDITOR_OPENED) {
             throw new Error('Choose Editor has not been initialised.');
@@ -18,190 +22,6 @@ const chooseEditorReducer = (
     }
 
     return state;
-}
-
-// Recording Editor Reducer
-
-const recordingEditorReducer = (
-    state: types.EditorContexts["recording"] | undefined,
-    action: types.RecordingEditorActionTypes
-): types.EditorContexts["recording"] => {
-    if (!state) {
-        if (action.type !== types.EDITOR_OPENED) {
-            throw new Error('Recording Editor has not been initialised.');
-        }
-        if (action.payload.context.type !== "recording") {
-            throw new Error(`Recording Editor incorrectly provided ${action.payload.context.type} context.`);
-        }
-
-        return action.payload.context;
-    }
-
-    switch (action.type) {
-        case types.RECORDING_EDITOR_MODE_UPDATED:
-            return {
-                ...state,
-                mode: action.payload.mode
-            }
-        case types.RECORDING_EDITOR_TITLE_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
-                    }
-                }
-            }
-        case types.RECORDING_EDITOR_CATEGORY_UPDATED:
-            const id = action.payload.id;
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            category: id === undefined ? id : { id }
-                        }
-                    }
-                }
-            }
-        case types.RECORDING_EDITOR_DATA_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        data: action.payload.data
-                    }
-                }
-            }
-        default:
-            return state;
-    }
-}
-
-// Note Editor Reducer
-
-const noteEditorReducer = (
-    state: types.EditorContexts["note"] | undefined,
-    action: types.NoteEditorActionTypes
-): types.EditorContexts["note"] => {
-    if (!state) {
-        if (action.type !== types.EDITOR_OPENED) {
-            throw new Error('Note Editor has not been initialised.');
-        }
-        if (action.payload.context.type !== "note") {
-            throw new Error(`Note Editor incorrectly provided ${action.payload.context.type} context.`);
-        }
-
-        return action.payload.context;
-    }
-
-    switch (action.type) {
-        case types.NOTE_EDITOR_TITLE_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
-                    }
-                }
-            }
-        case types.NOTE_EDITOR_CATEGORY_UPDATED:
-            const id = action.payload.id;
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            category: id === undefined ? id : { id }
-                        }
-                    }
-                }
-            }
-        case types.NOTE_EDITOR_DATA_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        data: action.payload.data
-                    }
-                }
-            }
-        default:
-            return state;
-    }
-}
-
-// Category Editor Reducer
-
-const categoryEditorReducer = (
-    state: types.EditorContexts["category"] | undefined,
-    action: types.CategoryEditorActionTypes
-): types.EditorContexts["category"] => {
-    if (!state) {
-        if (action.type !== types.EDITOR_OPENED) {
-            throw new Error('Category Editor has not been initialised.');
-        }
-        if (action.payload.context.type !== "category") {
-            throw new Error(`Category Editor incorrectly provided ${action.payload.context.type} context.`);
-        }
-
-        return action.payload.context;
-    }
-
-    switch (action.type) {
-        case types.CATEGORY_EDITOR_TITLE_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
-                    }
-                }
-            }
-        case types.CATEGORY_EDITOR_IDS_UPDATED:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            [action.payload.type]: {
-                                ids: action.payload.ids
-                            }
-                        }
-                    }
-                }
-            }
-        default:
-            return state;
-    }
 }
 
 // Base Editor Reducer
@@ -276,10 +96,10 @@ const editorReducer = (
             };
         case types.EDITOR_CLEARED:
             return initialEditorState;
-        case types.RECORDING_EDITOR_MODE_UPDATED:
-        case types.RECORDING_EDITOR_TITLE_UPDATED:
-        case types.RECORDING_EDITOR_CATEGORY_UPDATED:
-        case types.RECORDING_EDITOR_DATA_UPDATED:
+        case recordingTypes.RECORDING_EDITOR_MODE_UPDATED:
+        case recordingTypes.RECORDING_EDITOR_TITLE_UPDATED:
+        case recordingTypes.RECORDING_EDITOR_CATEGORY_UPDATED:
+        case recordingTypes.RECORDING_EDITOR_DATA_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "recording") {
                 throw new Error(`Recording Editor action cannot be executed on ${state.context.type} context.`);
@@ -289,9 +109,9 @@ const editorReducer = (
                 ...state,
                 context: recordingEditorReducer(state.context, action)
             }
-        case types.NOTE_EDITOR_TITLE_UPDATED:
-        case types.NOTE_EDITOR_CATEGORY_UPDATED:
-        case types.NOTE_EDITOR_DATA_UPDATED:
+        case noteTypes.NOTE_EDITOR_TITLE_UPDATED:
+        case noteTypes.NOTE_EDITOR_CATEGORY_UPDATED:
+        case noteTypes.NOTE_EDITOR_DATA_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "note") {
                 throw new Error(`Note Editor action cannot be executed on ${state.context.type} context.`);
@@ -301,8 +121,8 @@ const editorReducer = (
                 ...state,
                 context: noteEditorReducer(state.context, action)
             }
-        case types.CATEGORY_EDITOR_TITLE_UPDATED:
-        case types.CATEGORY_EDITOR_IDS_UPDATED:
+        case categoryTypes.CATEGORY_EDITOR_TITLE_UPDATED:
+        case categoryTypes.CATEGORY_EDITOR_IDS_UPDATED:
             if (!state.context) throw new Error('Editor has not been provided with a context.');
             if (state.context.type !== "category") {
                 throw new Error(`Category Editor action cannot be executed on ${state.context.type} context.`);

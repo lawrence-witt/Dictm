@@ -2,7 +2,8 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
+import { editorSelectors } from '../../../../../redux/ducks/editor';
+import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
 
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 
@@ -26,8 +27,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    updateData: editorOperations.updateRecordingEditorData,
-    saveRecording: editorOperations.saveRecordingEditorModel
+    updateData: recordingEditorOperations.updateRecordingEditorData,
+    saveRecording: recordingEditorOperations.saveRecordingEditorModel
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -67,8 +68,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
 
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
         nextFrame.current = () => {
-            timerHandle.current.increment(progress, duration);
-            waveHandle.current.increment(progress, duration);
+            (handle => handle?.increment(progress, duration))(timerHandle.current);
+            (handle => handle?.increment(progress, duration))(waveHandle.current);
             nextFrame.current = undefined;
         }
     }, []);
@@ -136,7 +137,6 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     // Scan the available tape and force animation
 
     const handleScan = React.useCallback(async (type: 'to' | 'by', secs: number) => {
-        //console.log(secs);
         if (type === "to") await cassette.controls.scanTo(secs);
         if (type === "by") await cassette.controls.scanBy(secs);
 

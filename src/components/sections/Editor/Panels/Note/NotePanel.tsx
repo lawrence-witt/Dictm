@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../../../redux/store';
 import { categorySelectors } from '../../../../../redux/ducks/categories';
-import { editorOperations } from '../../../../../redux/ducks/editor';
+import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
 
 import CustomSelect from '../../../../atoms/Inputs/CustomSelect';
 
@@ -19,9 +19,9 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    updateTitle: editorOperations.updateNoteEditorTitle,
-    updateCategory: editorOperations.updateNoteEditorCategory,
-    updateData: editorOperations.updateNoteEditorData
+    updateTitle: noteEditorOperations.updateNoteEditorTitle,
+    updateCategory: noteEditorOperations.updateNoteEditorCategory,
+    updateData: noteEditorOperations.updateNoteEditorData
 }
 
 const connector = connect(mapState, mapDispatch);
