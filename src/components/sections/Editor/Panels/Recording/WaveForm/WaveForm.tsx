@@ -74,6 +74,10 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         nodeMap
     } = props;
 
+    /* 
+    *   Set up
+    */
+
     // Cassette
 
     const isListening = status === "listening";
@@ -98,16 +102,9 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     const shouldResume = React.useRef(false);
 
-    // Set initial WaveForm options
-
-    React.useLayoutEffect(() => {
-        if (waveClass.current) return;
-
-        waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
-        waveClass.current.init();
-    }, []);
-
-    // Handle scanning with scroll grab
+    /* 
+    *   Handle scanning with scroll grab
+    */
 
     const startScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         if (!flags.canScan) return;
@@ -158,7 +155,15 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         if (isPlaying) shouldResume.current = false;
     }, [isPlaying]);
 
-    // Expose control methods to parent
+    /* 
+    *   Expose control methods to parent
+    */
+
+    const init = React.useCallback((frequencies: number[][]) => {
+        waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
+        waveClass.current.frequencyData = frequencies;
+        waveClass.current.init();
+    }, []);
 
     const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
         progressRef.current = p;
@@ -185,9 +190,10 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     }, []);
 
     React.useImperativeHandle(waveHandle, () => ({
+        init,
         increment,
         flush
-    }), [increment, flush]);
+    }), [init, increment, flush]);
 
     React.useEffect(() => {
         if (isListening) waveClass.current.flush(progressRef.current);

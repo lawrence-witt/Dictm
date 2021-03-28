@@ -136,6 +136,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     // Scan the available tape and force animation
 
     const handleScan = React.useCallback(async (type: 'to' | 'by', secs: number) => {
+        //console.log(secs);
         if (type === "to") await cassette.controls.scanTo(secs);
         if (type === "by") await cassette.controls.scanBy(secs);
 
@@ -148,34 +149,6 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         saveRecording();
         handleScan("to", 0);
     }, [saveRecording, handleScan]);
-
-    /* 
-    *   Handle getting and releasing microphone stream
-    */
-
-    const handleConnect = React.useCallback(async () => {
-        if (cassette.flags.hasStream) return;
-
-        try {
-            const mic = await navigator.mediaDevices.getUserMedia({audio: true});
-            stream.current = mic;
-            await cassette.controls.connect(stream.current);
-        } catch(err) {
-            console.log(err);
-            // TODO: dispatch notificaion error
-        }
-    }, [cassette.flags, cassette.controls]);
-
-    React.useEffect(() => {
-        if (mode === "play" || stream.current) return;
-        handleConnect();
-    }, [mode, handleConnect]);
-
-    React.useEffect(() => {
-        return () => {
-            if (stream.current) stream.current.getAudioTracks()[0].stop();
-        }
-    }, []);
 
     /* 
     *   Handle play resume after scan control
@@ -202,6 +175,61 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
             resumeTimeout.current = undefined;
         }
     }, [handleStart]);
+
+    /* 
+    *   Handle inserting audio and frequencies data
+    */
+
+    // TODO: the cassette error handling has to be rewritten because this will never throw
+
+    const insertFailed = React.useRef(false);
+
+    const handleInsert = React.useCallback(async (
+        audio: RecordingPanelProps["model"]["data"]["audio"]
+    ) => {
+        try {
+            await cassette.controls.insert(audio, () => insertFailed.current = true);
+        } catch(err) {
+            console.log(err);
+            // TODO: dispatch notification error
+        }
+    }, [cassette.controls]);
+
+    React.useEffect(() => {
+        if (mode !== "play" || !cassette.flags.canInsert || insertFailed.current) return;
+        handleInsert(model.data.audio);
+        waveHandle.current.init(model.data.frequencies);
+        waveHandle.current.increment(0, model.data.audio.data.duration);
+    }, [mode, model, cassette.flags, handleInsert]);
+
+    /* 
+    *   Handle getting and releasing microphone stream
+    */
+
+    const handleConnect = React.useCallback(async () => {
+        if (cassette.flags.hasStream) return;
+
+        try {
+            const mic = await navigator.mediaDevices.getUserMedia({audio: true});
+            stream.current = mic;
+            await cassette.controls.connect(stream.current);
+        } catch(err) {
+            console.log(err);
+            // TODO: dispatch notificaion error
+        }
+    }, [cassette.flags, cassette.controls]);
+
+    React.useEffect(() => {
+        if (mode !== "edit" || stream.current) return;
+        handleConnect();
+        waveHandle.current.init([]);
+    }, [mode, handleConnect]);
+
+    React.useEffect(() => {
+        return () => {
+            if (stream.current) stream.current.getAudioTracks()[0].stop();
+        }
+    }, []);
 
     return (
         <>

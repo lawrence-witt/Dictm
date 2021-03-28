@@ -16,6 +16,7 @@ export interface TimerHandle {
 }
 
 export interface WaveHandle {
+    init: (frequencies: number[][]) => void;
     increment: CassetteProgressCallback;
     flush: () => number[][];
 }

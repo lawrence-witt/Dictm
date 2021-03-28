@@ -59,7 +59,7 @@ const useCassette = (
     }, []);
 
     const defaultOnError = React.useCallback((error: unknown) => {
-        setError(error);
+        //setError(error);
         console.log(error);
     }, []);
 
