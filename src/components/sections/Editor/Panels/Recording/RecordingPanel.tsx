@@ -222,8 +222,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     React.useEffect(() => {
         if (mode !== "edit" || stream.current) return;
         handleConnect();
-        waveHandle.current.init([]);
-    }, [mode, handleConnect]);
+        if (!cassette.flags.hasData) waveHandle.current.init([]);
+    }, [mode, cassette.flags, handleConnect]);
 
     React.useEffect(() => {
         return () => {
