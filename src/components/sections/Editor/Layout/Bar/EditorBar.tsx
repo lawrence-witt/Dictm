@@ -1,4 +1,8 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../../../redux/store';
+import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -7,6 +11,28 @@ import { makeStyles } from '@material-ui/core/styles';
 import DirectionButton from '../../../../atoms/Buttons/DirectionButton';
 
 import { EditorBarProps } from './EditorBar.types';
+
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    title: state.editor.attributes.title,
+    canSave: editorSelectors.getSaveAvailability(state)
+});
+
+const mapDispatch = {
+    openSaveDialog: editorOperations.openSaveDialog,
+    closeEditor: editorOperations.closeEditor
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useBarStyles = makeStyles(theme => ({
     drawerBar: {
@@ -29,13 +55,26 @@ const useBarStyles = makeStyles(theme => ({
     }
 }));
 
-const EditorBar: React.FC<EditorBarProps> = (props) => {
+const EditorBar: React.FC<EditorBarProps & ReduxProps> = (props) => {
     const {
-        title = "",
+        title,
+        canSave,
+        openSaveDialog,
+        closeEditor,
         children
     } = props;
 
     const classes = useBarStyles();
+
+    // Handle editor close
+
+    const onClose = React.useCallback(() => {
+        if (canSave) {
+            return openSaveDialog();
+        }
+
+        closeEditor();
+    }, [canSave, openSaveDialog, closeEditor]);
 
     return (
         <Toolbar className={classes.drawerBar}>
@@ -45,6 +84,7 @@ const EditorBar: React.FC<EditorBarProps> = (props) => {
                 edge="start"
                 color="inherit"
                 className={classes.backButton}
+                onClick={onClose}
             />
             <Typography
                 variant="h6" 
@@ -59,4 +99,4 @@ const EditorBar: React.FC<EditorBarProps> = (props) => {
     );
 };
 
-export default EditorBar;
+export default connector(EditorBar);

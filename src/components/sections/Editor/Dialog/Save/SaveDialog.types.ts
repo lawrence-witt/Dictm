@@ -1,4 +1,6 @@
+import { EditorModelTypes } from '../../../../../redux/ducks/editor';
+
 export interface SaveDialogProps {
-    contentType: string;
-    newContent: boolean;
+    contentType: EditorModelTypes;
+    isNew: boolean;
 }

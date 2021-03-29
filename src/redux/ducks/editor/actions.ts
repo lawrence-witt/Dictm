@@ -21,6 +21,14 @@ export const unsetEditorSaving = (): types.EditorUnsetSavingAction => ({
     type: types.EDITOR_UNSET_SAVING
 });
 
+export const openSaveDialog = (): types.EditorOpenSaveDialogAction => ({
+    type: types.EDITOR_SAVE_DIALOG_OPENED
+});
+
+export const closeDialog = (): types.EditorCloseDialogAction => ({
+    type: types.EDITOR_DIALOG_CLOSED
+});
+
 export const closeEditor = (): types.EditorClosedAction => ({
     type: types.EDITOR_CLOSED
 });

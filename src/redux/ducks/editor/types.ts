@@ -36,6 +36,8 @@ export type EditorContexts = {
 export const EDITOR_OPENED                      = "dictm/editor/EDITOR_OPENED";
 export const EDITOR_SET_SAVING                  = "dictm/editor/EDITOR_SET_SAVING";
 export const EDITOR_UNSET_SAVING                = "dictm/editor/EDITOR_UNSET_SAVING";
+export const EDITOR_SAVE_DIALOG_OPENED          = "dictm/editor/EDITOR_SAVE_DIALOG_OPENED";
+export const EDITOR_DIALOG_CLOSED               = "dictm/editor/EDITOR_DIALOG_CLOSED";
 export const EDITOR_CLOSED                      = "dictm/editor/EDITOR_CLOSED";
 export const EDITOR_CLEARED                     = "dictm/editor/EDITOR_CLEARED";
 
@@ -56,6 +58,14 @@ export interface EditorUnsetSavingAction {
     type: typeof EDITOR_UNSET_SAVING;
 }
 
+export interface EditorOpenSaveDialogAction {
+    type: typeof EDITOR_SAVE_DIALOG_OPENED;
+}
+
+export interface EditorCloseDialogAction {
+    type: typeof EDITOR_DIALOG_CLOSED;
+}
+
 export interface EditorClosedAction {
     type: typeof EDITOR_CLOSED;
 }
@@ -70,6 +80,8 @@ export type EditorActionTypes =
     categoryTypes.CategoryEditorActionTypes |
     EditorSetSavingAction |
     EditorUnsetSavingAction |
+    EditorOpenSaveDialogAction |
+    EditorCloseDialogAction |
     EditorClosedAction |
     EditorClearedAction;
 

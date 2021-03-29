@@ -120,7 +120,11 @@ export const saveCategoryEditorModel = (): SaveCategoryEditorThunkAction => (
         dispatch(categoryOperations.overwriteCategory(stamped));
     }
 
-    dispatch(editorOperations.openEditor("category", data.editing.id));
+    if (editor.dialogs.save.isOpen) {
+        dispatch(editorOperations.closeEditor());
+    } else {
+        dispatch(editorOperations.openEditor("category", data.editing.id));
+    }    
 }
 
 type SaveCategoryEditorThunkAction = ThunkAction<void, RootState, unknown, any>;

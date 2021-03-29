@@ -6,10 +6,6 @@ import * as helpers from './helpers';
 
 import { RootState } from '../../store';
 
-/* 
-*   BASE EDITOR OPERATIONS
-*/
-
 /** 
 *  Summary 
 *  Opens the editor modal.
@@ -56,7 +52,7 @@ type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorO
 
 /** 
 *  Summary:
-*  Sets the editor isSaving flag to true.
+*  Sets the editor.attributes.isSaving flag to true.
 */
 
 export const setEditorSaving = (): SetEditorSavingThunkAction => (
@@ -69,7 +65,7 @@ type SetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.Ed
 
 /** 
 *  Summary:
-*  Sets the editor isSaving flag to false.
+*  Sets the editor.attributes.isSaving flag to false.
 */
 
 export const unsetEditorSaving = (): UnsetEditorSavingThunkAction => (
@@ -81,20 +77,60 @@ export const unsetEditorSaving = (): UnsetEditorSavingThunkAction => (
 type UnsetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.EditorUnsetSavingAction>;
 
 /** 
+*  Summary:
+*  Opens the save dialog.
+*
+*  Description:
+*  Sets the dialogs.save.isOpen property to true.
+*/
+
+export const openSaveDialog = (): OpenSaveDialogThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.openSaveDialog());
+}
+
+type OpenSaveDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorOpenSaveDialogAction>;
+
+/** 
+*  Summary:
+*  Closes any open dialogs.
+*
+*  Description:
+*  Sets the dialogs.[save | details].isOpen property to false.
+*/
+
+export const closeDialog = (): CloseDialogThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.closeDialog());
+}
+
+type CloseDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorCloseDialogAction>;
+
+/** 
 *  Summary 
 *  Closes the editor modal.
 *
 *  Description 
-*  Sets the editor isOpen state to false.
+*  Sets the editor.attributes.isOpen property to false.
+*  Optionally sets the editor.dialogs["save" | "details"].isOpen property to false.
 */
 
 export const closeEditor = (): CloseEditorThunkAction => (
-    dispatch
+    dispatch,
+    getState
 ): void => {
+    const { dialogs } = getState().editor;
+
+    if (dialogs.save.isOpen || dialogs.details.isOpen) {
+        dispatch(closeDialog());
+    }
+
     dispatch(actions.closeEditor());
 }
 
-type CloseEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClosedAction>;
+type CloseEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
 
 /** 
 *  Summary

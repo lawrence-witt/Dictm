@@ -6,7 +6,8 @@ export * as editorHelpers from './helpers';
 
 export {
     EditorModelTypes,
-    EditorContexts
+    EditorContexts,
+    EditorState
 } from './types'
 
 export default reducer;

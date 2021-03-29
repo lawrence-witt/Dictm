@@ -86,6 +86,28 @@ const editorReducer = (
                     isSaving: false
                 }
             }
+        case types.EDITOR_SAVE_DIALOG_OPENED:
+            return {
+                ...state,
+                dialogs: {
+                    ...state.dialogs,
+                    save: {
+                        isOpen: true
+                    }
+                }
+            }
+        case types.EDITOR_DIALOG_CLOSED:
+            return {
+                ...state,
+                dialogs: {
+                    save: {
+                        isOpen: false
+                    },
+                    details: {
+                        isOpen: false
+                    }
+                }
+            }
         case types.EDITOR_CLOSED:
             return {
                 ...state,

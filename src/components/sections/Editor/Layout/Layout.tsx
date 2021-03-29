@@ -44,7 +44,6 @@ const useEditorLayoutStyles = makeStyles(theme => ({
 
 const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
     const {
-        attributes,
         context
     } = props;
 
@@ -113,7 +112,7 @@ const EditorLayout: React.FC<EditorLayoutProps> = (props) => {
 
     return (
         <>
-            <EditorBar title={attributes.title}>
+            <EditorBar>
                 {Panel.buttons}
             </EditorBar>
             <EditorFrame>

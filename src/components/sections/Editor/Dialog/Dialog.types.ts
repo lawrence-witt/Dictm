@@ -1,14 +1,7 @@
-import { DialogProps as MuiDialogProps } from '@material-ui/core/Dialog';
+import { EditorState, EditorContexts } from '../../../../redux/ducks/editor'
 
-import { SaveDialogProps } from './Save/SaveDialog.types';
-import { DetailsDialogProps } from './Details/DetailsDialog.types';
-
-export interface DialogProps extends MuiDialogProps {
-    schema: { 
-        type: 'save', 
-        props: SaveDialogProps 
-    } | {
-        type: 'details',
-        props: DetailsDialogProps
-    }
+export interface DialogProps {
+    attributes: EditorState["attributes"];
+    context: EditorContexts[keyof EditorContexts];
+    dialogs: EditorState["dialogs"];
 }

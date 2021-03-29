@@ -2,7 +2,7 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
-import { editorOperations } from '../../../redux/ducks/editor';
+import { editorOperations, editorSelectors } from '../../../redux/ducks/editor';
 
 import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
 import EditorLayout from './Layout/Layout';
@@ -14,10 +14,12 @@ import Dialog from './Dialog/Dialog';
 */
 
 const mapState = (state: RootState) => ({
-    editor: state.editor
+    editor: state.editor,
+    canSave: editorSelectors.getSaveAvailability(state)
 });
 
 const mapDispatch = {
+    openSaveDialog: editorOperations.openSaveDialog,
     closeEditor: editorOperations.closeEditor,
     clearEditor: editorOperations.clearEditor
 }
@@ -33,28 +35,26 @@ type ReduxProps = ConnectedProps<typeof connector>;
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
         editor,
+        canSave,
+        openSaveDialog,
         closeEditor,
         clearEditor
     } = props;
 
-    // Editor visibility control
-
-    const [editorOpen, setEditorOpen] = React.useState(editor.attributes.isOpen);
-
-    React.useEffect(() => {
-        setEditorOpen(editor.attributes.isOpen);
-    }, [editor.attributes.isOpen]);
-
     // Handle editor close
 
-    const onRequestEditorClosed = React.useCallback(() => {
+    const onClose = React.useCallback(() => {
+        if (canSave) {
+            return openSaveDialog();
+        }
+
         closeEditor();
-    }, [closeEditor]);
+    }, [canSave, openSaveDialog, closeEditor]);
 
     return (
         <FocusDrawer
-            open={editorOpen}
-            onClose={onRequestEditorClosed}
+            open={editor.attributes.isOpen}
+            onClose={onClose}
             SlideProps={{
                 mountOnEnter: true,
                 unmountOnExit: true,
@@ -64,18 +64,12 @@ const Editor: React.FC<ReduxProps> = (props) => {
             {editor.context && (
                 <>
                     <EditorLayout
-                        attributes={editor.attributes}
                         context={editor.context}
                     />
                     <Dialog 
-                        open={false}
-                        schema={{
-                            type: 'save',
-                            props: {
-                                contentType: 'recording',
-                                newContent: false
-                            }
-                        }}
+                        attributes={editor.attributes}
+                        context={editor.context}
+                        dialogs={editor.dialogs}
                     />
                 </>
             )}

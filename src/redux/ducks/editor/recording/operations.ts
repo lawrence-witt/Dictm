@@ -120,7 +120,13 @@ export const saveRecordingEditorModel = (): SaveRecordingEditorThunkAction => (
         dispatch(recordingOperations.overwriteRecording(stamped));
     }
 
-    dispatch(editorOperations.openEditor("recording", data.editing.id));
+    const { save } = editor.dialogs;
+
+    if (save.isOpen) {
+        dispatch(editorOperations.closeEditor());
+    } else {
+        dispatch(editorOperations.openEditor("recording", data.editing.id));
+    }
 }
 
 type SaveRecordingEditorThunkAction = ThunkAction<void, RootState, unknown, any>;

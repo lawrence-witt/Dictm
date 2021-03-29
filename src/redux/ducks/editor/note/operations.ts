@@ -113,7 +113,13 @@ export const saveNoteEditorModel = (): SaveNoteEditorThunkAction => (
         dispatch(noteOperations.overwriteNote(stamped));
     }
 
-    dispatch(editorOperations.openEditor("note", data.editing.id));
+    const { save } = editor.dialogs;
+
+    if (save.isOpen) {
+        dispatch(editorOperations.closeEditor());
+    } else {
+        dispatch(editorOperations.openEditor("note", data.editing.id));
+    }
 }
 
 type SaveNoteEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
