@@ -5,8 +5,8 @@ import {
 } from './types';
 
 const initialState: UserState = {
-    id: '',
-    name: ''
+    id: 'user1',
+    name: 'Lazarus'
 }
 
 const userReducer = (

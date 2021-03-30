@@ -12,7 +12,6 @@ import NavBar from '../../sections/NavBar/NavBar';
 import NavMenu from '../../sections/NavMenu/NavMenu';
 import Editor from '../../sections/Editor/Editor';
 
-import useToggle from '../../../utils/hooks/useToggle';
 import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
 
 const useStyles = makeStyles(() => ({
@@ -44,8 +43,6 @@ const useStyles = makeStyles(() => ({
 const App: React.FC = (): React.ReactElement => {
     const classes = useStyles();
 
-    const [isMenuOpen, toggleMenu] = useToggle(false);
-
     const location = useLocation();
     const left = true;
 
@@ -58,13 +55,10 @@ const App: React.FC = (): React.ReactElement => {
 
     return (
         <div className={classes.fixedBase}>
-            <NavMenu 
-                isMenuOpen={isMenuOpen}
-                toggleMenu={toggleMenu}
-            />
+            <NavMenu/>
             <div className={classes.pageBase}>
                 <ToolBar
-                    toggleMenu={toggleMenu}
+                    toggleMenu={() => ({})}
                 />
                 <div className={classes.templateBase}>
                     {templateTransition((style, location) => (

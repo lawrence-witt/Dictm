@@ -35,12 +35,11 @@ const useActionStyles = makeStyles(theme => ({
 
 const NavBar: React.FC = () => {
     const navClasses = useNavStyles();
-    const actClasses = useActionStyles();
+    const actionClasses = useActionStyles();
 
     const [tab, setTab] = React.useState<TabTypes>('');
 
     const history = useHistory();
-    const pushHistory = (val: string) => history.push(val);
 
     // Required to stop mui from throwing TS error
     const changeHandler = (...args: [React.MouseEvent, TabTypes] | unknown[]) => {
@@ -59,22 +58,22 @@ const NavBar: React.FC = () => {
                     label="Recordings"
                     value="recordings"
                     icon={<Album />}
-                    classes={actClasses}
-                    onClick={() => pushHistory('/recordings')}
+                    classes={actionClasses}
+                    onClick={() => history.push('/recordings')}
                 />
                 <BottomNavigationAction
                     label="Notes"
                     value="notes"
                     icon={<EventNote />}
-                    classes={actClasses}
-                    onClick={() => pushHistory('/notes')}
+                    classes={actionClasses}
+                    onClick={() => history.push('/notes')}
                 />
                 <BottomNavigationAction
                     label="Categories"
                     value="categories"
                     icon={<Category />}
-                    classes={actClasses}
-                    onClick={() => pushHistory('/categories')}
+                    classes={actionClasses}
+                    onClick={() => history.push('/categories')}
                 />
             </BottomNavigation>
     );

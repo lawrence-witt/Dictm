@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { connect, ConnectedProps } from 'react-redux';
+
+import { toolOperations } from '../../../../redux/ducks/tools';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -14,7 +18,21 @@ import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 
 import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 
-import { DefaultRowProps } from './ToolBarRow.types';
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    onToggleMenu: toolOperations.toggleNavMenu
+}
+
+const connector = connect(null, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useDefaultRowStyles = makeStyles<Theme, {
     titleHidden: boolean; 
@@ -53,9 +71,9 @@ const useDefaultRowStyles = makeStyles<Theme, {
     })
 ));
 
-const DefaultRow: React.FC<DefaultRowProps> = (props) => {
+const ToolBarRow: React.FC<ReduxProps> = (props) => {
     const {
-        toggleMenu,
+        onToggleMenu,
         children
     } = props;
 
@@ -83,7 +101,7 @@ const DefaultRow: React.FC<DefaultRowProps> = (props) => {
                 edge="start"
                 color="inherit"
                 className={rowClasses.menuButton}
-                onClick={toggleMenu}
+                onClick={onToggleMenu}
             />
             <Typography 
                 variant="h6"
@@ -122,4 +140,4 @@ const DefaultRow: React.FC<DefaultRowProps> = (props) => {
     )
 }
 
-export default DefaultRow;
+export default connector(ToolBarRow);

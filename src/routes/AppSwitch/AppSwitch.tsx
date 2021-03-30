@@ -12,16 +12,6 @@ import Routes from '../Routes/Routes';
 
 import { AppSwitchProps } from './AppSwitch.types';
 
-export const testCategories = {
-    "abc": {
-        media: []
-    },
-    "def": {
-        media: []
-    },
-    "keys": ["abc", "def"]
-}
-
 /* 
 *   Redux
 */

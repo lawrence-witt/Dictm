@@ -32,8 +32,8 @@ type CreateCategoryThunkAction = ThunkAction<void, undefined, unknown, types.Cat
 *  Overwrites a Category Model.
 *
 *  Description:
-*  Updates the Category Model in the database.
-*  Updates the Category Model in the store.
+*  Overwrites the Category Model in the database.
+*  Overwrites the Category Model in the store.
 *
 *  @param {object} category The updated Category Model.
 */
@@ -52,6 +52,10 @@ type OverwriteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.
 /** 
 *  Summary:
 *  Adds an array of resource ids to a Category Model.
+*
+*  Description:
+*  Adds the Category Model ids in the database.
+*  Adds the Category Model ids in the store.
 *
 *  @param {string} id The id identifying the Category Model.
 *  @param {"recording" | "note"} type The resource type of the ids.
@@ -74,6 +78,10 @@ type AddCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.Cat
 /** 
 *  Summary:
 *  Removes an array of resource ids from a Category Model.
+*
+*  Description:
+*  Removes the Category Model ids in the database.
+*  Removes the Category Model ids in the store.
 *
 *  @param {string} id The id identifying the Category Model.
 *  @param {"recording" | "note"} type The resource type of the ids.

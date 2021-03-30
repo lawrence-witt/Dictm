@@ -24,12 +24,12 @@ interface HybridDrawerStyleProps {
 
 interface HybridDrawerProps {
     children: React.ReactNode;
-    flow?: Flows;
-    open?: boolean;
+    flow: Flows;
+    open: boolean;
     miniWidth?: number;
     fullWidth?: number;
     elevation?: number;
-    onClose?: (e: React.MouseEvent) => void;
+    onClose: (e: React.MouseEvent) => void;
 }
 
 // Helpers

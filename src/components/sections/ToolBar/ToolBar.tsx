@@ -8,15 +8,9 @@ import { ToolBarProps } from './ToolBar.types';
 
 // Component
 
-const ToolBar: React.FC<ToolBarProps> = ({
-    toggleMenu
-}) => {
-
-
+const ToolBar: React.FC<ToolBarProps> = (props) => {
     return (
-        <ToolBarRow
-            toggleMenu={toggleMenu}
-        >
+        <ToolBarRow>
             {/* <SearchTool /> */}
             {/* <DeleteTool 
                 contentType="recordings"
