@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
 import { mediaSelectors } from '../../../redux/ducks/media';
-import { editorOperations, EditorModelTypes } from '../../../redux/ducks/editor';
+import { editorOperations } from '../../../redux/ducks/editor';
 
 import CardGrid from '../../molecules/Grids/CardGrid';
 import RecordingCard from '../../molecules/Cards/RecordingCard';
@@ -38,10 +38,6 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
         openEditor
     } = props;
 
-    const onCardClick = React.useCallback((type: EditorModelTypes, id: string) => {
-        openEditor(type, id);
-    }, [openEditor]);
-
     const onFabClick = React.useCallback(() => {
         const editorType = {
             recordings: "recording" as const,
@@ -62,18 +58,18 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
                 return item.type === "recording" ? (
                     <RecordingCard
                         key={item.id}
+                        id={item.id}
                         title={item.attributes.title}
                         duration={item.data.audio.data.duration}
                         created={item.attributes.timestamps.created}
-                        onCardClick={() => onCardClick("recording", item.id)}
                     />
                 ) : (
                     <NoteCard
                         key={item.id}
+                        id={item.id}
                         title={item.attributes.title}
                         data={item.data}
                         created={item.attributes.timestamps.created}
-                        onCardClick={() => onCardClick("note", item.id)}
                     />
                 );
             })}

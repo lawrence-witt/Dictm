@@ -33,13 +33,9 @@ const CategoriesTemplate: React.FC<ReduxProps> = (props) => {
         openEditor
     } = props;
 
-    const onCardClick = (id: string) => {
-        openEditor("category", id);
-    }
-
-    const onFabClick = () => {
+    const onFabClick = React.useCallback(() => {
         openEditor("category", "new");
-    }
+    }, [openEditor]);
 
     return (
         <CardGrid
@@ -51,8 +47,8 @@ const CategoriesTemplate: React.FC<ReduxProps> = (props) => {
                 return (
                     <CategoryCard
                         key={category.id}
+                        id={category.id}
                         title={category.attributes.title}
-                        onCardClick={() => onCardClick(category.id)}
                     />
                 )
             })}

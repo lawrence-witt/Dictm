@@ -1,22 +1,47 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { editorOperations } from '../../../redux/ducks/editor';
+
 import Play from '@material-ui/icons/PlayArrow';
 
 import CardBase, { CardBasePrimaryRow, CardBaseActionSwitch } from './CardBase';
 
 interface RecordingCardProps {
+    id: string;
     title: string;
     duration: number;
     created: number;
-    onCardClick: () => void;
 }
 
-const RecordingCard: React.FC<RecordingCardProps> = (props) => {
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    openEditor: editorOperations.openEditor
+}
+
+const connector = connect(null, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
     const {
+        id,
         title,
         duration,
         created,
-        onCardClick
+        openEditor
     } = props;
+
+    const onCardClick = React.useCallback(() => {
+        openEditor("recording", id);
+    }, [openEditor, id]);
 
     return (
         <CardBase
@@ -39,4 +64,4 @@ const RecordingCard: React.FC<RecordingCardProps> = (props) => {
     )
 };
 
-export default RecordingCard;
+export default connector(RecordingCard);

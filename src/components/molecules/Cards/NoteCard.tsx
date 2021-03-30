@@ -1,10 +1,15 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { editorOperations } from '../../../redux/ducks/editor';
+
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import CardBase, { CardBasePrimaryRow, CardBaseSecondaryRow, CardBaseActionSwitch } from './CardBase';
 
 interface NoteCardProps {
+    id: string;
     title: string;
     data: {
         content: string;
@@ -12,8 +17,23 @@ interface NoteCardProps {
         charCount: number;
     }
     created: number;
-    onCardClick: () => void;
 }
+
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    openEditor: editorOperations.openEditor
+}
+
+const connector = connect(null, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useStyles = makeStyles(theme => 
     createStyles({
@@ -26,15 +46,20 @@ const useStyles = makeStyles(theme =>
     })    
 );
 
-const NoteCard: React.FC<NoteCardProps> = (props) => {
+const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
     const {
+        id,
         title,
         data,
         created,
-        onCardClick
+        openEditor
     } = props;
 
     const classes = useStyles();
+
+    const onCardClick = React.useCallback(() => {
+        openEditor("note", id);
+    }, [openEditor, id]);
 
     return (
         <CardBase
@@ -66,4 +91,4 @@ const NoteCard: React.FC<NoteCardProps> = (props) => {
     );
 };
 
-export default NoteCard;
+export default connector(NoteCard);
