@@ -3,8 +3,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
-import { toolSelectors, toolOperations } from '../../../redux/ducks/tools';
-import { NavMenuLists } from '../../../redux/ducks/tools';
+import { navigationSelectors, navigationOperations, NavMenuLists } from '../../../redux/ducks/navigation';
 
 import { useBreakContext } from '../../../utils/hooks/useBreakpoints';
 
@@ -20,12 +19,12 @@ import { NavMenuState } from './NavMenu.types';
 */
 
 const mapState = (state: RootState, props: RouteComponentProps) => ({
-    isMenuOpen: state.tools.nav.menu.isOpen,
-    navLists: toolSelectors.getNavLists(state.user, state.categories, props.history.push)
+    isMenuOpen: state.navigation.menu.isOpen,
+    navLists: navigationSelectors.getNavLists(state.user, state.categories, props.history.push)
 });
 
 const mapDispatch = {
-    onToggleMenu: toolOperations.toggleNavMenu
+    onToggleMenu: navigationOperations.toggleNavMenu
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -54,7 +53,7 @@ const createMenu = (
 
 const refreshMenu = (
     m: NavMenuState,
-    lists: ReturnType<typeof toolSelectors.getNavLists>
+    lists: NavMenuLists
 ): NavMenuState => {
     return {
         ...m,

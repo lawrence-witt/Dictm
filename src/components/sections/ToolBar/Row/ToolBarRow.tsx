@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect, ConnectedProps } from 'react-redux';
 
-import { toolOperations } from '../../../../redux/ducks/tools';
+import { navigationOperations } from '../../../../redux/ducks/navigation';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,7 +23,7 @@ import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 */
 
 const mapDispatch = {
-    onToggleMenu: toolOperations.toggleNavMenu
+    onToggleMenu: navigationOperations.toggleNavMenu
 }
 
 const connector = connect(null, mapDispatch);
