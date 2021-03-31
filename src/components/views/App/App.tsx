@@ -1,7 +1,11 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 import { hot } from 'react-hot-loader';
-import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { a } from 'react-spring';
+
+import { RootState } from '../../../redux/store';
+import { navigationOperations, navigationSelectors } from '../../../redux/ducks/navigation';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -13,6 +17,30 @@ import NavMenu from '../../sections/NavMenu/NavMenu';
 import Editor from '../../sections/Editor/Editor';
 
 import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
+
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    location: state.navigation.history.current.location,
+    transition: navigationSelectors.getTemplateAnimation(
+        state.categories, 
+        state.navigation.history
+    )
+});
+
+const mapDispatch = {
+    changeLocation: navigationOperations.changeLocation
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useStyles = makeStyles(() => ({
     fixedBase: {
@@ -40,17 +68,36 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-const App: React.FC = (): React.ReactElement => {
+const App: React.FC<ReduxProps> = (props): React.ReactElement => {
+    const {
+        location,
+        transition,
+        changeLocation
+    } = props;
+
     const classes = useStyles();
 
-    const location = useLocation();
-    const left = true;
+    const history = useHistory();
+
+    const { dir, active } = transition;
+    
+    const left = dir === "left";
+
+    React.useLayoutEffect(() => {
+        const unlisten = history.listen((location, action) => {
+            changeLocation(location, action);
+        });
+
+        changeLocation(history.location, "POP");
+
+        return () => unlisten();
+    }, [history, changeLocation]);
 
     const templateTransition = useUniqueTransition("pathname", location, {
-        initial: {transform: "translateX(0%)"},
-        from: {transform: `translateX(${left ? 100 : -100}%)`},
-        enter: {transform: "translateX(0%)"},
-        leave: {transform: `translateX(${left ? -100 : 100}%)`}
+        initial: {transform: 'translateX(0%)'},
+        from: active && { transform: `translateX(${left ? '' : '-'}100%)`},
+        enter: { transform: 'translateX(0%)'},
+        leave: active && { transform: `translateX(${left ? '-' : ''}100%)`}
     });
 
     return (
@@ -74,4 +121,4 @@ const App: React.FC = (): React.ReactElement => {
     )
 };
 
-export default hot(module)(App);
+export default hot(module)(connector(App));

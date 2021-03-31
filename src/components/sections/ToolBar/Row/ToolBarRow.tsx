@@ -1,8 +1,8 @@
 import React from 'react';
-
 import { connect, ConnectedProps } from 'react-redux';
 
-import { navigationOperations } from '../../../../redux/ducks/navigation';
+import { RootState } from '../../../../redux/store';
+import { navigationOperations, navigationSelectors } from '../../../../redux/ducks/navigation';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -22,11 +22,18 @@ import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 *   Redux
 */
 
+const mapState = (state: RootState) => ({
+    pageTitle: navigationSelectors.getPageTitle(
+        state.categories, 
+        state.navigation.history.current.location.pathname
+    )
+})
+
 const mapDispatch = {
     onToggleMenu: navigationOperations.toggleNavMenu
 }
 
-const connector = connect(null, mapDispatch);
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -73,6 +80,7 @@ const useDefaultRowStyles = makeStyles<Theme, {
 
 const ToolBarRow: React.FC<ReduxProps> = (props) => {
     const {
+        pageTitle,
         onToggleMenu,
         children
     } = props;
@@ -107,7 +115,7 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
                 variant="h6"
                 className={rowClasses.pageTitle}
             >
-                Page Title
+                {pageTitle}
             </Typography>
             <FlexSpace flex={titleHidden ? 0 : 1} />
             {children}

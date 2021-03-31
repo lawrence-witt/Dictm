@@ -38,7 +38,7 @@ const renderNotesRoute = () => {
 
 const renderCategoriesRoute = (
     categories: RootState["categories"],
-    routeProps: RouteComponentProps<any, StaticContext, unknown>
+    routeProps: RouteComponentProps<{categoryId: 'string'}, StaticContext, unknown>
 ) => {
     const categoryId = routeProps.match.params.categoryId;
 

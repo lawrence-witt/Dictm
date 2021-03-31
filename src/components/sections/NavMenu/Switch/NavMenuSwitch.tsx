@@ -36,11 +36,15 @@ const NavMenuSwitch: React.FC<NavMenuSwitchProps> = (props) => {
 
     const classes = useNestedMenuStyles();
 
+    const { dir, active } = animation;
+
+    const left = dir === "left";
+
     const transition = useTransition(list, {
         initial: {transform: 'translateX(0%)'},
-        from: animation.active && { transform: `translateX(${animation.dir === "left" ? '' : '-'}100%)`},
+        from: active && { transform: `translateX(${left ? '' : '-'}100%)`},
         enter: { transform: 'translateX(0%)'},
-        leave: animation.active && { transform: `translateX(${animation.dir === "left" ? '-' : ''}100%)`}
+        leave: active && { transform: `translateX(${left ? '-' : ''}100%)`}
     });
 
     return (
