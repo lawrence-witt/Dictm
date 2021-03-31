@@ -185,3 +185,28 @@ export const getTemplateAnimation = createSelector((
         default: return noAnimate;
     }
 }, direction => direction);
+
+/** 
+*  Summary:
+*  Filters a tab identifier out of current params state.
+*
+*  @param {object} params Object containing current stem and categoryId params.
+*
+*  @returns {string} The stem string (possibly empty) denoting the current tab.
+*/
+
+export const getNavBarTab = createSelector((
+    params: RootState["navigation"]["history"]["current"]["params"]
+) => {
+    const { stem, categoryId } = params;
+
+    switch(stem) {
+        case "recordings":
+        case "notes":
+            return stem;
+        case "categories":
+            if (!categoryId) return stem;
+        default:
+            return "";
+    }
+}, tab => tab);

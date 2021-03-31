@@ -1,5 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../redux/store';
+import { navigationSelectors } from '../../../redux/ducks/navigation';
+
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import Album from '@material-ui/icons/Album';
@@ -7,7 +12,21 @@ import EventNote from '@material-ui/icons/EventNote';
 import Category from '@material-ui/icons/Category';
 import { makeStyles, fade } from '@material-ui/core/styles';
 
-import { TabTypes } from './NavBar.types';
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    tab: navigationSelectors.getNavBarTab(state.navigation.history.current.params)
+});
+
+const connector = connect(mapState);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useNavStyles = makeStyles((theme) => ({
     root: {
@@ -33,18 +52,15 @@ const useActionStyles = makeStyles(theme => ({
     selected: {}
 }));
 
-const NavBar: React.FC = () => {
+const NavBar: React.FC<ReduxProps> = (props) => {
+    const {
+        tab
+    } = props;
+
     const navClasses = useNavStyles();
     const actionClasses = useActionStyles();
 
-    const [tab, setTab] = React.useState<TabTypes>('');
-
     const history = useHistory();
-
-    // Required to stop mui from throwing TS error
-    const changeHandler = (...args: [React.MouseEvent, TabTypes] | unknown[]) => {
-        setTab(args[1] as TabTypes);
-    };
 
     return (
             <BottomNavigation
@@ -52,7 +68,6 @@ const NavBar: React.FC = () => {
                 value={tab}
                 showLabels
                 classes={navClasses}
-                onChange={changeHandler}
             >
                 <BottomNavigationAction
                     label="Recordings"
@@ -79,4 +94,4 @@ const NavBar: React.FC = () => {
     );
 };
 
-export default NavBar;
+export default connector(NavBar);
