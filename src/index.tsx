@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 
-import { ConnectedRouter } from 'connected-react-router';
+import { BrowserRouter } from 'react-router-dom';
 
-import store, { history } from './redux/store';
+import store from './redux/store';
 
 import ThemeProvider from './utils/providers/ThemeProvider';
 import BreakpointsProvider from './utils/providers/BreakpointsProvider';
@@ -12,15 +12,15 @@ import BreakpointsProvider from './utils/providers/BreakpointsProvider';
 import App from './components/views/App/App';
 
 const rootHtml = (
-  <ReduxProvider store={store}>
-    <ConnectedRouter history={history}>
+  <StoreProvider store={store}>
+    <BrowserRouter>
       <ThemeProvider>
         <BreakpointsProvider>
           <App />
         </BreakpointsProvider>
       </ThemeProvider>
-    </ConnectedRouter>
-  </ReduxProvider>
+    </BrowserRouter>
+  </StoreProvider>
 )
 
 ReactDOM.render(rootHtml, document.getElementById('root'));

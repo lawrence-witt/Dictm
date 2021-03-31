@@ -21,6 +21,23 @@ export type NavToolActionTypes =
     NavMenuOpenedAction |
     NavMenuClosedAction;
 
+export interface NavMenuItem {
+    id: string;
+    primary: string;
+    icon?: string;
+    divider?: boolean;
+    to?: string;
+    onClick?: () => void;
+}
+
+export interface NavMenuList {
+    id: string;
+    name: string;
+    items: NavMenuItem[];
+}
+
+export type NavMenuLists = Record<string, NavMenuList>;
+
 /* Search Types */
 
 /* Delete Types */

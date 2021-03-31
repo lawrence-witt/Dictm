@@ -5,7 +5,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Divider from '@material-ui/core/Divider';
+import Album from '@material-ui/icons/Album';
+import EventNote from '@material-ui/icons/EventNote';
+import Category from '@material-ui/icons/Category';
+import Settings from '@material-ui/icons/Settings';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+
+import AuthIcon from '../../../atoms/Icons/AuthIcon';
 
 import DirectionButton from '../../../atoms/Buttons/DirectionButton';
 
@@ -25,6 +31,14 @@ const useStyles = makeStyles<Theme, {icon: boolean}>(theme => ({
     }
 }));
 
+const iconMap: Record<string, JSX.Element> = {
+    recordings: <Album />,
+    notes: <EventNote />,
+    categories: <Category />,
+    settings: <Settings />,
+    signout: <AuthIcon type="out" />
+}
+
 const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
     const {
         primary,
@@ -39,7 +53,7 @@ const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
 
     return (
         <ListItem button disableGutters onClick={onClick}>
-            {icon && <ListItemIcon className={classes.icon}>{icon}</ListItemIcon>}
+            {icon && <ListItemIcon className={classes.icon}>{iconMap[icon]}</ListItemIcon>}
             <ListItemText className={classes.primary} primary={primary}/>
             {divider && <Divider className={classes.divider}/>}
             {to && (
