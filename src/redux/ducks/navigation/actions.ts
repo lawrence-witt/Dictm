@@ -1,4 +1,3 @@
-import { Location, Action } from 'history';
 import * as types from './types';
 
 /* Nav Menu Actions */
@@ -14,12 +13,14 @@ export const closeNavMenu = (): types.NavMenuClosedAction => ({
 /* Nav History Actions */
 
 export const changeLocation = (
-    location: Location,
-    action: Action
+    pathname: string,
+    title: string,
+    params: types.Params
 ): types.NavLocationChangedAction => ({
     type: types.NAV_LOCATION_CHANGED,
     payload: {
-        location,
-        action
+        pathname,
+        title,
+        params
     }
 })

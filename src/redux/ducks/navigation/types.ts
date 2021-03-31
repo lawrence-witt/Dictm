@@ -40,12 +40,20 @@ export type NavMenuLists = Record<string, NavMenuList>;
 
 /* Nav History Types */
 
-export const NAV_LOCATION_CHANGED = "dictm/navigation/history/LOCATION_CHANGED";
+export const stems = ['recordings', 'notes', 'categories', 'settings'] as const;
+
+export interface Params {
+    stem: typeof stems[number] | undefined;
+    categoryId: string | undefined;
+}
 
 interface NavHistoryRecord {
-    location: Location,
-    action: Action
+    pathname: string;
+    title: string;
+    params: Params;
 }
+
+export const NAV_LOCATION_CHANGED = "dictm/navigation/history/LOCATION_CHANGED";
 
 export interface NavHistoryState {
     previous?: NavHistoryRecord;
@@ -54,10 +62,7 @@ export interface NavHistoryState {
 
 export interface NavLocationChangedAction {
     type: typeof NAV_LOCATION_CHANGED;
-    payload: {
-        location: Location,
-        action: Action
-    }
+    payload: NavHistoryRecord;
 }
 
 export type NavHistoryActionTypes =

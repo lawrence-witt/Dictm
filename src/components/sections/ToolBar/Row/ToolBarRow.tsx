@@ -2,7 +2,7 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../redux/store';
-import { navigationOperations, navigationSelectors } from '../../../../redux/ducks/navigation';
+import { navigationOperations } from '../../../../redux/ducks/navigation';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,11 +23,8 @@ import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 */
 
 const mapState = (state: RootState) => ({
-    pageTitle: navigationSelectors.getPageTitle(
-        state.categories, 
-        state.navigation.history.current.location.pathname
-    )
-})
+    pageTitle: state.navigation.history.current.title
+});
 
 const mapDispatch = {
     onToggleMenu: navigationOperations.toggleNavMenu

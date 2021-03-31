@@ -23,7 +23,7 @@ import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
 */
 
 const mapState = (state: RootState) => ({
-    location: state.navigation.history.current.location,
+    location: state.navigation.history.current,
     transition: navigationSelectors.getTemplateAnimation(
         state.categories, 
         state.navigation.history
@@ -80,15 +80,15 @@ const App: React.FC<ReduxProps> = (props): React.ReactElement => {
     const history = useHistory();
 
     const { dir, active } = transition;
-    
+
     const left = dir === "left";
 
     React.useLayoutEffect(() => {
-        const unlisten = history.listen((location, action) => {
-            changeLocation(location, action);
+        const unlisten = history.listen((location) => {
+            changeLocation(location);
         });
 
-        changeLocation(history.location, "POP");
+        changeLocation(history.location);
 
         return () => unlisten();
     }, [history, changeLocation]);

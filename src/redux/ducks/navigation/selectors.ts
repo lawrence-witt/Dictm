@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
-import { matchPath, RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { RootState } from '../../store';
 
-import { NavMenuLists } from './types';
+import { NavMenuLists, stems } from './types';
 
 /* Nav Menu Selectors */
 
@@ -79,62 +79,6 @@ export const getNavLists = createSelector((
 
 /* Nav History Selectors */
 
-const matchOptions = {
-    path: '/:stem/:categoryId?',
-    exact: true,
-    strict: true
-}
-
-const stems = ['recordings', 'notes', 'categories', 'settings'] as const;
-
-/** 
-*  Summary:
-*  Determine the page title for the next template.
-*
-*  Description:
-*  By default, simply use the stem of the location.
-*  Where a categoryId is included, look it up the in categories Redux state.
-*
-*  @param {object} categories The categories state in the Redux store.
-*  @param {string} pathname The pathname of the current location.
-*
-*  @returns {string} The title of the next page.
-*/
-
-export const getPageTitle = createSelector((
-    categories: RootState["categories"],
-    pathname: string
-) => {
-    const match = matchPath<
-        {stem: typeof stems[number], categoryId: string}
-    >(pathname, matchOptions);
-
-    if (!match || !stems.includes(match.params.stem)) {
-        return "Redirecting...";
-    }
-
-    switch (match.params.stem) {
-        case "recordings":
-            return "Recordings";
-        case "notes":
-            return "Notes";
-        case "categories": {
-            const categoryId = match.params.categoryId;
-
-            if (!categoryId) return "Categories";
-
-            const category = categories.byId[categoryId];
-
-            if (category) return category.attributes.title;
-        }
-        case "settings": {
-            return "Settings";
-        }
-        default:
-            return "Redirecting...";
-    }
-}, pageTitle => pageTitle);
-
 /** 
 *  Summary:
 *  Derives an animation direction by comparing stem indexes.
@@ -182,7 +126,7 @@ const getDirectionByCategoryIndex = (
 *  Determines the animation activity and direction for the next template.
 *
 *  Description:
-*  By default, perform a simple index check versus previous location on the root of the pathname.
+*  By default, perform a simple index check versus previous location on the stem of the pathname.
 *  Where a categoryId is included, check the index versus previous location in categories.allIds.
 *
 *  @param {object} categories The categories state in the Redux store.
@@ -197,54 +141,37 @@ export const getTemplateAnimation = createSelector((
 ) => {
     const { previous, current } = history;
 
-    const prevMatch = matchPath<
-        {stem: typeof stems[number], categoryId: string}
-    >(previous?.location.pathname || "", matchOptions);
-
-    const currMatch = matchPath<
-        {stem: typeof stems[number], categoryId: string}
-    >(current.location.pathname, matchOptions);
-
     const leftAnimate = { dir: 'left', active: true };
     const rightAnimate = { dir: 'right', active: true };
     const noAnimate = { dir: 'left', active: false};
 
-    if (
-        !prevMatch ||
-        !currMatch ||
-        !stems.includes(prevMatch.params.stem) ||
-        !stems.includes(currMatch.params.stem)
-    ) return noAnimate;
+    if (!previous?.params.stem || !current.params.stem) return noAnimate;
 
-    const stemComparison = () => ({
+    const { stem: prevStem, categoryId: prevId } = previous.params;
+    const { stem: currStem, categoryId: currId } = current.params;
+
+    const stemComparison = (
+        previous: typeof stems[number],
+        current: typeof stems[number]
+    ) => ({
         ...leftAnimate,
-        dir: getDirectionByStemIndex(
-            prevMatch.params.stem,
-            currMatch.params.stem
-        )
+        dir: getDirectionByStemIndex(previous, current)
     });
 
     const categoryComparison = (
-        prevId: string,
-        currId: string
+        pId: string,
+        cId: string
     ) => ({
         ...leftAnimate,
-        dir: getDirectionByCategoryIndex(
-            prevId,
-            currId,
-            categories
-        )
+        dir: getDirectionByCategoryIndex(pId, cId, categories)
     });
 
-    switch(currMatch.params.stem) {
+    switch(current.params.stem) {
         case "recordings":
         case "notes":
         case "settings":
-            return stemComparison();
+            return stemComparison(prevStem, currStem);
         case "categories": {
-            const prevId = prevMatch.params.categoryId;
-            const currId = currMatch.params.categoryId;
-
             if (currId) {
                 if (!prevId) return leftAnimate;
 
@@ -252,7 +179,7 @@ export const getTemplateAnimation = createSelector((
             } else {
                 if (prevId) return rightAnimate;
 
-                return stemComparison();
+                return stemComparison(prevStem, currStem);
             }
         }
         default: return noAnimate;

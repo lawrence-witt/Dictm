@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 import * as types from './types';
+import * as helpers from './helpers';
 
 /* Nav Menu Reducer */
 
@@ -30,14 +31,9 @@ const menuReducer = (
 const initialHistoryState: types.NavHistoryState = {
     previous: undefined,
     current: {
-        location: {
-            key: "initialKey",
-            pathname: window.location.pathname,
-            search: "",
-            state: "",
-            hash: ""
-        },
-        action: "POP"
+        pathname: window.location.pathname,
+        title: "",
+        params: helpers.extractParams(window.location.pathname)
     }
 }
 
@@ -49,10 +45,7 @@ const historyReducer = (
         case types.NAV_LOCATION_CHANGED:
             return {
                 previous: state.current,
-                current: {
-                    location: action.payload.location,
-                    action: action.payload.action
-                }
+                current: action.payload
             }
         default: return state;
     }

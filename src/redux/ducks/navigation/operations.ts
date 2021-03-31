@@ -1,10 +1,11 @@
 import { ThunkAction } from 'redux-thunk';
-import { Location, Action } from 'history';
+import { Location } from 'history';
 
 import { RootState } from '../../store';
 
 import * as types from './types';
 import * as actions from './actions';
+import * as helpers from './helpers';
 
 /* Nav Menu Operations */
 
@@ -39,12 +40,21 @@ type ToggleNavMenuThunkAction = ThunkAction<void, RootState, unknown,
 */
 
 export const changeLocation = (
-    location: Location,
-    action: Action
+    location: Location
 ): ChangeLocationThunkAction => (
-    dispatch
-) => {
-    dispatch(actions.changeLocation(location, action));
+    dispatch,
+    getState
+): void => {
+    const { categories } = getState();
+
+    const params = helpers.extractParams(location.pathname);
+    const title = helpers.extractPageTitle(params, categories);
+
+    dispatch(actions.changeLocation(
+        location.pathname,
+        title,
+        params
+    ));
 }
 
-type ChangeLocationThunkAction = ThunkAction<void, undefined, unknown, types.NavLocationChangedAction>;
+type ChangeLocationThunkAction = ThunkAction<void, RootState, unknown, types.NavLocationChangedAction>;
