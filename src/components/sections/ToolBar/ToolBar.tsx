@@ -1,17 +1,36 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../redux/store';
 
 import ToolBarRow from './Row/ToolBarRow';
 import SearchTool from './Tools/Search/SearchTool';
 import DeleteTool from './Tools/Delete/DeleteTool';
 
-import { ToolBarProps } from './ToolBar.types';
+/* 
+*   Redux
+*/
 
-// Component
+const mapState = (state: RootState) => ({
+    searchIsOpen: state.tools.search.isOpen
+});
 
-const ToolBar: React.FC<ToolBarProps> = (props) => {
+const connector = connect(mapState);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const ToolBar: React.FC<ReduxProps> = (props) => {
+    const {
+        searchIsOpen
+    } = props;
+
     return (
         <ToolBarRow>
-            {/* <SearchTool /> */}
+            {searchIsOpen ? <SearchTool/> : null}
             {/* <DeleteTool 
                 contentType="recordings"
                 quantity={6}
@@ -20,4 +39,4 @@ const ToolBar: React.FC<ToolBarProps> = (props) => {
     )
 };
 
-export default ToolBar;
+export default connector(ToolBar);

@@ -3,6 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../redux/store';
 import { navigationOperations } from '../../../../redux/ducks/navigation';
+import { toolOperations } from '../../../../redux/ducks/tools';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,11 +24,13 @@ import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 */
 
 const mapState = (state: RootState) => ({
-    pageTitle: state.navigation.history.current.title
+    pageTitle: state.navigation.history.current.title,
+    searchIsOpen: state.tools.search.isOpen
 });
 
 const mapDispatch = {
-    onToggleMenu: navigationOperations.toggleNavMenu
+    onToggleMenu: navigationOperations.toggleNavMenu,
+    onToggleSearch: toolOperations.toggleSearchTool
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -78,39 +81,43 @@ const useDefaultRowStyles = makeStyles<Theme, {
 const ToolBarRow: React.FC<ReduxProps> = (props) => {
     const {
         pageTitle,
+        searchIsOpen,
+        onToggleSearch,
         onToggleMenu,
         children
     } = props;
 
     const breakpoint = useBreakContext();
 
-    const titleHidden = React.Children.count(children) > 0 && breakpoint.index < 2; 
+    const titleHidden = React.Children.count(children) > 0 && breakpoint.index < 2;
 
-    const rowClasses = useDefaultRowStyles({ 
+    const classes = useDefaultRowStyles({ 
         titleHidden,
         menuButtonHidden: titleHidden || breakpoint.index > 0
     });
 
+    const searchClass = searchIsOpen ? classes.toolIconSelected : classes.toolIcon;
+
     return (
         <AppBar
             elevation={0}
-            className={rowClasses.appBar}
+            className={classes.appBar}
         >
         <Toolbar
             classes={{
-                root: rowClasses.toolbarRoot,
-                gutters: rowClasses.toolbarGutters
+                root: classes.toolbarRoot,
+                gutters: classes.toolbarGutters
             }}
         >
             <MenuButton 
                 edge="start"
                 color="inherit"
-                className={rowClasses.menuButton}
+                className={classes.menuButton}
                 onClick={onToggleMenu}
             />
             <Typography 
                 variant="h6"
-                className={rowClasses.pageTitle}
+                className={classes.pageTitle}
             >
                 {pageTitle}
             </Typography>
@@ -119,17 +126,18 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
             <FlexSpace flex={1} />
             <IconButton
                 color="inherit"
-                className={rowClasses.leftMostButton}
+                className={classes.leftMostButton}
             >
                 <Repeat 
-                    className={rowClasses.toolIcon}
+                    className={classes.toolIcon}
                 />
             </IconButton>
             <IconButton
                 color="inherit"
+                onClick={onToggleSearch}
             >
                 <Search 
-                    className={rowClasses.toolIcon}
+                    className={searchClass}
                 />
             </IconButton>
             <IconButton
@@ -137,7 +145,7 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
                 color="inherit"
             >
                 <Delete 
-                    className={rowClasses.toolIcon}
+                    className={classes.toolIcon}
                 />
             </IconButton>
         </Toolbar>

@@ -104,9 +104,7 @@ const App: React.FC<ReduxProps> = (props): React.ReactElement => {
         <div className={classes.fixedBase}>
             <NavMenu/>
             <div className={classes.pageBase}>
-                <ToolBar
-                    toggleMenu={() => ({})}
-                />
+                <ToolBar/>
                 <div className={classes.templateBase}>
                     {templateTransition((style, location) => (
                         <a.div className={classes.templateFrame} style={style}>

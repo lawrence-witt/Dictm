@@ -16,7 +16,12 @@ import { MediaTemplateProps } from './Media.types';
 */
 
 const mapState = (state: RootState, props: MediaTemplateProps) => ({
-    mediaList: mediaSelectors.getMediaList(state, props)
+    mediaList: mediaSelectors.getMediaList(
+        state.media,
+        state.categories,
+        state.tools.search.term,
+        props
+    )
 });
 
 const mapDispatch = {

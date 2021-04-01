@@ -11,23 +11,69 @@ interface MediaTemplateProps {
     categoryId?: string;
 }
 
-const getMediaSlice = (state: RootState["media"]["recordings" | "notes"], ids: string[]) => (
+const mediaMatchesFilter = (
+    title: string,
+    filter: string
+) => {
+    return title.toLowerCase().includes(filter.toLowerCase());
+}
+
+const getMediaSlice = (
+    state: RootState["media"]["recordings" | "notes"], 
+    ids: string[],
+    filter: string
+) => (
     ids.reduce((slice: typeof state, id) => {
-        slice.byId[id] = state.byId[id];
+        const media = state.byId[id];
+
+        if (filter.length > 0) {
+            if (!mediaMatchesFilter(media.attributes.title, filter)) {
+                return slice;
+            }
+        }
+
+        slice.byId[id] = media;
         slice.allIds.push(id);
+
         return slice;
     }, {byId: {}, allIds: []})
 );
 
-export const getMediaList = createSelector((state: RootState, props: MediaTemplateProps) => {
-    if (props.context !== "category") return state.media[props.context];
+export const getMediaList = createSelector((
+    media: RootState["media"],
+    categories: RootState["categories"],
+    filter: RootState["tools"]["search"]["term"], 
+    props: MediaTemplateProps
+) => {
+    /* Return default media list if no category specified */
+
+    if (props.context !== "category") {
+        const mediaState = media[props.context];
+
+        if (filter.length === 0) return mediaState;
+
+        return getMediaSlice(mediaState, mediaState.allIds, filter);
+    }
 
     if (!props.categoryId) throw new Error('selector: getMediaList missing a categoryId');
 
-    const category = state.categories.byId[props.categoryId];
+    /* Sort category resources into new media list by timestamps.created */
 
-    const recordingsSlice = getMediaSlice(state.media.recordings, category.relationships.recordings.ids);
-    const notesSlice = getMediaSlice(state.media.notes, category.relationships.notes.ids);
+    const { recordings, notes } = media;
+
+    const category = categories.byId[props.categoryId];
+
+    const recordingsSlice = getMediaSlice(
+        recordings, 
+        category.relationships.recordings.ids, 
+        filter
+    );
+
+    const notesSlice = getMediaSlice(
+        notes, 
+        category.relationships.notes.ids,
+        filter
+    );
     
     const byId = Object.assign({}, recordingsSlice.byId, notesSlice.byId);
     const allIds = [...recordingsSlice.allIds, ...notesSlice.allIds].sort((a, b) => {
@@ -44,7 +90,10 @@ export const getMediaList = createSelector((state: RootState, props: MediaTempla
 *   Select media category data
 */
 
-export const getMediaByTitleAndCategory = createSelector((state: RootState, context: "recordings" | "notes") => {
+export const getMediaByTitleAndCategory = createSelector((
+    state: RootState, 
+    context: "recordings" | "notes"
+) => {
     const mediaList = state.media[context];
 
     return mediaList.allIds.map(id => ({

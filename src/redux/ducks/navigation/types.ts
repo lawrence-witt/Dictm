@@ -1,5 +1,3 @@
-import { Location, Action } from 'history';
-
 /* Nav Menu Types */
 
 export const NAV_MENU_OPENED = "dictm/navigation/menu/MENU_OPENED";
