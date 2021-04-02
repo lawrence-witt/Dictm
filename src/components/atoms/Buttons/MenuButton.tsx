@@ -3,7 +3,7 @@ import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreIcon from '@material-ui/icons/MoreVert';
 
-interface MenuButtonProps extends IconButtonProps {
+export interface MenuButtonProps extends IconButtonProps {
     design?: 'bars' | 'dots';
 }
 

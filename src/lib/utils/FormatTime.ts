@@ -1,7 +1,11 @@
-export const formatTimestamp = (stamp: number): string => {
+export const formatShortTimestamp = (stamp: number): string => {
     return new Intl.DateTimeFormat(undefined, {
         day: '2-digit', month: 'short', year: 'numeric'
     }).format(new Date(stamp));
+}
+
+export const formatLongTimestamp = (stamp: number): string => {
+    return stamp.toString();
 }
 
 export const formatDuration = (secs: number): {m: string; s: string; cs: string} => {

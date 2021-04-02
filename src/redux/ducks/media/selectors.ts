@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import { RootState } from '../../store';
 
-import { formatDuration, formatTimestamp } from '../../../lib/utils/FormatTime';
+import { formatDuration, formatShortTimestamp } from '../../../lib/utils/FormatTime';
 
 /* 
 *   Select media models for card display
@@ -132,5 +132,5 @@ export const getFormattedDuration = createSelector((
 export const getFormattedTimestamp = createSelector((
     timestamp: number
 ) => {
-    return formatTimestamp(timestamp);
+    return formatShortTimestamp(timestamp);
 }, formatted => formatted);

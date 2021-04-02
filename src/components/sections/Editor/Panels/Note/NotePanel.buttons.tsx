@@ -3,10 +3,13 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorSelectors } from '../../../../../redux/ducks/editor';
+import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
 import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
 
+import DropdownMenu from '../../../../molecules/Menus/Dropdown/DropdownMenu';
+
 import SaveButton from '../../../../atoms/Buttons/SaveButton';
+import { MenuItem } from '@material-ui/core';
 
 /* 
 *   Redux
@@ -17,7 +20,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    saveNote: noteEditorOperations.saveNoteEditorModel
+    saveNote: noteEditorOperations.saveNoteEditorModel,
+    openDetailsDialog: editorOperations.openDetailsDialog
 };
 
 const connector = connect(mapState, mapDispatch);
@@ -32,14 +36,33 @@ const NotePanelButtons: React.FC<ReduxProps> = (props) => {
     const {
         canSave,
         saveNote,
+        openDetailsDialog
     } = props;
 
+    const onDetailsClick = React.useCallback((closeMenu: () => void) => {
+        return () => {
+            closeMenu();
+            openDetailsDialog();
+        }
+    }, [openDetailsDialog]);
+
     return (
-        <SaveButton
-            color="inherit"
-            disabled={!canSave}
-            onClick={saveNote}
-        />
+        <>
+            <SaveButton
+                color="inherit"
+                disabled={!canSave}
+                onClick={saveNote}
+            />
+            <DropdownMenu>
+                {(closeMenu) => (
+                    <MenuItem
+                        onClick={onDetailsClick(closeMenu)}
+                    >
+                        Details
+                    </MenuItem>
+                )}
+            </DropdownMenu>
+        </>
     )
 };
 

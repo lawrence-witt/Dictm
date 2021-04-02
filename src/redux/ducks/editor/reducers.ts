@@ -96,6 +96,16 @@ const editorReducer = (
                     }
                 }
             }
+        case types.EDITOR_DETAILS_DIALOG_OPENED:
+            return {
+                ...state,
+                dialogs: {
+                    ...state.dialogs,
+                    details: {
+                        isOpen: true
+                    }
+                }
+            }
         case types.EDITOR_DIALOG_CLOSED:
             return {
                 ...state,

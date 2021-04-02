@@ -1,3 +1,9 @@
-export interface DetailsDialogProps {
-    nothing: string;
+export interface DetailProps {
+    name: string;
+    value: string;
+}
+
+export interface DetailDialogProps {
+    details: DetailProps[];
+    onClose: () => unknown;
 }

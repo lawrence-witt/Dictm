@@ -1,7 +1,4 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
-
-import { RootState } from '../../../../redux/store';
 
 import MuiDialog from '@material-ui/core/Dialog';
 import SaveDialog from './Save/SaveDialog';
@@ -9,25 +6,6 @@ import DetailsDialog from './Details/DetailsDialog';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { DialogProps } from './Dialog.types';
-
-/* 
-*   Redux
-*/
-
-/* const mapState = (state: RootState) => ({
-    editor: state.editor,
-    canSave: editorSelectors.getSaveAvailability(state)
-});
-
-const mapDispatch = {
-    openSaveDialog: editorOperations.openSaveDialog,
-    closeEditor: editorOperations.closeEditor,
-    clearEditor: editorOperations.clearEditor
-}
-
-const connector = connect(mapState);
-
-type ReduxProps = ConnectedProps<typeof connector>; */
 
 /* 
 *   Local
@@ -54,14 +32,16 @@ const Dialog: React.FC<DialogProps> = (props) => {
 
     const classes = useDialogStyles();
 
-    const dialogKey = dialogs.details.isOpen ? "details" : dialogs.save.isOpen ? "save" : null;
+    const dialogKey = dialogs.details.isOpen ? 
+        "details"   : dialogs.save.isOpen ? 
+        "save"      : "none";
 
     const RenderedDialog = React.useMemo(() => {
         switch(dialogKey) {
             case "save":
                 return <SaveDialog contentType={context.type} isNew={attributes.isNew}/>;
             case "details":
-                return <DetailsDialog nothing={""}/>;
+                return <DetailsDialog/>;
             default:
                 return null;
         }
@@ -69,8 +49,8 @@ const Dialog: React.FC<DialogProps> = (props) => {
 
     return (
         <MuiDialog
-            open={Boolean(dialogKey)}
-            aria-describedby="editor-dialog-description"
+            open={dialogKey !== "none"}
+            aria-describedby={`editor-${dialogKey}-dialog`}
             classes={classes}
         >
             {RenderedDialog}

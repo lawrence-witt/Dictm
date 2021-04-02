@@ -52,7 +52,7 @@ type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorO
 
 /** 
 *  Summary:
-*  Sets the editor.attributes.isSaving flag to true.
+*  Sets the editor isSaving flag to true.
 */
 
 export const setEditorSaving = (): SetEditorSavingThunkAction => (
@@ -65,7 +65,7 @@ type SetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.Ed
 
 /** 
 *  Summary:
-*  Sets the editor.attributes.isSaving flag to false.
+*  Sets the editor isSaving flag to false.
 */
 
 export const unsetEditorSaving = (): UnsetEditorSavingThunkAction => (
@@ -78,10 +78,7 @@ type UnsetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.
 
 /** 
 *  Summary:
-*  Opens the save dialog.
-*
-*  Description:
-*  Sets the dialogs.save.isOpen property to true.
+*  Opens the save editor dialog.
 */
 
 export const openSaveDialog = (): OpenSaveDialogThunkAction => (
@@ -94,10 +91,20 @@ type OpenSaveDialogThunkAction = ThunkAction<void, undefined, unknown, types.Edi
 
 /** 
 *  Summary:
-*  Closes any open dialogs.
-*
-*  Description:
-*  Sets the dialogs.[save | details].isOpen property to false.
+*  Opens the details editor dialog.
+*/
+
+export const openDetailsDialog = (): OpenDetailsDialogThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.openDetailsDialog());
+}
+
+type OpenDetailsDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorOpenDetailsDialogAction>;
+
+/** 
+*  Summary:
+*  Closes any open editor dialogs.
 */
 
 export const closeDialog = (): CloseDialogThunkAction => (
@@ -113,8 +120,8 @@ type CloseDialogThunkAction = ThunkAction<void, undefined, unknown, types.Editor
 *  Closes the editor modal.
 *
 *  Description 
-*  Sets the editor.attributes.isOpen property to false.
-*  Optionally sets the editor.dialogs["save" | "details"].isOpen property to false.
+*  Sets the editor open property to false.
+*  Additionally sets any open dialog's isOpen property to false.
 */
 
 export const closeEditor = (): CloseEditorThunkAction => (

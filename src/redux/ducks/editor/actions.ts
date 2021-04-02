@@ -25,6 +25,10 @@ export const openSaveDialog = (): types.EditorOpenSaveDialogAction => ({
     type: types.EDITOR_SAVE_DIALOG_OPENED
 });
 
+export const openDetailsDialog = (): types.EditorOpenDetailsDialogAction => ({
+    type: types.EDITOR_DETAILS_DIALOG_OPENED
+});
+
 export const closeDialog = (): types.EditorCloseDialogAction => ({
     type: types.EDITOR_DIALOG_CLOSED
 });

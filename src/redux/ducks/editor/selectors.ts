@@ -1,11 +1,21 @@
 import { createSelector } from "reselect";
 
 import { RootState } from "../../store";
+import { RecordingModel } from '../../_data/recordingsData';
+import { NoteModel } from "../../_data/notesData";
+import { ContentModels } from './types';
+
+import { formatLongTimestamp, formatDuration } from '../../../lib/utils/FormatTime';
+import { formatByteLength, formatStringBytes } from '../../../lib/utils/FormatFileSize';
 
 const stringArraysEqual = (arr1: string[], arr2: string[]) => {
     const asSet = new Set([...arr1, ...arr2]);
     return asSet.size === arr1.length && asSet.size === arr2.length;
 }
+
+/* 
+*   Decide whether the editing model can be saved.
+*/
 
 export const getSaveAvailability = createSelector((state: RootState) => {
     const { attributes, context } = state.editor;
@@ -62,3 +72,113 @@ export const getSaveAvailability = createSelector((state: RootState) => {
 
     return false;
 }, canSave => canSave);
+
+/* 
+*   Format the details of the editing model
+*/
+
+// Factory
+
+const createDetail = (
+    name: string,
+    value: string
+) => ({ name, value });
+
+// Generic
+
+const createStampDetails = (
+    model: ContentModels
+) => ([
+    createDetail(
+        "Created", 
+        formatLongTimestamp(model.attributes.timestamps.created)
+    ),
+    createDetail(
+        "Last Modified",
+        formatLongTimestamp(model.attributes.timestamps.modified)
+    )
+]);
+
+// Media
+
+const createDurationDetail = (
+    model: RecordingModel
+) => createDetail(
+    "Duration",
+    (() => {
+        const { m, s, cs } = formatDuration(model.data.audio.data.duration);
+        return `${m}:${s}.${cs}`;
+    })()
+);
+
+const createSampleRateDetail = (
+    model: RecordingModel
+) => createDetail(
+    "Sample Rate",
+    model.data.audio.data.sampleRate.toString()
+);
+
+const createNoteCountDetail = (
+    model: NoteModel
+) => ([
+    createDetail("Word Count", model.data.wordCount.toString()),
+    createDetail("Charater Count", model.data.charCount.toString())
+])
+
+const createSizeDetail = (
+    model: RecordingModel | NoteModel
+) => createDetail(
+    "Size",
+    model.type === "recording" ?
+    formatByteLength(model.data.audio.data.bytes.length) :
+    formatStringBytes(model.data.content)
+);
+
+// Combined Details
+
+const createWrappedDetails = (
+    model: ContentModels,
+    details: ReturnType<typeof createDetail>[] = []
+) => ([
+    createDetail("Title", model.attributes.title),
+    ...details,
+    ...createStampDetails(model)
+]);
+
+const createRecodingDetails = (
+    model: RecordingModel
+) => createWrappedDetails(
+    model,
+    [
+        createDurationDetail(model),
+        createSampleRateDetail(model),
+        createSizeDetail(model),
+    ]
+);
+
+const createNoteDetails = (
+    model: NoteModel
+) => createWrappedDetails(
+    model,
+    [
+        ...createNoteCountDetail(model),
+        createSizeDetail(model),
+    ]
+);
+
+export const getModelDetails = createSelector((
+    context: RootState["editor"]["context"]
+) => {
+    if (!context || context.type === "choose") return [];
+
+    switch(context.type) {
+        case "recording": 
+            return createRecodingDetails(context.data.editing);
+        case "note":
+            return createNoteDetails(context.data.editing);
+        case "category":
+            return createWrappedDetails(context.data.editing);
+        default:
+            return []
+    }
+}, details => details);
