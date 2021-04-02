@@ -6,8 +6,8 @@ import { BrowserRouter } from 'react-router-dom';
 
 import store from './redux/store';
 
-import ThemeProvider from './utils/providers/ThemeProvider';
-import BreakpointsProvider from './utils/providers/BreakpointsProvider';
+import ThemeProvider from './lib/providers/ThemeProvider';
+import BreakpointsProvider from './lib/providers/BreakpointsProvider';
 
 import App from './components/views/App/App';
 

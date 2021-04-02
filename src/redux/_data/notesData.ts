@@ -21,13 +21,10 @@ export interface NoteModel {
     }
 }
 
-const createMockStamps = () => {
-    const modified = Math.floor(Math.random() * 100000);
-    return {
-        created: modified - Math.floor(Math.random() * 100000),
-        modified
-    }
-}
+const createMockStamps = () => ({
+    created: Date.now(),
+    modified: Date.now()
+})
 
 const createMockData = (content: string) => {
     const wordCount = Math.floor(Math.random() * 100);

@@ -11,8 +11,6 @@ import DirectionButton from '../../../atoms/Buttons/DirectionButton';
 
 import { Flows, NavMenuHeaderProps, MenuHeaderStyleProps } from './NavMenuHeader.types';
 
-// Styled
-
 const useHeaderStyles = makeStyles<Theme, MenuHeaderStyleProps>(theme =>
   createStyles({
     header: {
@@ -46,8 +44,6 @@ const useHeaderStyles = makeStyles<Theme, MenuHeaderStyleProps>(theme =>
     }
   })  
 );
-
-// Component
 
 const getToggleState = (prevFlow: Flows, nextFlow: Flows, open: boolean) => {
     const isToggleVisible = (nextFlow === Flows.HYBRID && !open) || 

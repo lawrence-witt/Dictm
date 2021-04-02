@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 
 import { RootState } from '../../store';
 
+import { formatDuration, formatTimestamp } from '../../../lib/utils/FormatTime';
+
 /* 
 *   Select media models for card display
 */
@@ -111,3 +113,24 @@ export const getMediaByTitleAndCategory = createSelector((
         })()
     }))
 }, mediaData => mediaData);
+
+/* 
+*   Get a string formatted duration value
+*/
+
+export const getFormattedDuration = createSelector((
+    duration: number
+) => {
+    const { m, s } = formatDuration(duration);
+    return `${m}:${s}`;
+}, formatted => formatted);
+
+/* 
+*   Get a string formatted time stamp
+*/
+
+export const getFormattedTimestamp = createSelector((
+    timestamp: number
+) => {
+    return formatTimestamp(timestamp);
+}, formatted => formatted);

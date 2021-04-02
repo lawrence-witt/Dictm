@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
 import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
+import { mediaSelectors } from '../../../redux/ducks/media';
 
 import Play from '@material-ui/icons/PlayArrow';
 
@@ -26,7 +27,9 @@ const mapState = (state: RootState, props: RecordingCardProps) => ({
         state.tools.delete,
         "recordings",
         props.id
-    )
+    ),
+    durationFormatted: mediaSelectors.getFormattedDuration(props.duration),
+    createdFormatted: mediaSelectors.getFormattedTimestamp(props.created)
 });
 
 const mapDispatch = {
@@ -46,8 +49,8 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
     const {
         id,
         title,
-        duration,
-        created,
+        durationFormatted,
+        createdFormatted,
         isSecondaryActive,
         isSecondarySelected,
         onToggleDelete,
@@ -69,8 +72,8 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
         >
             <CardBasePrimaryRow
                 title={title}
-                subTitle={duration.toString()}
-                createdDate={created.toString()}
+                subTitle={durationFormatted}
+                createdDate={createdFormatted}
             >
                 <CardBaseActionSwitch 
                     primaryIcon={Play}

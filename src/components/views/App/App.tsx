@@ -16,7 +16,7 @@ import NavBar from '../../sections/NavBar/NavBar';
 import NavMenu from '../../sections/NavMenu/NavMenu';
 import Editor from '../../sections/Editor/Editor';
 
-import useUniqueTransition from '../../../utils/hooks/useUniqueTransition'
+import useUniqueTransition from '../../../lib/hooks/useUniqueTransition'
 
 /* 
 *   Redux

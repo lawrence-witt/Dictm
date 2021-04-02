@@ -5,7 +5,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { navigationSelectors, navigationOperations, NavMenuLists } from '../../../redux/ducks/navigation';
 
-import { useBreakContext } from '../../../utils/hooks/useBreakpoints';
+import { useBreakContext } from '../../../lib/hooks/useBreakpoints';
 
 import HybridDrawer from '../../molecules/Drawers/HybridDrawer';
 

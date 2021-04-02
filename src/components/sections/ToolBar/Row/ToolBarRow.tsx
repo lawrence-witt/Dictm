@@ -17,7 +17,7 @@ import { makeStyles, createStyles, Theme, fade } from '@material-ui/core/styles'
 import MenuButton from '../../../atoms/Buttons/MenuButton'
 import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 
-import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
+import { useBreakContext } from '../../../../lib/hooks/useBreakpoints';
 
 /* 
 *   Redux

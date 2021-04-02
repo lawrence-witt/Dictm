@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
 import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
+import { mediaSelectors } from '../../../redux/ducks/media';
 
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -31,7 +32,8 @@ const mapState = (state: RootState, props: NoteCardProps) => ({
         state.tools.delete,
         "notes",
         props.id
-    )
+    ),
+    createdFormatted: mediaSelectors.getFormattedTimestamp(props.created)
 });
 
 const mapDispatch = {
@@ -63,7 +65,7 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
         id,
         title,
         data,
-        created,
+        createdFormatted,
         isSecondaryActive,
         isSecondarySelected,
         onToggleDelete,
@@ -88,7 +90,7 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
             <CardBasePrimaryRow
                 title={title}
                 subTitle={`${data.wordCount} words / ${data.charCount} chars`}
-                createdDate={created.toString()}
+                createdDate={createdFormatted}
             >
                 <CardBaseActionSwitch
                     primaryIcon={() => (

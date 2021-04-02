@@ -2,6 +2,8 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { formatDuration } from '../../../../../../lib/utils/FormatTime';
+
 import { TimerProps } from './Timer.types';
 
 // Styles
@@ -27,19 +29,16 @@ const Timer: React.FC<TimerProps> = (props) => {
 
     const classes = useStyles();
 
-    const minRef = React.useRef<HTMLSpanElement>(null);
-    const secRef = React.useRef<HTMLSpanElement>(null);
-    const csRef = React.useRef<HTMLSpanElement>(null);
+    const minRef = React.useRef() as React.MutableRefObject<HTMLSpanElement>;
+    const secRef = React.useRef() as React.MutableRefObject<HTMLSpanElement>;
+    const csRef = React.useRef() as React.MutableRefObject<HTMLSpanElement>;
 
     const increment = React.useCallback((progress: number) => {
-        const totalMs = progress * 1000;
-        const d = new Date(totalMs);
+        const { m, s, cs } = formatDuration(progress);
 
-        const addZero = (n: number) => n < 10 ? `0${n}`: `${n}`;
-
-        if (minRef.current) minRef.current.innerHTML = addZero(d.getMinutes());
-        if (secRef.current) secRef.current.innerHTML = addZero(d.getSeconds());
-        if (csRef.current) csRef.current.innerHTML = addZero(Math.floor(d.getMilliseconds() / 10));
+        minRef.current.innerHTML = m;
+        secRef.current.innerHTML = s;
+        csRef.current.innerHTML = cs;
     }, []);
 
     React.useImperativeHandle(timerHandle, () => ({

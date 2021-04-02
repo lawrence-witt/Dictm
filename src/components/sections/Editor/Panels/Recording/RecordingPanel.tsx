@@ -16,7 +16,7 @@ import Controls from './Controls/Controls';
 import { CassetteProgressCallback } from 'cassette-js';
 import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe';
 
-import useCassette from '../../../../../utils/hooks/useCassette';
+import useCassette from '../../../../../lib/hooks/useCassette';
 
 /* 
 *   Redux
