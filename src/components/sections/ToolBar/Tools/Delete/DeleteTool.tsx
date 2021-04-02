@@ -1,9 +1,33 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../../../redux/store';
+import { toolOperations, toolSelectors } from '../../../../../redux/ducks/tools';
 
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { DeleteToolProps } from './DeleteTool.types';
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    isDeleting: state.tools.delete.isDeleting,
+    quantity: toolSelectors.getDeleteQuantity(state.tools.delete),
+    context: toolSelectors.getDeleteContext(state.navigation.history.current)
+});
+
+const mapDispatch = {
+    onCommitDelete: toolOperations.commitDeleteTool
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useDeleteStyles = makeStyles(theme => ({
     root: {
@@ -20,10 +44,12 @@ const useDeleteStyles = makeStyles(theme => ({
     }
 }))
 
-const DeleteTool: React.FC<DeleteToolProps> = (props) => {
+const DeleteTool: React.FC<ReduxProps> = (props) => {
     const {
-        contentType,
-        quantity
+        isDeleting,
+        quantity,
+        context,
+        onCommitDelete
     } = props;
 
     const classes = useDeleteStyles();
@@ -32,10 +58,12 @@ const DeleteTool: React.FC<DeleteToolProps> = (props) => {
         <Button
             variant="outlined"
             classes={classes}
+            onClick={onCommitDelete}
+            disabled={isDeleting}
         >
-            {`Delete ${quantity} ${contentType}`}
+            {`Delete ${quantity} ${context}`}
         </Button>
     )
 }
 
-export default DeleteTool;
+export default connector(DeleteTool);

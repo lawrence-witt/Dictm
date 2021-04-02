@@ -12,7 +12,8 @@ import DeleteTool from './Tools/Delete/DeleteTool';
 */
 
 const mapState = (state: RootState) => ({
-    searchIsOpen: state.tools.search.isOpen
+    searchIsOpen: state.tools.search.isOpen,
+    deleteIsOpen: state.tools.delete.isOpen
 });
 
 const connector = connect(mapState);
@@ -25,16 +26,14 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const ToolBar: React.FC<ReduxProps> = (props) => {
     const {
-        searchIsOpen
+        searchIsOpen,
+        deleteIsOpen
     } = props;
 
     return (
         <ToolBarRow>
-            {searchIsOpen ? <SearchTool/> : null}
-            {/* <DeleteTool 
-                contentType="recordings"
-                quantity={6}
-            /> */}
+            {searchIsOpen ? <SearchTool/> : []}
+            {deleteIsOpen ? <DeleteTool/> : []}
         </ToolBarRow>
     )
 };

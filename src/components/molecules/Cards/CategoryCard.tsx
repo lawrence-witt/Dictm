@@ -2,7 +2,9 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 
+import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
+import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
 
 import Edit from '@material-ui/icons/Edit';
 
@@ -17,11 +19,21 @@ interface CategoryCardProps {
 *   Redux
 */
 
+const mapState = (state: RootState, props: CategoryCardProps) => ({
+    isSecondaryActive: state.tools.delete.isOpen,
+    isSecondarySelected: toolSelectors.getDeleteToggledStatus(
+        state.tools.delete,
+        "categories",
+        props.id
+    )
+});
+
 const mapDispatch = {
-    openEditor: editorOperations.openEditor
+    openEditor: editorOperations.openEditor,
+    onToggleDelete: toolOperations.toggleDeleteResource
 }
 
-const connector = connect(null, mapDispatch);
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -33,6 +45,9 @@ const CategoryCard: React.FC<CategoryCardProps & ReduxProps> = (props) => {
     const {
         id,
         title,
+        isSecondaryActive,
+        isSecondarySelected,
+        onToggleDelete,
         openEditor
     } = props;
 
@@ -46,9 +61,14 @@ const CategoryCard: React.FC<CategoryCardProps & ReduxProps> = (props) => {
         openEditor("category", id);
     }, [openEditor, id]);
 
+    const onSecondaryAction = React.useCallback(() => {
+        onToggleDelete("category", id);
+    }, [onToggleDelete, id]);
+
     return (
         <CardBase
             onCardClick={onCardClick}
+            isSecondaryActive={isSecondaryActive}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -56,8 +76,9 @@ const CategoryCard: React.FC<CategoryCardProps & ReduxProps> = (props) => {
                 <CardBaseActionSwitch 
                     primaryIcon={Edit}
                     onPrimaryAction={onPrimaryAction}
-                    isSecondaryActive={false}
-                    isSecondarySelected={false}
+                    onSecondaryAction={onSecondaryAction}
+                    isSecondaryActive={isSecondaryActive}
+                    isSecondarySelected={isSecondarySelected}
                 />
             </CardBasePrimaryRow>
         </CardBase>

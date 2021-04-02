@@ -25,12 +25,14 @@ import { useBreakContext } from '../../../../utils/hooks/useBreakpoints';
 
 const mapState = (state: RootState) => ({
     pageTitle: state.navigation.history.current.title,
-    searchIsOpen: state.tools.search.isOpen
+    searchIsOpen: state.tools.search.isOpen,
+    deleteIsOpen: state.tools.delete.isOpen
 });
 
 const mapDispatch = {
     onToggleMenu: navigationOperations.toggleNavMenu,
-    onToggleSearch: toolOperations.toggleSearchTool
+    onToggleSearch: toolOperations.toggleSearchTool,
+    onToggleDelete: toolOperations.toggleDeleteTool
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -82,7 +84,9 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
     const {
         pageTitle,
         searchIsOpen,
+        deleteIsOpen,
         onToggleSearch,
+        onToggleDelete,
         onToggleMenu,
         children
     } = props;
@@ -97,6 +101,7 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
     });
 
     const searchClass = searchIsOpen ? classes.toolIconSelected : classes.toolIcon;
+    const deleteClass = deleteIsOpen ? classes.toolIconSelected : classes.toolIcon;
 
     return (
         <AppBar
@@ -143,9 +148,10 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
             <IconButton
                 edge="end"
                 color="inherit"
+                onClick={onToggleDelete}
             >
                 <Delete 
-                    className={classes.toolIcon}
+                    className={deleteClass}
                 />
             </IconButton>
         </Toolbar>

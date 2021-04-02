@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
+import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
+import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
 
 import Play from '@material-ui/icons/PlayArrow';
 
@@ -18,11 +20,21 @@ interface RecordingCardProps {
 *   Redux
 */
 
+const mapState = (state: RootState, props: RecordingCardProps) => ({
+    isSecondaryActive: state.tools.delete.isOpen,
+    isSecondarySelected: toolSelectors.getDeleteToggledStatus(
+        state.tools.delete,
+        "recordings",
+        props.id
+    )
+});
+
 const mapDispatch = {
-    openEditor: editorOperations.openEditor
+    openEditor: editorOperations.openEditor,
+    onToggleDelete: toolOperations.toggleDeleteResource
 }
 
-const connector = connect(null, mapDispatch);
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -36,6 +48,9 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
         title,
         duration,
         created,
+        isSecondaryActive,
+        isSecondarySelected,
+        onToggleDelete,
         openEditor
     } = props;
 
@@ -43,9 +58,14 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
         openEditor("recording", id);
     }, [openEditor, id]);
 
+    const onSecondaryAction = React.useCallback(() => {
+        onToggleDelete("recording", id);
+    }, [onToggleDelete, id]);
+
     return (
         <CardBase
             onCardClick={onCardClick}
+            isSecondaryActive={isSecondaryActive}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -55,9 +75,9 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
                 <CardBaseActionSwitch 
                     primaryIcon={Play}
                     contained={true}
-                    onSecondaryAction={() => console.log('rec secondary')}
-                    isSecondaryActive={false}
-                    isSecondarySelected={false}
+                    onSecondaryAction={onSecondaryAction}
+                    isSecondaryActive={isSecondaryActive}
+                    isSecondarySelected={isSecondarySelected}
                 />
             </CardBasePrimaryRow>
         </CardBase>

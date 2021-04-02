@@ -25,10 +25,8 @@ const searchToolReducer = (
                 term: action.payload.term
             }
         case types.SEARCH_TOOL_CLOSED:
-            return {
-                isOpen: false,
-                term: ""
-            }
+        case types.DELETE_TOOL_OPENED:
+            return initialSearchState;
         default:
             return state;
     }
@@ -36,8 +34,64 @@ const searchToolReducer = (
 
 /* Delete Tool Reducer */
 
+const initialDeleteState: types.DeleteToolState = {
+    isOpen: false,
+    isDeleting: false,
+    recordings: {},
+    notes: {},
+    categories: {}
+}
+
+const deleteToolReducer = (
+    state = initialDeleteState,
+    action: types.DeleteToolActionTypes
+): types.DeleteToolState => {
+    switch(action.type) {
+        case types.DELETE_TOOL_OPENED:
+            return {
+                ...state,
+                isOpen: true
+            }
+        case types.DELETE_TOOL_RESOURCE_TOGGLED: {
+            const { bucket, id } = action.payload;
+
+            const bucketClone = {...state[bucket]};
+
+            if (bucketClone[id]) {
+                delete bucketClone[id];
+            } else {
+                bucketClone[id] = true;
+            }
+
+            return {
+                ...state,
+                [bucket]: bucketClone
+            }
+        }
+        case types.DELETE_TOOL_SET_DELETING:
+            return {
+                ...state,
+                isDeleting: true
+            }
+        case types.DELETE_TOOL_DELETED:
+            return {
+                ...initialDeleteState,
+                isOpen: state.isOpen,
+                isDeleting: false
+            }
+        case types.DELETE_TOOL_CLOSED:
+        case types.SEARCH_TOOL_OPENED:
+            return initialDeleteState;
+        default:
+            return state;
+    }
+}
+
+/* Root Reducer */
+
 const reducer = combineReducers({
-    search: searchToolReducer
+    search: searchToolReducer,
+    delete: deleteToolReducer
 });
 
 export default reducer;

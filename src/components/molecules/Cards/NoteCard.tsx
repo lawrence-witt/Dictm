@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
+import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
+import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
 
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -23,11 +25,21 @@ interface NoteCardProps {
 *   Redux
 */
 
+const mapState = (state: RootState, props: NoteCardProps) => ({
+    isSecondaryActive: state.tools.delete.isOpen,
+    isSecondarySelected: toolSelectors.getDeleteToggledStatus(
+        state.tools.delete,
+        "notes",
+        props.id
+    )
+});
+
 const mapDispatch = {
-    openEditor: editorOperations.openEditor
+    openEditor: editorOperations.openEditor,
+    onToggleDelete: toolOperations.toggleDeleteResource
 }
 
-const connector = connect(null, mapDispatch);
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -52,6 +64,9 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
         title,
         data,
         created,
+        isSecondaryActive,
+        isSecondarySelected,
+        onToggleDelete,
         openEditor
     } = props;
 
@@ -61,9 +76,14 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
         openEditor("note", id);
     }, [openEditor, id]);
 
+    const onSecondaryAction = React.useCallback(() => {
+        onToggleDelete("note", id);
+    }, [onToggleDelete, id]);
+
     return (
         <CardBase
             onCardClick={onCardClick}
+            isSecondaryActive={isSecondaryActive}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -77,9 +97,9 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
                         </Typography>
                     )}
                     contained={true}
-                    onSecondaryAction={() => console.log('note secondary')}
-                    isSecondaryActive={false}
-                    isSecondarySelected={false}
+                    onSecondaryAction={onSecondaryAction}
+                    isSecondaryActive={isSecondaryActive}
+                    isSecondarySelected={isSecondarySelected}
                 />
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>

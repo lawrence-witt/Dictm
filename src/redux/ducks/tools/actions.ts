@@ -20,3 +20,30 @@ export const closeSearchTool = (): types.SearchToolClosedAction => ({
 });
 
 /* Delete Tool Actions */
+
+export const openDeleteTool = (): types.DeleteToolOpenedAction => ({
+    type: types.DELETE_TOOL_OPENED
+});
+
+export const toggleDeleteResource = (
+    bucket: "recordings" | "notes" | "categories",
+    id: string
+): types.DeleteToolToggleResourceAction => ({
+    type: types.DELETE_TOOL_RESOURCE_TOGGLED,
+    payload: {
+        bucket,
+        id
+    }
+});
+
+export const setDeleteToolDeleting = (): types.DeleteToolSetDeletingAction => ({
+    type: types.DELETE_TOOL_SET_DELETING
+})
+
+export const commitDeleteTool = (): types.DeleteToolDeletedAction => ({
+    type: types.DELETE_TOOL_DELETED
+})
+
+export const closeDeleteTool = (): types.DeleteToolClosedAction => ({
+    type: types.DELETE_TOOL_CLOSED
+});
