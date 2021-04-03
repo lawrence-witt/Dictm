@@ -3,8 +3,13 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from '@material-ui/core/Typography';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../../../redux/store';
 import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
@@ -38,10 +43,9 @@ const Detail: React.FC<DetailProps> = (props) => {
     } = props;
 
     return (
-        <>
-        <p>{name}</p>
-        <p>{value}</p>
-        </>
+        <ListItem>
+            <ListItemText primary={name} secondary={value}/>
+        </ListItem>
     );
 }
 
@@ -53,13 +57,15 @@ const DetailsDialog: React.FC<DetailDialogProps> = (props) => {
 
     return (
         <>
-            {details.map(detail => (
-                <Detail 
-                    key={detail.name} 
-                    name={detail.name} 
-                    value={detail.value}
-                />)
-            )}
+            <List style={{overflow: 'auto'}}>
+                {details.map(detail => (
+                    <Detail 
+                        key={detail.name} 
+                        name={detail.name} 
+                        value={detail.value}
+                    />)
+                )}
+            </List>
             <DialogActions>
                 <Button 
                     color="primary"

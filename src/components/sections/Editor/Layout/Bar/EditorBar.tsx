@@ -18,7 +18,7 @@ import { EditorBarProps } from './EditorBar.types';
 
 const mapState = (state: RootState) => ({
     title: state.editor.attributes.title,
-    canSave: editorSelectors.getSaveAvailability(state)
+    canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
 const mapDispatch = {

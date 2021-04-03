@@ -16,7 +16,7 @@ import { MenuItem } from '@material-ui/core';
 */
 
 const mapState = (state: RootState) => ({
-    canSave: editorSelectors.getSaveAvailability(state)
+    canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
 const mapDispatch = {

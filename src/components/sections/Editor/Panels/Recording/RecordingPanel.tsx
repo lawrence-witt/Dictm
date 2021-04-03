@@ -23,7 +23,7 @@ import useCassette from '../../../../../lib/hooks/useCassette';
 */
 
 const mapState = (state: RootState) => ({
-    canSave: editorSelectors.getSaveAvailability(state)
+    canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
 const mapDispatch = {

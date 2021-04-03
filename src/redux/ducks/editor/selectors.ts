@@ -17,8 +17,8 @@ const stringArraysEqual = (arr1: string[], arr2: string[]) => {
 *   Decide whether the editing model can be saved.
 */
 
-export const getSaveAvailability = createSelector((state: RootState) => {
-    const { attributes, context } = state.editor;
+export const getSaveAvailability = createSelector((editorState: RootState["editor"]) => {
+    const { attributes, context } = editorState;
 
     if (attributes.isSaving || !context || context.type === "choose") return false;
 

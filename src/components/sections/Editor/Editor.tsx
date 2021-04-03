@@ -15,7 +15,7 @@ import Dialog from './Dialog/Dialog';
 
 const mapState = (state: RootState) => ({
     editor: state.editor,
-    canSave: editorSelectors.getSaveAvailability(state)
+    canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
 const mapDispatch = {
