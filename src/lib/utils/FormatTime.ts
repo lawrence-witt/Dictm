@@ -1,11 +1,14 @@
 export const formatShortTimestamp = (stamp: number): string => {
-    return new Intl.DateTimeFormat(undefined, {
+    return new Intl.DateTimeFormat('default', {
         day: '2-digit', month: 'short', year: 'numeric'
     }).format(new Date(stamp));
 }
 
 export const formatLongTimestamp = (stamp: number): string => {
-    return stamp.toString();
+    return new Intl.DateTimeFormat('default', {
+        day: '2-digit', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    }).format(new Date(stamp));
 }
 
 export const formatDuration = (secs: number): {m: string; s: string; cs: string} => {
