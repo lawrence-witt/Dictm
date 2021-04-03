@@ -82,6 +82,12 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
         onToggleDelete("note", id);
     }, [onToggleDelete, id]);
 
+    const typographyIcon = React.useCallback(() => (
+        <Typography variant="h6" className={classes.textIcon}>
+            T
+        </Typography>
+    ), [classes.textIcon]);
+
     return (
         <CardBase
             onCardClick={onCardClick}
@@ -93,12 +99,9 @@ const NoteCard: React.FC<NoteCardProps & ReduxProps> = (props) => {
                 createdDate={createdFormatted}
             >
                 <CardBaseActionSwitch
-                    primaryIcon={() => (
-                        <Typography variant="h6" className={classes.textIcon}>
-                            T
-                        </Typography>
-                    )}
+                    primaryIcon={typographyIcon}
                     contained={true}
+                    isPrimaryPlaceholder={true}
                     onSecondaryAction={onSecondaryAction}
                     isSecondaryActive={isSecondaryActive}
                     isSecondarySelected={isSecondarySelected}

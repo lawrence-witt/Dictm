@@ -5,6 +5,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import ToolTip from '@material-ui/core/Tooltip';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import ContainedIconButton from '../../atoms/Buttons/ContainedIconButton';
@@ -28,6 +29,7 @@ interface CardBaseActionSwitchProps {
     primaryIcon?: React.FunctionComponent;
     contained?: boolean;
     onPrimaryAction?: () => void;
+    isPrimaryPlaceholder?: boolean;
     onSecondaryAction?: () => void;
     isSecondaryActive?: boolean;
     isSecondarySelected?: boolean;
@@ -211,6 +213,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
         primaryIcon: PrimaryIcon,
         contained,
         onPrimaryAction,
+        isPrimaryPlaceholder,
         onSecondaryAction,
         isSecondaryActive,
         isSecondarySelected
@@ -220,7 +223,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
 
     const IconButtonType = contained ? ContainedIconButton : IconButton;
 
-    const PrimaryAction = (
+    const primaryButton = (
         <IconButtonType 
             edge="start"
             onClick={onPrimaryAction} 
@@ -231,8 +234,20 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
             {PrimaryIcon && <PrimaryIcon />}
         </IconButtonType>
     );
+
+    // Temporary fallback while implementing playlists
+
+    const primaryAction = isPrimaryPlaceholder ? (
+        <ToolTip 
+            title="Playlists coming soon!" 
+            arrow
+            enterTouchDelay={0}
+        >
+            {primaryButton}
+        </ToolTip>
+    ) : primaryButton;
     
-    const SecondaryAction = (
+    const secondaryAction = (
         <PrimaryCheckBox 
             classes={{root: classes.actionRoot}}
             checked={isSecondarySelected}
@@ -241,7 +256,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
         />
     );
 
-    return isSecondaryActive ? SecondaryAction : PrimaryAction;
+    return isSecondaryActive ? secondaryAction : primaryAction;
 };
 
 /* EXPORTS */

@@ -9,6 +9,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import ToolTip from '@material-ui/core/Tooltip';
 import Repeat from '@material-ui/icons/Repeat';
 import Search from '@material-ui/icons/Search';
 import Delete from '@material-ui/icons/Delete';
@@ -129,14 +130,20 @@ const ToolBarRow: React.FC<ReduxProps> = (props) => {
             <FlexSpace flex={titleHidden ? 0 : 1} />
             {children}
             <FlexSpace flex={1} />
-            <IconButton
-                color="inherit"
-                className={classes.leftMostButton}
+            <ToolTip
+                title="Playlists coming soon!"
+                arrow
+                enterTouchDelay={0}
             >
-                <Repeat 
-                    className={classes.toolIcon}
-                />
-            </IconButton>
+                <IconButton
+                    color="inherit"
+                    className={classes.leftMostButton}
+                >
+                    <Repeat 
+                        className={classes.toolIcon}
+                    />
+                </IconButton>
+            </ToolTip>
             <IconButton
                 color="inherit"
                 onClick={onToggleSearch}

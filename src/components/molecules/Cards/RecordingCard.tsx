@@ -78,6 +78,7 @@ const RecordingCard: React.FC<RecordingCardProps & ReduxProps> = (props) => {
                 <CardBaseActionSwitch 
                     primaryIcon={Play}
                     contained={true}
+                    isPrimaryPlaceholder={true}
                     onSecondaryAction={onSecondaryAction}
                     isSecondaryActive={isSecondaryActive}
                     isSecondarySelected={isSecondarySelected}

@@ -1,9 +1,8 @@
 import React from 'react';
-import clsx from 'clsx';
 import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, Theme } from '@material-ui/core/styles';
 
-const useStyles = makeStyles(theme => ({
+const styles = (theme: Theme) => ({
     root: {
         color: theme.palette.getContrastText(theme.palette.grey[300]),
         backgroundColor: theme.palette.grey[300],
@@ -21,27 +20,28 @@ const useStyles = makeStyles(theme => ({
             backgroundColor: theme.palette.grey[300]
         }
     },
+    label: {},
+    edgeStart: {},
+    edgeEnd: {},
+    colorInherit: {},
+    colorPrimary: {},
+    colorSecondary: {},
+    sizeSmall: {},
     disabled: {}
-}));
+})
 
-const ContainedIconButton: React.FC<IconButtonProps> = (props) => {
-    const {
-        classes,
-        children
-    } = props;
+class ContainedIconButton extends React.Component<IconButtonProps> {
+    render() {
+        const { children } = this.props;
 
-    const containedClasses = useStyles();
+        return (
+            <IconButton 
+                {...this.props} 
+            >
+                {children}
+            </IconButton>
+        )
+    }
+}
 
-    return (
-        <IconButton 
-            {...props} 
-            classes={{
-                root: clsx(containedClasses.root, classes?.root), 
-                label: classes?.label
-            }}>
-            {children}
-        </IconButton>
-    )
-};
-
-export default ContainedIconButton;
+export default withStyles(styles)(ContainedIconButton);
