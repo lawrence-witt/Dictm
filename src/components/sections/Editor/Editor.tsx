@@ -5,7 +5,6 @@ import { RootState } from '../../../redux/store';
 import { editorOperations, editorSelectors } from '../../../redux/ducks/editor';
 
 import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
-import EditorLayout from './Layout/Layout';
 
 import Dialog from './Dialog/Dialog';
 
@@ -14,7 +13,7 @@ import Dialog from './Dialog/Dialog';
 */
 
 const mapState = (state: RootState) => ({
-    editor: state.editor,
+    isOpen: state.editor.attributes.isOpen,
     canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
@@ -34,7 +33,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
-        editor,
+        isOpen,
         canSave,
         openSaveDialog,
         closeEditor,
@@ -53,7 +52,7 @@ const Editor: React.FC<ReduxProps> = (props) => {
 
     return (
         <FocusDrawer
-            open={editor.attributes.isOpen}
+            open={isOpen}
             onClose={onClose}
             SlideProps={{
                 mountOnEnter: true,
@@ -61,18 +60,7 @@ const Editor: React.FC<ReduxProps> = (props) => {
                 onExited: clearEditor
             }}
         >
-            {editor.context && (
-                <>
-                    <EditorLayout
-                        context={editor.context}
-                    />
-                    <Dialog 
-                        attributes={editor.attributes}
-                        context={editor.context}
-                        dialogs={editor.dialogs}
-                    />
-                </>
-            )}
+            <Dialog/>
         </FocusDrawer>
     )
 };

@@ -40,7 +40,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const SaveDialog: React.FC<SaveDialogProps & ReduxProps> = (props) => {
     const {
-        contentType,
+        type = "invalid",
         isNew,
         canSave,
         saveRecording,
@@ -51,17 +51,17 @@ const SaveDialog: React.FC<SaveDialogProps & ReduxProps> = (props) => {
     } = props;
 
     const text = isNew ? 
-    `Save your ${contentType} or discard it?` : 
+    `Save your ${type} or discard it?` : 
     'Save your changes or discard them?';
 
     const saveAction = React.useMemo(() => {
-        switch(contentType) {
+        switch(type) {
             case "recording": return saveRecording;
             case "note": return saveNote;
             case "category": return saveCategory;
             default: return () => ({});
         }
-    }, [contentType, saveRecording, saveCategory, saveNote]);
+    }, [type, saveRecording, saveCategory, saveNote]);
 
     return (
         <>

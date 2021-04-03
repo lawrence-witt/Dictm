@@ -1,15 +1,11 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect } from 'react-redux';
 
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../../../redux/store';
 import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
@@ -29,8 +25,6 @@ const mapDispatch = {
 }
 
 const connector = connect(mapState, mapDispatch);
-
-type ReduxProps = ConnectedProps<typeof connector>;
 
 /* 
 *   Local
