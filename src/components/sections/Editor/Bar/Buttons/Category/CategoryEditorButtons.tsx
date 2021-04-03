@@ -3,13 +3,13 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import MenuItem from '@material-ui/core/MenuItem';
 
-import { RootState } from '../../../../../redux/store';
-import { editorSelectors, editorOperations } from '../../../../../redux/ducks/editor';
-import { categoryEditorOperations } from '../../../../../redux/ducks/editor/category';
+import { RootState } from '../../../../../../redux/store';
+import { editorSelectors, editorOperations } from '../../../../../../redux/ducks/editor';
+import { categoryEditorOperations } from '../../../../../../redux/ducks/editor/category';
 
-import DropdownMenu from '../../../../molecules/Menus/Dropdown/DropdownMenu';
+import DropdownMenu from '../../../../../molecules/Menus/Dropdown/DropdownMenu';
 
-import SaveButton from '../../../../atoms/Buttons/SaveButton';
+import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 
 /* 
 *   Redux

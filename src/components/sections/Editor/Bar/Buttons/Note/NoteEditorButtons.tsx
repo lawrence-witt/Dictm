@@ -2,13 +2,13 @@ import React from 'react';
 
 import { connect, ConnectedProps } from 'react-redux';
 
-import { RootState } from '../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
-import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
+import { RootState } from '../../../../../../redux/store';
+import { editorOperations, editorSelectors } from '../../../../../../redux/ducks/editor';
+import { noteEditorOperations } from '../../../../../../redux/ducks/editor/note';
 
-import DropdownMenu from '../../../../molecules/Menus/Dropdown/DropdownMenu';
+import DropdownMenu from '../../../../../molecules/Menus/Dropdown/DropdownMenu';
 
-import SaveButton from '../../../../atoms/Buttons/SaveButton';
+import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 import { MenuItem } from '@material-ui/core';
 
 /* 

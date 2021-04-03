@@ -5,12 +5,12 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import MenuItem from '@material-ui/core/MenuItem';
 
-import DropdownMenu from '../../../../molecules/Menus/Dropdown/DropdownMenu';
+import DropdownMenu from '../../../../../molecules/Menus/Dropdown/DropdownMenu';
 
-import { editorOperations } from '../../../../../redux/ducks/editor';
-import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
+import { editorOperations } from '../../../../../../redux/ducks/editor';
+import { recordingEditorOperations } from '../../../../../../redux/ducks/editor/recording';
 
-import { RecordingPanelButtonsProps } from './RecordingPanel.types';
+import { RecordingEditorButtonsProps } from './RecordingEditorButtons.types';
 
 /* 
 *   Redux
@@ -29,7 +29,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 *   Local
 */
 
-const RecordingPanelButtons: React.FC<RecordingPanelButtonsProps & ReduxProps> = (props) => {
+const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> = (props) => {
     const {
         mode,
         updateMode,

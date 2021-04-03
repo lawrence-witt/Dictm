@@ -1,16 +1,19 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { RootState } from '../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
-
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import DirectionButton from '../../../../atoms/Buttons/DirectionButton';
+import { RootState } from '../../../../redux/store';
+import { editorSelectors, editorOperations } from '../../../../redux/ducks/editor';
 
-import { EditorBarProps } from './EditorBar.types';
+import RecordingEditorButtons from './Buttons/Recording/RecordingEditorButtons';
+import NoteEditorButtons from './Buttons/Note/NoteEditorButtons';
+import CategoryEditorButtons from './Buttons/Category/CategoryEditorButtons';
+
+import DirectionButton from '../../../atoms/Buttons/DirectionButton';
+import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 
 /* 
 *   Redux
@@ -18,6 +21,7 @@ import { EditorBarProps } from './EditorBar.types';
 
 const mapState = (state: RootState) => ({
     title: state.editor.attributes.title,
+    context: state.editor.context,
     canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
@@ -34,8 +38,8 @@ type ReduxProps = ConnectedProps<typeof connector>;
 *   Local
 */
 
-const useBarStyles = makeStyles(theme => ({
-    drawerBar: {
+const useStyles = makeStyles(theme => ({
+    container: {
         position: 'sticky',
         top: 0,
         height: 56,
@@ -47,26 +51,36 @@ const useBarStyles = makeStyles(theme => ({
     backButton: {
         marginRight: theme.spacing(1)
     },
-    editorTitle: {
+    title: {
         marginRight: theme.spacing(1)
-    },
-    grow: {
-        flex: 1
     }
 }));
 
-const EditorBar: React.FC<EditorBarProps & ReduxProps> = (props) => {
+const EditorBar: React.FC<ReduxProps> = (props) => {
     const {
         title,
+        context,
         canSave,
         openSaveDialog,
-        closeEditor,
-        children
+        closeEditor
     } = props;
 
-    const classes = useBarStyles();
+    const classes = useStyles();
 
-    // Handle editor close
+    const buttons = React.useMemo(() => {
+        if (!context) return null;
+
+        switch(context.type) {
+            case "recording":
+                return <RecordingEditorButtons mode={context.mode} />
+            case "note":
+                return <NoteEditorButtons />
+            case "category":
+                return <CategoryEditorButtons/>
+            default:
+                return null;
+        }
+    }, [context]);
 
     const onClose = React.useCallback(() => {
         if (canSave) {
@@ -77,7 +91,7 @@ const EditorBar: React.FC<EditorBarProps & ReduxProps> = (props) => {
     }, [canSave, openSaveDialog, closeEditor]);
 
     return (
-        <Toolbar className={classes.drawerBar}>
+        <Toolbar className={classes.container}>
             <DirectionButton 
                 design="arrow" 
                 direction="left"
@@ -89,14 +103,14 @@ const EditorBar: React.FC<EditorBarProps & ReduxProps> = (props) => {
             <Typography
                 variant="h6" 
                 noWrap
-                className={classes.editorTitle}
+                className={classes.title}
             >
                 {title}
             </Typography>
-            <div className={classes.grow}></div>
-            {children}
+            <FlexSpace flex={1}/>
+            {buttons}
         </Toolbar>
-    );
-};
+    )
+}
 
 export default connector(EditorBar);

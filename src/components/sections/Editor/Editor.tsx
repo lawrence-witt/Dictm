@@ -6,6 +6,8 @@ import { editorOperations, editorSelectors } from '../../../redux/ducks/editor';
 
 import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
 
+import EditorBar from './Bar/EditorBar';
+import EditorPanel from './Panel/EditorPanel';
 import Dialog from './Dialog/Dialog';
 
 /* 
@@ -14,6 +16,7 @@ import Dialog from './Dialog/Dialog';
 
 const mapState = (state: RootState) => ({
     isOpen: state.editor.attributes.isOpen,
+    context: state.editor.context,
     canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
@@ -27,20 +30,15 @@ const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
-/* 
-*   Local
-*/
-
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
         isOpen,
+        context,
         canSave,
         openSaveDialog,
         closeEditor,
         clearEditor
     } = props;
-
-    // Handle editor close
 
     const onClose = React.useCallback(() => {
         if (canSave) {
@@ -60,7 +58,13 @@ const Editor: React.FC<ReduxProps> = (props) => {
                 onExited: clearEditor
             }}
         >
-            <Dialog/>
+            {context ? (
+                <>
+                    <EditorBar />
+                    <EditorPanel context={context}/>
+                    <Dialog />
+                </>
+            ) : null}
         </FocusDrawer>
     )
 };
