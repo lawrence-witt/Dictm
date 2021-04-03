@@ -44,10 +44,14 @@ const CategoryPanel: React.FC<CategoryPanelProps & ReduxProps> = (props) => {
 
     const onTitleChange = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
         updateTitle(ev.target.value);
-    }, [updateTitle])
+    }, [updateTitle]);
 
-    const onAutocompleteChange = React.useCallback((type: "recordings" | "notes", newSelected: MediaOption[]) => {
-        updateIds(type, newSelected.map(option => option.id));
+    const onRecordingsIdsChange = React.useCallback((newSelected: MediaOption[]) => {
+        updateIds("recordings", newSelected.map(option => option.id));
+    }, [updateIds]);
+
+    const onNotesIdsChange = React.useCallback((newSelected: MediaOption[]) => {
+        updateIds("notes", newSelected.map(option => option.id));
     }, [updateIds]);
 
     return (
@@ -62,13 +66,13 @@ const CategoryPanel: React.FC<CategoryPanelProps & ReduxProps> = (props) => {
                 options={recordingOptions}
                 values={model.relationships.recordings.ids} 
                 label='Recordings'
-                onChange={(newSelected) => onAutocompleteChange("recordings", newSelected)}
+                onChange={onRecordingsIdsChange}
             />
             <MediaAutocomplete 
                 options={noteOptions}
                 values={model.relationships.notes.ids}
                 label='Notes'
-                onChange={(newSelected) => onAutocompleteChange("notes", newSelected)} 
+                onChange={onNotesIdsChange} 
             />
         </>
     );
