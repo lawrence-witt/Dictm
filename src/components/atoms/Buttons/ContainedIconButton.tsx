@@ -1,8 +1,9 @@
 import React from 'react';
+import clsx from 'clsx';
 import IconButton, { IconButtonProps } from '@material-ui/core/IconButton';
-import { withStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
-const styles = (theme: Theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         color: theme.palette.getContrastText(theme.palette.grey[300]),
         backgroundColor: theme.palette.grey[300],
@@ -20,28 +21,32 @@ const styles = (theme: Theme) => ({
             backgroundColor: theme.palette.grey[300]
         }
     },
-    label: {},
-    edgeStart: {},
-    edgeEnd: {},
-    colorInherit: {},
-    colorPrimary: {},
-    colorSecondary: {},
-    sizeSmall: {},
     disabled: {}
-})
+}));
 
-class ContainedIconButton extends React.Component<IconButtonProps> {
-    render() {
-        const { children } = this.props;
+const ContainedIconButton = React.forwardRef<
+    HTMLButtonElement, IconButtonProps
+>(function ContainedIconButton(props, ref) {
+    const {
+        classes = {},
+        children
+    } = props;
 
-        return (
-            <IconButton 
-                {...this.props} 
-            >
-                {children}
-            </IconButton>
-        )
-    }
-}
+    const defaultClasses = useStyles();
 
-export default withStyles(styles)(ContainedIconButton);
+    const { root: inheritedRoot, ...inheritedOther } = classes;
+
+    return (
+        <IconButton
+            ref={ref}
+            {...props} 
+            classes={{
+                ...inheritedOther,
+                root: clsx(defaultClasses.root, inheritedRoot)
+            }}>
+            {children}
+        </IconButton>
+    )
+});
+
+export default ContainedIconButton;
