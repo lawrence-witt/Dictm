@@ -68,10 +68,10 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         waveHandle,
         status,
         flags,
+        analyser,
         handleStop,
         handleScan,
-        handleTimeout,
-        nodeMap
+        handleTimeout
     } = props;
 
     /* 
@@ -174,7 +174,6 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         tapeRef.current.scrollLeft = p * waveFormOptions.secondWidth;
 
         if (isRecording) {
-            const analyser = nodeMap().recording[0];
             if (!(analyser instanceof AnalyserNode)) throw new Error('AnalyserNode not found.');
 
             freqArray.current = freqArray.current || new Uint8Array(analyser.frequencyBinCount);
@@ -182,7 +181,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
             waveClass.current.buffer(p, freqArray.current);
         }
-    }, [isRecording, nodeMap]);
+    }, [isRecording, analyser]);
 
     const flush = React.useCallback(() => {
         waveClass.current.flush(progressRef.current);

@@ -2,8 +2,7 @@ import { WaveHandle } from '../RecordingPanel.types';
 
 import {
     CassetteStatus,
-    CassettePublicFlags,
-    CassetteNodeMap
+    CassettePublicFlags
 } from 'cassette-js';
 
 // Component
@@ -12,10 +11,10 @@ export interface WaveFormProps {
     waveHandle: React.RefObject<WaveHandle>;
     status: CassetteStatus;
     flags: CassettePublicFlags;
+    analyser: AnalyserNode | null;
     handleStop: () => Promise<void>;
     handleScan: (type: 'to' | 'by', secs: number) => Promise<void>;
     handleTimeout: (type: 'set' | 'clear') => void;
-    nodeMap: () => CassetteNodeMap;
 }
 
 // Class

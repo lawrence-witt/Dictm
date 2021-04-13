@@ -106,7 +106,7 @@ const createDurationDetail = (
 ) => createDetail(
     "Duration",
     (() => {
-        const { m, s, cs } = formatDuration(model.data.audio.data.duration);
+        const { m, s, cs } = formatDuration(model.data.audio.attributes.duration);
         return `${m}:${s}.${cs}`;
     })()
 );
@@ -115,7 +115,7 @@ const createSampleRateDetail = (
     model: RecordingModel
 ) => createDetail(
     "Sample Rate",
-    model.data.audio.data.sampleRate.toString()
+    model.data.audio.attributes.sampleRate.toString()
 );
 
 const createNoteCountDetail = (

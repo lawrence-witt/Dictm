@@ -74,8 +74,6 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         }
     }, []);
 
-    const onError = React.useCallback((error) => console.error(error), []);
-
     /* 
     *   Cassette and audio refs
     */
@@ -85,7 +83,6 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         true,       // floorTimerOutput
         onProgress, // progress callback
         undefined,  // status callback
-        onError     // error callback
     );
 
     const stream = React.useRef(null) as React.MutableRefObject<MediaStream | null>;
@@ -101,8 +98,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (type === 'record') {
             analyser.current = cassette.get.context().createAnalyser();
             analyser.current.fftSize = 1024;
-            await cassette.controls.addNode(analyser.current, 0);
-            await cassette.controls.record();
+            await cassette.controls.record([analyser.current]);
         } else {
             await cassette.controls.play();
         }
@@ -122,10 +118,9 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         cancelAnimationFrame(frameLoop.current);
 
         if (analyser.current) {
-            await cassette.controls.removeNodes([analyser.current]);
             analyser.current = null;
 
-            const audioData = cassette.get.wavData();
+            const audioData = cassette.get.track()?.copy;
             const frequencyData = waveHandle.current.flush();
 
             if (!audioData) throw new Error('Could not retrieve audio data.');
@@ -180,15 +175,13 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle inserting audio and frequencies data
     */
 
-    // TODO: the cassette error handling has to be rewritten because this will never throw
-
     const insertFailed = React.useRef(false);
 
     const handleInsert = React.useCallback(async (
         audio: RecordingPanelProps["model"]["data"]["audio"]
     ) => {
         try {
-            await cassette.controls.insert(audio, () => insertFailed.current = true);
+            await cassette.controls.insert(audio);
         } catch(err) {
             console.log(err);
             // TODO: dispatch notification error
@@ -199,7 +192,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (mode !== "play" || !cassette.flags.canInsert || insertFailed.current) return;
         handleInsert(model.data.audio);
         waveHandle.current.init(model.data.frequencies);
-        waveHandle.current.increment(0, model.data.audio.data.duration);
+        waveHandle.current.increment(0, model.data.audio.attributes.duration);
     }, [mode, model, cassette.flags, handleInsert]);
 
     /* 
@@ -240,7 +233,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
                 waveHandle={waveHandle}
                 status={cassette.status}
                 flags={cassette.flags}
-                nodeMap={cassette.get.nodeMap}
+                analyser={analyser.current}
                 handleStop={handleStop}
                 handleScan={handleScan}
                 handleTimeout={handleTimeout}

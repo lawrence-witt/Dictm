@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { WavObject, blankWavObject } from 'cassette-js';
+import { StreamRecorderTrack, generateBlankTrack } from 'cassette-js';
 
 export interface RecordingModel {
     id: string;
@@ -12,7 +12,7 @@ export interface RecordingModel {
         }
     };
     data: {
-        audio: WavObject;
+        audio: StreamRecorderTrack<"wav">;
         frequencies: number[][];
     };
     relationships: {
@@ -26,20 +26,19 @@ const createMockStamps = () => ({
     modified: Date.now()
 });
 
-const createMockAudioData = (): WavObject => {
-    return Object.assign({}, {
-        ...blankWavObject,
-        data: {
-            ...blankWavObject.data,
-            bytes: new Uint8Array(10000),
-            duration: 10
-        },
+const createMockAudioData = (): StreamRecorderTrack<"wav"> => {
+    const blankTrack = generateBlankTrack("wav");
+
+    return {
+        ...blankTrack,
         attributes: {
+            ...blankTrack.attributes,
+            duration: Math.floor(Math.random() * 20),
             timestamps: {
                 ...createMockStamps()
             }
         }
-    })
+    }
 }
 
 const createMockFrequenciesData = () => {
@@ -59,7 +58,7 @@ const generateMockRecordingModel = (
     id: string,
     title: string,
     timestamps: { created: number, modified: number },
-    data: { audio: WavObject, frequencies: number[][] },
+    data: ReturnType<typeof createMockData>,
     userId: string,
     categoryId?: string
 ): RecordingModel => ({
@@ -84,7 +83,7 @@ export const generateNewRecordingModel = (
     nanoid(10),
     "",
     { created: 0, modified: 0 },
-    { audio: blankWavObject, frequencies: [] },
+    { audio: generateBlankTrack("wav"), frequencies: [] },
     userId
 );
 

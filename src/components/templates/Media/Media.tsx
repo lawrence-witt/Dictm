@@ -65,7 +65,7 @@ const MediaTemplate: React.FC<MediaTemplateProps & ReduxProps> = (props) => {
                         key={item.id}
                         id={item.id}
                         title={item.attributes.title}
-                        duration={item.data.audio.data.duration}
+                        duration={item.data.audio.attributes.duration}
                         created={item.attributes.timestamps.created}
                     />
                 ) : (

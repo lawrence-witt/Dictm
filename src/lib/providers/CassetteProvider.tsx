@@ -1,4 +1,4 @@
-import React from 'react';
+/* import React from 'react';
 import { CassetteUserParams, CassettePublicMethods, CassetteStatus, CassettePublicFlags } from 'cassette-js';
 
 import useCassette, { CassetteGetters } from '../hooks/useCassette';
@@ -56,4 +56,4 @@ const CassetteProvider: React.FC<CassetteUserParams> = ({
 };
 
 export default CassetteProvider;
-export { useCassetteControls, useCassetteStamps, useCassetteStatus, useCassetteGetters, useCassetteError };
+export { useCassetteControls, useCassetteStamps, useCassetteStatus, useCassetteGetters, useCassetteError }; */

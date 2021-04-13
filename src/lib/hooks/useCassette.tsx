@@ -1,13 +1,11 @@
 import React from 'react';
 import isEqual from 'react-fast-compare';
 import Cassette, { 
-    CassetteUserParams,
+    CassetteParams,
     CassettePublicMethods,
     CassetteStatus,
     CassettePublicFlags,
-    CassetteNodeMap,
-    CassetteErrorCallback,
-    WavObject
+    WavEncoder
 } from 'cassette-js';
 
 /*  
@@ -21,8 +19,7 @@ export interface CassetteGetters {
     flags: () => CassettePublicFlags;
     progress: () => number;
     duration: () => number;
-    wavData: () => WavObject | null;
-    nodeMap: () => CassetteNodeMap;
+    track: () => Cassette<"wav">["track"];
 }
 
 interface CassetteReturn {
@@ -30,21 +27,19 @@ interface CassetteReturn {
     duration: number;
     status: CassetteStatus;
     flags: CassettePublicFlags;
-    controls: CassettePublicMethods;
+    controls: CassettePublicMethods<"wav">;
     get: CassetteGetters;
-    error: unknown;
 }
 
 const useCassette = (
-    increment?: CassetteUserParams["increment"],
-    floorOutput?: CassetteUserParams["floorOutput"],
-    onProgress?: CassetteUserParams["onProgress"],
-    onStatus?: CassetteUserParams["onStatus"],
-    onError?: CassetteUserParams["onError"]
+    increment?: CassetteParams["increment"],
+    floorOutput?: CassetteParams["floorOutput"],
+    onProgress?: CassetteParams["onProgress"],
+    onStatus?: CassetteParams["onStatus"]
 ): CassetteReturn => {
     
     // Base Class
-    const cassette = React.useRef() as React.MutableRefObject<Cassette>;
+    const cassette = React.useRef() as React.MutableRefObject<Cassette<"wav">>;
 
     // Utility Callbacks
 
@@ -58,20 +53,16 @@ const useCassette = (
         setFlags(flags);
     }, []);
 
-    const defaultOnError = React.useCallback((error: unknown) => {
-        setError(error);
-    }, []);
-
     // Mounting and Unmounting
 
     if (!cassette.current) {
-        const params = { increment, floorOutput };
-        const cbs = { 
-            onProgress: onProgress || defaultOnProgress, 
-            onStatus: onStatus || defaultOnStatus,
-            onError: onError || defaultOnError
-        };
-        cassette.current = new Cassette({...params, ...cbs});
+        const options = {
+            increment,
+            floorOutput,
+            onProgress: onProgress || defaultOnProgress,
+            onStatus: onStatus || defaultOnStatus
+        }
+        cassette.current = new Cassette(WavEncoder, options);
     }
 
     React.useEffect(() => {
@@ -79,7 +70,6 @@ const useCassette = (
             if (cassette.current.flags.canUnlink) {
                 cassette.current.onProgress = null;
                 cassette.current.onStatus = null;
-                cassette.current.onError = null;
                 cassette.current.unlink();
             }
         };
@@ -89,7 +79,6 @@ const useCassette = (
 
     const prevOnProgress = React.useRef(onProgress);
     const prevOnStatus = React.useRef(onStatus);
-    const prevOnError = React.useRef(onError);
 
     React.useEffect(() => {
         if (increment) cassette.current.increment = increment;
@@ -110,35 +99,24 @@ const useCassette = (
         }
     }, [onStatus, defaultOnStatus]);
 
-    React.useEffect(() => {
-        if (!isEqual(onError, prevOnError.current)) {
-            prevOnError.current = onError;
-            cassette.current.onError = onError || defaultOnError;
-        }
-    }, [onError, defaultOnError]);
-
     // State and Return Structure
 
     const [progress, setProgress] = React.useState(cassette.current.progress);
     const [duration, setDuration] = React.useState(cassette.current.duration);
     const [status, setStatus] = React.useState(cassette.current.status);
     const [flags, setFlags] = React.useState(cassette.current.flags);
-    const [error, setError] = React.useState<unknown>();
 
-    const controls: CassettePublicMethods = React.useMemo(() => ({
+    const controls: CassettePublicMethods<"wav"> = React.useMemo(() => ({
         connect: async (stream, cb?) => await cassette.current.connect(stream, cb),
         disconnect: async (cb?) => await cassette.current.disconnect(cb),
         insert: async (file, cb?) => await cassette.current.insert(file, cb),
-        eject: async (cb?: CassetteErrorCallback): Promise<WavObject | null> => await cassette.current.eject(cb),
-        addNode: async (n, rI?, pI?, cb?) => await cassette.current.addNode(n, rI, pI, cb),
-        modifyNode: async (n, rI?, pI?, cb?) => await cassette.current.modifyNode(n, rI, pI, cb),
-        removeNodes: async (n, cb?) => await cassette.current.removeNodes(n, cb),
-        record: async (cb?) => await cassette.current.record(cb),
-        play: async (cb?) => await cassette.current.play(cb),
+        eject: async (cb?) => await cassette.current.eject(cb),
+        record: async (nodes?, cb?) => await cassette.current.record(nodes, cb),
+        play: async (nodes?, cb?) => await cassette.current.play(nodes, cb),
         pause: async (cb?) => await cassette.current.pause(cb),
         scanTo: async (secs, cb?) => await cassette.current.scanTo(secs, cb),
         scanBy: async (secs, cb?) => await cassette.current.scanBy(secs, cb),
-        unlink: async (cb?) => await cassette.current.unlink(cb)
+        unlink: async (closeContext?, cb?) => await cassette.current.unlink(closeContext, cb)
     }), []);
 
     const get = React.useMemo(() => ({
@@ -147,8 +125,7 @@ const useCassette = (
         flags: () => cassette.current.flags,
         progress: () => cassette.current.progress,
         duration: () => cassette.current.duration,
-        wavData: () => cassette.current.wavData,
-        nodeMap: () => cassette.current.nodeMap
+        track: () => cassette.current.track
     }), []);
 
     return {
@@ -157,8 +134,7 @@ const useCassette = (
         status,
         flags,
         controls,
-        get,
-        error
+        get
     }
 }
 
