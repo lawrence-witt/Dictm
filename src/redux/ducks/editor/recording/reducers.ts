@@ -46,7 +46,7 @@ const recordingEditorReducer = (
                         ...state.data.editing,
                         relationships: {
                             ...state.data.editing.relationships,
-                            category: id === undefined ? id : { id }
+                            category: { id }
                         }
                     }
                 }

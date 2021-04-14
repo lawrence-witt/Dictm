@@ -16,6 +16,8 @@ import NavBar from '../../sections/NavBar/NavBar';
 import NavMenu from '../../sections/NavMenu/NavMenu';
 import Editor from '../../sections/Editor/Editor';
 
+import Auth from '../../sections/Auth/Auth';
+
 import useUniqueTransition from '../../../lib/hooks/useUniqueTransition'
 
 /* 
@@ -100,7 +102,7 @@ const App: React.FC<ReduxProps> = (props): React.ReactElement => {
         leave: active && { transform: `translateX(${left ? '-' : ''}100%)`}
     });
 
-    return (
+    /* return (
         <div className={classes.fixedBase}>
             <NavMenu/>
             <div className={classes.pageBase}>
@@ -116,7 +118,8 @@ const App: React.FC<ReduxProps> = (props): React.ReactElement => {
                 <NavBar />
             </div>
         </div>
-    )
+    ) */
+    return <Auth/>;
 };
 
 export default hot(module)(connector(App));

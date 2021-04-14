@@ -90,10 +90,10 @@ export const saveCategoryEditorModel = (): SaveCategoryEditorThunkAction => (
 
     editingRecordingIds.forEach(id => {
         if (!originalRecordingIds.includes(id)) {
-            const assignedCategory = media.recordings.byId[id].relationships.category;
+            const assignedCategory = media.recordings.byId[id].relationships.category.id;
 
             if (assignedCategory) {
-                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "recordings", [id]));
+                dispatch(categoryOperations.removeCategoryIds(assignedCategory, "recordings", [id]));
             }
 
             dispatch(recordingOperations.updateRecordingCategory(id, data.editing.id));
@@ -102,10 +102,10 @@ export const saveCategoryEditorModel = (): SaveCategoryEditorThunkAction => (
 
     editingNoteIds.forEach(id => {
         if (!originalNoteIds.includes(id)) {
-            const assignedCategory = media.notes.byId[id].relationships.category;
+            const assignedCategory = media.notes.byId[id].relationships.category.id;
 
             if (assignedCategory) {
-                dispatch(categoryOperations.removeCategoryIds(assignedCategory.id, "notes", [id]));
+                dispatch(categoryOperations.removeCategoryIds(assignedCategory, "notes", [id]));
             }
 
             dispatch(noteOperations.updateNoteCategory(id, data.editing.id));

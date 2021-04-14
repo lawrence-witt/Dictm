@@ -102,13 +102,13 @@ export const getMediaByTitleAndCategory = createSelector((
         id,
         title: mediaList.byId[id].attributes.title,
         category: (() => {
-            const assignedCategory = mediaList.byId[id].relationships.category;
+            const assignedCategory = mediaList.byId[id].relationships.category.id;
 
             if (!assignedCategory) return undefined;
 
             return {
-                id: assignedCategory.id,
-                title: state.categories.byId[assignedCategory.id].attributes.title
+                id: assignedCategory,
+                title: state.categories.byId[assignedCategory].attributes.title
             }
         })()
     }))

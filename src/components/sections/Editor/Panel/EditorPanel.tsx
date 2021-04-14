@@ -92,6 +92,7 @@ const EditorPanelSwitch = React.memo(function EditorPanelSwitch(
     }
     
 }, (prev, next) => {
+    // Node should only ever display context it was initialised with
     if (prev.displayType !== next.context.type) return true;
     return false;
 });

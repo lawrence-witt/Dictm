@@ -46,7 +46,9 @@ const notesReducer = (
                         ...state.byId[id],
                         relationships: {
                             ...state.byId[id].relationships,
-                            category: categoryId ? { id: categoryId } : undefined
+                            category: {
+                                id: categoryId
+                            }
                         }
                     }
                 }
