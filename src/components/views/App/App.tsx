@@ -16,7 +16,7 @@ import NavBar from '../../sections/NavBar/NavBar';
 import NavMenu from '../../sections/NavMenu/NavMenu';
 import Editor from '../../sections/Editor/Editor';
 
-import Auth from '../../sections/Auth/Auth';
+import AuthModal from '../../sections/AuthModal/AuthModal';
 
 import useUniqueTransition from '../../../lib/hooks/useUniqueTransition'
 
@@ -119,7 +119,7 @@ const App: React.FC<ReduxProps> = (props): React.ReactElement => {
             </div>
         </div>
     ) */
-    return <Auth/>;
+    return <AuthModal/>;
 };
 
 export default hot(module)(connector(App));

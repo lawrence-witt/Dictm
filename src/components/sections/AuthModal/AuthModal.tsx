@@ -1,14 +1,17 @@
 import React from 'react';
 
 import Dialog from '@material-ui/core/Dialog';
-import { makeStyles } from '@material-ui/core/styles'
+import { fade, makeStyles } from '@material-ui/core/styles'
 
-import * as types from './Auth.types';
+import * as types from './AuthModal.types';
 
 import AuthPanel from './Panel/AuthPanel';
 import AuthBar from './Bar/AuthBar';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
+    backdropRoot: {
+        backgroundColor: fade(theme.palette.common.white, 0.7)
+    },
     paper: {
         width: '100%',
         height: '100%',
@@ -46,6 +49,11 @@ const Auth: React.FC = () => {
             open={true}
             classes={classes}
             maxWidth="xs"
+            BackdropProps={{
+                classes: {
+                    root: classes.backdropRoot
+                }
+            }}
         >
             <AuthPanel panel={panel} pushPanel={pushPanel}/>
             <AuthBar panel={panel.current} popPanel={popPanel}/>

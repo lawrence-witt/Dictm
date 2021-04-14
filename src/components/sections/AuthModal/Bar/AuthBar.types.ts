@@ -1,4 +1,4 @@
-import { PanelTypes } from '../Auth.types';
+import { PanelTypes } from '../AuthModal.types';
 
 export interface AuthBarProps {
     panel: PanelTypes;
