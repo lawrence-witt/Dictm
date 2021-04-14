@@ -15,10 +15,10 @@ const useStyles = makeStyles<Theme, {type: 'in' | 'out'}>(() =>
     })
 )
 
-const AuthIcon: React.FC<Props> = ({type, ...props}) => {
+const LogInOutIcon: React.FC<Props> = ({type, ...props}) => {
     const { root } = useStyles({type});
 
     return <ExitToApp className={root} {...props} />
 }
 
-export default AuthIcon;
+export default LogInOutIcon;

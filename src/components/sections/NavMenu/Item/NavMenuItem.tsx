@@ -11,7 +11,7 @@ import Category from '@material-ui/icons/Category';
 import Settings from '@material-ui/icons/Settings';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
-import AuthIcon from '../../../atoms/Icons/AuthIcon';
+import LogInOutIcon from '../../../atoms/Icons/LogInOutIcon';
 
 import DirectionButton from '../../../atoms/Buttons/DirectionButton';
 
@@ -36,7 +36,7 @@ const iconMap: Record<string, JSX.Element> = {
     notes: <EventNote />,
     categories: <Category />,
     settings: <Settings />,
-    signout: <AuthIcon type="out" />
+    signout: <LogInOutIcon type="out" />
 }
 
 const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {

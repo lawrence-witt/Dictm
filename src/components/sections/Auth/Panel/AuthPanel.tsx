@@ -25,20 +25,21 @@ const useStyles = makeStyles(theme => ({
     slide: {
         position: 'absolute',
         width: '100%',
-        height: '100%'
-    },
-    home: {
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: "center",
-        padding: `0 ${theme.spacing(2)}px`
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+            paddingLeft: theme.spacing(3),
+            paddingRight: theme.spacing(3),
+        }
     },
-    localUsers: {
-
+    home: {
+        justifyContent: "center"
     },
-    newUser: {
-
-    }
+    localUsers: {},
+    newUser: {}
 }))
 
 /* Components */

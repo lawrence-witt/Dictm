@@ -3,7 +3,7 @@ import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import Home from '@material-ui/icons/Home';
 import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
+import Toolbar from '@material-ui/core/Toolbar';
 
 import * as types from './AuthBar.types';
 
@@ -22,6 +22,7 @@ const AuthBar: React.FC<types.AuthBarProps> = (props) => {
 
     const homeButton = React.useMemo(() => (
         <IconButton
+            edge="start"
             onClick={homeHandler}
         >
             <Home/>
@@ -38,7 +39,8 @@ const AuthBar: React.FC<types.AuthBarProps> = (props) => {
                 return homeButton;
             default: 
                 return (
-                    <DirectionButton 
+                    <DirectionButton
+                        edge="start"
                         design="arrow" 
                         direction="left"
                         onClick={popHandler}
@@ -78,11 +80,11 @@ const AuthBar: React.FC<types.AuthBarProps> = (props) => {
     }, [panel, secondaryText, secondaryHandler]);
 
     return (
-        <DialogActions>
+        <Toolbar>
             {primaryButton}
             <FlexSpace />
             {secondaryButton}
-        </DialogActions>
+        </Toolbar>
     )
 }
 
