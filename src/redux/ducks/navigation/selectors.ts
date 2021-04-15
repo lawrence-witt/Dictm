@@ -45,7 +45,7 @@ export const getNavLists = createSelector((
 ): NavMenuLists => {
     const mainList = {
         id: "main",
-        name: user.name,
+        name: user.profile.attributes.name,
         items: [
             createNavItem("recordings", "recordings", "Recordings", false, undefined, () => push('/recordings')),
             createNavItem("notes", "notes", "Notes", false, undefined, () => push('/notes')),

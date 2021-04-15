@@ -1,15 +1,16 @@
-export const USER_LOADED = 'dictm/user/USER_LOADED';
+import User from '../../../db/models/User';
+
+export const USER_LOADED = 'dictm/user/LOADED';
 
 export interface UserState {
-    id: string;
-    name: string;
+    isLoaded: boolean;
+    profile: User;
 }
 
 interface UserLoadedAction {
     type: typeof USER_LOADED;
     payload: {
-        id: string;
-        name: string;
+        profile: User;
     }
 }
 

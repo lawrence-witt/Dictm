@@ -2,6 +2,8 @@ import { ThunkAction } from 'redux-thunk';
 
 import { RootState } from '../../store';
 
+import { UserController } from '../../../db/controllers/User';
+
 import * as types from './types';
 import * as actions from './actions';
 
@@ -46,10 +48,21 @@ type PushAuthPanelThunkAction = ThunkAction<void, undefined, unknown, types.Auth
 *  Load local user profiles from IndexedDB
 */
 
-export const loadLocalUsers = (): LoadLocalUsersThunkAction => (
+export const loadLocalUsers = (): LoadLocalUsersThunkAction => async (
     dispatch
-): void => {
-    //
+): Promise<void> => {
+    const users = await (async () => {
+        try {
+            return await UserController.getLocalUsers();
+        } catch (err) {
+            // handle bad db connection
+            console.log(err);
+        }
+    })();
+
+    if (!users) return;
+
+    dispatch(actions.loadLocalUsers(users));
 }
 
 type LoadLocalUsersThunkAction = ThunkAction<void, undefined, unknown, types.LocalUsersLoadedAction>;
@@ -91,7 +104,13 @@ export const loadSelectedUser = (): LoadSelectedUserThunkAction => (
     dispatch,
     getState
 ): void => {
-    //
+    const { selectedId, byId } = getState().auth.local;
+
+    if (!selectedId) return;
+
+    const user = byId[selectedId];
+
+    // dispatch userOperations.loadUser(user);
 }
 
 type LoadSelectedUserThunkAction = ThunkAction<void, RootState, unknown, any>;
@@ -144,14 +163,30 @@ type UpdateNewUserThunkAction = ThunkAction<void, undefined, unknown, types.NewU
 
 /** 
 *  Summary:
-*  Create a new user with the provided fields
+*  Create and load a new user into the application
 */
 
-export const createNewUser = (): CreateNewUserThunkAction => (
+export const createNewUser = (): CreateNewUserThunkAction => async (
     dispatch,
     getState
-): void => {
-    //
+): Promise<void> => {
+    const { name, greeting } = getState().auth.new;
+
+    if (!name || name.length === 0) return;
+
+    const user = await (async () => {
+        try {
+            return await UserController.createNewUser(name, greeting);
+        } catch (err) {
+            // handle no creation
+            console.log(err);
+            return;
+        }
+    })();
+
+    if (!user) return;
+
+    // dispatch userOperations.loadUser(user)
 }
 
 type CreateNewUserThunkAction = ThunkAction<void, RootState, unknown, any>;

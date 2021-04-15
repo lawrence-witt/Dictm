@@ -1,23 +1,32 @@
-import {
-    UserState,
-    UserActionTypes,
-    USER_LOADED
-} from './types';
+import * as types from './types';
 
-const initialState: UserState = {
-    id: 'user1',
-    name: 'Lazarus'
+const initialState: types.UserState = {
+    isLoaded: false,
+    profile: {
+        id: "",
+        type: "user",
+        attributes: {
+            name: "",
+            timestamps: {
+                created: 0,
+                modified: 0
+            }
+        },
+        preferences: {
+            greeting: ""
+        }
+    }
 }
 
 const userReducer = (
     state = initialState, 
-    action: UserActionTypes
-): UserState => {
+    action: types.UserActionTypes
+): types.UserState => {
     switch(action.type) {
-        case USER_LOADED:
+        case types.USER_LOADED:
             return {
-                id: action.payload.id,
-                name: action.payload.name
+                isLoaded: true,
+                profile: action.payload.profile
             }
         default:
             return state;

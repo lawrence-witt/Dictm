@@ -29,10 +29,10 @@ export type AuthPanelActions =
 
 // Local Users Types
 
-export const LOCAL_USERS_LOADED         = "dictm/auth/users/local/USERS_LOADED";
-export const LOCAL_USER_SELECTED        = "dictm/auth/users/local/USER_SELECTED";
-export const LOCAL_USER_UNSELECTED      = "dictm/auth/users/local/USER_UNSELECTED";
-export const LOCAL_USERS_CLEARED        = "dictm/auth/users/local/USERS_CLEARED";
+export const LOCAL_USERS_LOADED         = "dictm/auth/users/local/LOADED";
+export const LOCAL_USER_SELECTED        = "dictm/auth/users/local/SELECTED";
+export const LOCAL_USER_UNSELECTED      = "dictm/auth/users/local/UNSELECTED";
+export const LOCAL_USERS_CLEARED        = "dictm/auth/users/local/CLEARED";
 
 export interface LocalUsersState {
     isLoaded: boolean;
@@ -71,8 +71,8 @@ export type LocalUsersActions =
 
 // New User Types
 
-export const NEW_USER_STARTED       = "dictm/auth/users/new/USER_STARTED";
-export const NEW_USER_UPDATED       = "dictm/auth/users/new/USER_UPDATED";
+export const NEW_USER_STARTED       = "dictm/auth/users/new/STARTED";
+export const NEW_USER_UPDATED       = "dictm/auth/users/new/UPDATED";
 
 export interface NewUserState {
     name: string;

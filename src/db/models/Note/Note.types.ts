@@ -1,25 +1,12 @@
-export interface NoteIndex {
+export interface NoteModel {
     id: string;
+    type: "note";
     attributes: {
+        title: string;
         timestamps: {
             created: number;
             modified: number;
         }
-    };
-    relationships: {
-        user: {
-            id: string;
-        };
-        category: {
-            id: string | undefined;
-        };
-    }
-}
-
-export interface NoteModel extends NoteIndex {
-    type: "note";
-    attributes: NoteIndex["attributes"] & {
-        title: string;
     };
     data: {
         content: string;
@@ -33,5 +20,5 @@ export interface NoteModel extends NoteIndex {
         category: {
             id: string | undefined;
         }
-    }
+    };
 }

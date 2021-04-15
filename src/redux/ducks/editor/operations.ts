@@ -32,7 +32,7 @@ export const openEditor = (
     let model: types.EditorModels | undefined;
 
     if (editorType === "choose" || isNew) {
-        model = helpers.generateContentModel(editorType, user.id);
+        model = helpers.generateContentModel(editorType, user.profile.id);
     } else {
         model = helpers.findContentModel(media, categories, editorType, contentId);
     }

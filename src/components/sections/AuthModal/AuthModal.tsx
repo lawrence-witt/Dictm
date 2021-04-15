@@ -26,9 +26,7 @@ const Auth: React.FC = () => {
             classes={classes}
             maxWidth="xs"
             BackdropProps={{
-                classes: {
-                    root: classes.backdropRoot
-                }
+                className: classes.backdropRoot
             }}
         >
             <AuthPanel/>

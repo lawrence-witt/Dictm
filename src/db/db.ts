@@ -1,15 +1,15 @@
 import Dexie from 'dexie';
 
-import User, { UserIndex, userIndexes } from './models/User';
-import Recording, { RecordingIndex, recordingIndexes } from './models/Recording';
-import Note, { NoteIndex, noteIndexes } from './models/Note';
-import Category, { CategoryIndex, categoryIndexes } from './models/Category';
+import User, { userIndexes } from './models/User';
+import Recording, { recordingIndexes } from './models/Recording';
+import Note, { noteIndexes } from './models/Note';
+import Category, { categoryIndexes } from './models/Category';
 
 class DictmDatabase extends Dexie {
-    users: Dexie.Table<UserIndex, string>;
-    recordings: Dexie.Table<RecordingIndex, string>;
-    notes: Dexie.Table<NoteIndex, string>;
-    categories: Dexie.Table<CategoryIndex, string>;
+    users: Dexie.Table<User, string>;
+    recordings: Dexie.Table<Recording, string>;
+    notes: Dexie.Table<Note, string>;
+    categories: Dexie.Table<Category, string>;
 
     constructor() {
         super("DictmDatabase");

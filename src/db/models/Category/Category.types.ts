@@ -1,6 +1,8 @@
-export interface CategoryIndex {
+export interface CategoryModel {
     id: string;
+    type: "category";
     attributes: {
+        title: string;
         timestamps: {
             created: number;
             modified: number;
@@ -17,11 +19,4 @@ export interface CategoryIndex {
             ids: string[];
         };
     };
-}
-
-export interface CategoryModel extends CategoryIndex {
-    type: "category";
-    attributes: CategoryIndex["attributes"] & {
-        title: string;
-    }
 }

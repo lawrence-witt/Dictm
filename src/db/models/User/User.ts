@@ -6,8 +6,9 @@ class User implements UserModel {
     id: string;
     type = "user" as const;
     attributes: UserModel["attributes"];
+    preferences: UserModel["preferences"];
 
-    constructor(name: string) {
+    constructor(name: string, greeting: string) {
         this.id = nanoid(10);
         this.attributes = {
             name,
@@ -15,6 +16,9 @@ class User implements UserModel {
                 created: Date.now(),
                 modified: Date.now()
             }
+        }
+        this.preferences = {
+            greeting
         }
     }
 }

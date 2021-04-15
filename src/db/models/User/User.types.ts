@@ -1,16 +1,14 @@
-export interface UserIndex {
+export interface UserModel {
     id: string;
+    type: "user";
     attributes: {
+        name: string;
         timestamps: {
             created: number;
             modified: number;
         }
-    }
-}
-
-export interface UserModel extends UserIndex {
-    type: "user";
-    attributes: UserIndex["attributes"] & {
-        name: string;
+    };
+    preferences: {
+        greeting: string;
     }
 }

@@ -1,12 +1,18 @@
 import { StreamRecorderTrack } from 'cassette-js';
 
-export interface RecordingIndex {
+export interface RecordingModel {
     id: string;
+    type: "recording";
     attributes: {
+        title: string;
         timestamps: {
             created: number;
             modified: number;
         }
+    };
+    data: {
+        audio: StreamRecorderTrack<"wav">;
+        frequencies: number[][];
     };
     relationships: {
         user: {
@@ -15,16 +21,5 @@ export interface RecordingIndex {
         category: {
             id: string | undefined;
         };
-    }
-}
-
-export interface RecordingModel extends RecordingIndex {
-    type: "recording";
-    attributes: RecordingIndex["attributes"] & {
-        title: string;
-    };
-    data: {
-        audio: StreamRecorderTrack<"wav">;
-        frequencies: number[][];
     };
 }
