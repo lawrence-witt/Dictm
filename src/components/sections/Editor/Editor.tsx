@@ -30,6 +30,10 @@ const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
+/* 
+*   Local
+*/
+
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
         isOpen,

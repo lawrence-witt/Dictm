@@ -1,9 +1,11 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { RootState } from '../../../../../redux/store';
+import { authOperations, authSelectors } from '../../../../../redux/ducks/auth';
 
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-
-import * as types from './HomePanel.types';
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -13,19 +15,40 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const HomePanel: React.FC<types.HomePanelProps> = (props) => {
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    usersExist: authSelectors.getUsersExist(state.auth.local)
+});
+
+const mapDispatch = {
+    pushPanel: authOperations.pushAuthPanel
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const HomePanel: React.FC<ReduxProps> = (props) => {
     const {
+        usersExist,
         pushPanel
     } = props;
 
     const classes = useStyles();
 
     const handleLocalUsers = React.useCallback(() => {
-        pushPanel("localUsers");
+        pushPanel("local");
     }, [pushPanel]);
 
     const handleNewUser = React.useCallback(() => {
-        pushPanel("newUser")
+        pushPanel("new")
     }, [pushPanel]);
 
     return (
@@ -42,6 +65,7 @@ const HomePanel: React.FC<types.HomePanelProps> = (props) => {
                 variant="outlined"
                 onClick={handleLocalUsers}
                 className={classes.button}
+                disabled={!usersExist}
             >
                 Local Users
             </Button>
@@ -56,4 +80,4 @@ const HomePanel: React.FC<types.HomePanelProps> = (props) => {
     )
 }
 
-export default HomePanel;
+export default connector(HomePanel);

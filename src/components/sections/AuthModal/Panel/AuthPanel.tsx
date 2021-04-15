@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 
 import clsx from 'clsx';
 
@@ -6,6 +7,8 @@ import { animated, useTransition } from 'react-spring';
 
 import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
+
+import { RootState } from '../../../../redux/store';
 
 import HomePanel from './Home/HomePanel';
 import LocalUsersPanel from './LocalUsers/LocalUsersPanel';
@@ -38,21 +41,35 @@ const useStyles = makeStyles(theme => ({
     home: {
         justifyContent: "center"
     },
-    localUsers: {},
-    newUser: {}
-}))
+    local: {},
+    new: {}
+}));
+
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    panel: state.auth.panel
+});
+
+const connector = connect(mapState);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 /* Components */
 
-const AuthPanelSwitch: React.FC<types.AuthPanelSwitchProps> = (props) => {
-    const { panel, pushPanel } = props;
-
+const AuthPanelSwitch: React.FC<types.AuthPanelSwitchProps> = ({panel}) => {
     switch(panel) {
         case "home":
-            return <HomePanel pushPanel={pushPanel} />
-        case "localUsers":
+            return <HomePanel />
+        case "local":
             return <LocalUsersPanel />
-        case "newUser":
+        case "new":
             return <NewUserPanel />
         default:
             return null;
@@ -61,10 +78,9 @@ const AuthPanelSwitch: React.FC<types.AuthPanelSwitchProps> = (props) => {
 
 const AnimatedBox = animated(Box);
 
-const AuthPanel: React.FC<types.AuthPanelProps> = (props) => {
+const AuthPanel: React.FC<ReduxProps> = (props) => {
     const {
-        panel,
-        pushPanel
+        panel
     } = props;
 
     const classes = useStyles();
@@ -86,8 +102,7 @@ const AuthPanel: React.FC<types.AuthPanelProps> = (props) => {
                     className={clsx(classes.slide, classes[item])}
                 >
                     <AuthPanelSwitch 
-                        panel={item} 
-                        pushPanel={pushPanel} 
+                        panel={item}
                     />
                 </AnimatedBox>
             ))}
@@ -95,4 +110,4 @@ const AuthPanel: React.FC<types.AuthPanelProps> = (props) => {
     )
 }
 
-export default AuthPanel;
+export default connector(AuthPanel);

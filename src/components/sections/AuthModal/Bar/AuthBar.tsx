@@ -1,42 +1,63 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 
 import IconButton from '@material-ui/core/IconButton';
 import Home from '@material-ui/icons/Home';
 import Button from '@material-ui/core/Button';
 import Toolbar from '@material-ui/core/Toolbar';
 
-import * as types from './AuthBar.types';
+import { RootState } from '../../../../redux/store';
+import { authOperations, authSelectors } from '../../../../redux/ducks/auth';
 
 import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 import DirectionButton from '../../../atoms/Buttons/DirectionButton';
 
-const AuthBar: React.FC<types.AuthBarProps> = (props) => {
+/* Redux */
+
+const mapState = (state: RootState) => ({
+    currentPanel: state.auth.panel.current,
+    canLoadUser: authSelectors.getCanLoadUser(state.auth.local.selectedId),
+    canCreateUser: authSelectors.getCanCreateUser(state.auth.new)
+});
+
+const mapDispatch = {
+    popPanel: authOperations.popAuthPanel,
+    loadUser: authOperations.loadSelectedUser,
+    createUser: authOperations.createNewUser
+}
+
+const connector = connect(mapState, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* Local */
+
+const AuthBar: React.FC<ReduxProps> = (props) => {
     const {
-        panel,
-        popPanel
+        currentPanel,
+        canLoadUser,
+        canCreateUser,
+        popPanel,
+        loadUser,
+        createUser
     } = props;
-
-    /* Primary Button Home Option */
-
-    const homeHandler = React.useCallback(() => console.log('nav to splash'), []);
-
-    const homeButton = React.useMemo(() => (
-        <IconButton
-            edge="start"
-            onClick={homeHandler}
-        >
-            <Home/>
-        </IconButton>
-    ), [homeHandler]);
 
     /* Primary Button */
 
+    const homeHandler = React.useCallback(() => console.log('nav to splash'), []);
     const popHandler = React.useCallback(() => popPanel(), [popPanel]);
 
     const primaryButton = React.useMemo(() => {
-        switch(panel) {
+        switch(currentPanel) {
             case "home": 
-                return homeButton;
+                return (
+                    <IconButton
+                        edge="start"
+                        onClick={homeHandler}
+                    >
+                        <Home/>
+                    </IconButton>  
+                );
             default: 
                 return (
                     <DirectionButton
@@ -47,37 +68,44 @@ const AuthBar: React.FC<types.AuthBarProps> = (props) => {
                     />
                 )
         }
-    }, [panel, popHandler, homeButton]);
+    }, [currentPanel, popHandler, homeHandler]);
 
     /* Secondary Button */
 
     const secondaryText = React.useMemo(() => ({
         home: "",
-        localUsers: "Load",
-        newUser: "Get Started"
-    }[panel]), [panel]);
+        local: "Load",
+        new: "Get Started"
+    }[currentPanel]), [currentPanel]);
 
     const secondaryHandler = React.useMemo(() => ({
         home: () => {/**/},
-        localUsers: () => console.log('load user'),
-        newUser: () => console.log('create user')
-    }[panel]), [panel]);
+        local: loadUser,
+        new: createUser
+    }[currentPanel]), [currentPanel, loadUser, createUser]);
+
+    const secondaryDisabled = React.useMemo(() => ({
+        home: false,
+        local: !canLoadUser,
+        new: !canCreateUser
+    }[currentPanel]), [currentPanel, canLoadUser, canCreateUser]);
 
     const secondaryButton = React.useMemo(() => {
-        switch(panel) {
+        switch(currentPanel) {
             case "home": return null;
             default: {
                 return (
                     <Button
                         variant="outlined"
                         onClick={secondaryHandler}
+                        disabled={secondaryDisabled}
                     >
                         {secondaryText}
                     </Button>
                 )
             }
         }
-    }, [panel, secondaryText, secondaryHandler]);
+    }, [currentPanel, secondaryText, secondaryHandler, secondaryDisabled]);
 
     return (
         <Toolbar>
@@ -88,4 +116,4 @@ const AuthBar: React.FC<types.AuthBarProps> = (props) => {
     )
 }
 
-export default AuthBar;
+export default connector(AuthBar);
