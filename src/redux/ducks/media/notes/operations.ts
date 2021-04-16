@@ -3,21 +3,36 @@ import { ThunkAction } from 'redux-thunk';
 import * as types from './types';
 import * as actions from './actions';
 
-import { NoteModel } from '../../../_data/notesData';
+import Note from '../../../../db/models/Note';
 
 /** 
 *  Summary:
-*  Persists a new Note Model.
+*  Loads the user's Notes into the store
+*/
+
+export const loadNotes = (
+    notes: Note[]
+): NotesLoadedThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.loadNotes(notes));
+}
+
+type NotesLoadedThunkAction = ThunkAction<void, undefined, unknown, types.NotesLoadedAction>;
+
+/** 
+*  Summary:
+*  Persists a new Note.
 *
 *  Description:
-*  Adds the Note Model to the database.
-*  Adds the Note Model to the store.
+*  Adds the Note to the database.
+*  Adds the Note to the store.
 *
 *  @param {object} note The new Note Model.
 */
 
 export const createNote = (
-    note: NoteModel
+    note: Note
 ): CreateNoteThunkAction => (
     dispatch
 ): void => {
@@ -29,17 +44,17 @@ type CreateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NoteCre
 
 /** 
 *  Summary:
-*  Overwrites a Note Model.
+*  Overwrites a Note.
 *
 *  Description:
-*  Updates the Note Model in the database.
-*  Updates the Note Model in the store.
+*  Updates the Note in the database.
+*  Updates the Note in the store.
 *
 *  @param {object} note The updated Note Model.
 */
 
 export const overwriteNote = (
-    note: NoteModel
+    note: Note
 ): OverwriteNoteThunkAction => (
     dispatch
 ): void => {
@@ -51,7 +66,7 @@ type OverwriteNoteThunkAction = ThunkAction<void, undefined, unknown, types.Note
 
 /** 
 *  Summary:
-*  Updates the category of a Note Model.
+*  Updates the category of a Note.
 *
 *  Description:
 *  Updates the category in the database.
@@ -74,11 +89,11 @@ type UpdateNoteCategoryThunkAction = ThunkAction<void, undefined, unknown, types
 
 /** 
 *  Summary:
-*  Deletes a Note Model.
+*  Deletes a Note.
 *
 *  Description:
-*  Deletes the Note Model from the database.
-*  Deletes the Note Model from the store.
+*  Deletes the Note from the database.
+*  Deletes the Note from the store.
 *
 *  @param {string} id The id identifying the Note Model.
 */

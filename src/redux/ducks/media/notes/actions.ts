@@ -1,9 +1,18 @@
 import * as types from './types';
 
-import { NoteModel } from '../../../_data/notesData';
+import Note from '../../../../db/models/Note';
+
+export const loadNotes = (
+    notes: Note[]
+): types.NotesLoadedAction => ({
+    type: types.NOTES_LOADED,
+    payload: {
+        notes
+    }
+});
 
 export const createNote = (
-    note: NoteModel
+    note: Note
 ): types.NoteCreatedAction => ({
     type: types.NOTE_CREATED,
     payload: {
@@ -12,7 +21,7 @@ export const createNote = (
 });
 
 export const overwriteNote = (
-    note: NoteModel
+    note: Note
 ): types.NoteOverwrittenAction => ({
     type: types.NOTE_OVERWRITTEN,
     payload: {

@@ -7,6 +7,8 @@ import { UserController } from '../../../db/controllers/User';
 import * as types from './types';
 import * as actions from './actions';
 
+import { userOperations } from '../user';
+
 /* 
 *   Auth Panel Operations
 */
@@ -97,7 +99,7 @@ type UnselectLocalUserThunkAction = ThunkAction<void, undefined, unknown, types.
 
 /** 
 *  Summary:
-*  Load the selected user into the application
+*  Initialise application load with the selected user
 */
 
 export const loadSelectedUser = (): LoadSelectedUserThunkAction => (
@@ -110,7 +112,7 @@ export const loadSelectedUser = (): LoadSelectedUserThunkAction => (
 
     const user = byId[selectedId];
 
-    // dispatch userOperations.loadUser(user);
+    dispatch(userOperations.loadUser(user));
 }
 
 type LoadSelectedUserThunkAction = ThunkAction<void, RootState, unknown, any>;
@@ -163,7 +165,7 @@ type UpdateNewUserThunkAction = ThunkAction<void, undefined, unknown, types.NewU
 
 /** 
 *  Summary:
-*  Create and load a new user into the application
+*  Create a new user and initialise application load
 */
 
 export const createNewUser = (): CreateNewUserThunkAction => async (
@@ -186,7 +188,7 @@ export const createNewUser = (): CreateNewUserThunkAction => async (
 
     if (!user) return;
 
-    // dispatch userOperations.loadUser(user)
+    dispatch(userOperations.loadUser(user));
 }
 
 type CreateNewUserThunkAction = ThunkAction<void, RootState, unknown, any>;

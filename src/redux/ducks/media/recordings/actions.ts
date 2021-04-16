@@ -1,9 +1,18 @@
 import * as types from './types';
 
-import { RecordingModel } from '../../../_data/recordingsData';
+import Recording from '../../../../db/models/Recording';
+
+export const loadRecordings = (
+    recordings: Recording[]
+): types.RecordingsLoadedAction => ({
+    type: types.RECORDINGS_LOADED,
+    payload: {
+        recordings
+    }
+})
 
 export const createRecording = (
-    recording: RecordingModel
+    recording: Recording
 ): types.RecordingCreatedAction => ({
     type: types.RECORDING_CREATED,
     payload: {
@@ -12,7 +21,7 @@ export const createRecording = (
 });
 
 export const overwriteRecording = (
-    recording: RecordingModel
+    recording: Recording
 ): types.RecordingOverwrittenAction => ({
     type: types.RECORDING_OVERWRITTEN,
     payload: {

@@ -1,18 +1,21 @@
 import * as types from './types';
 
-import mockRecordingsData from '../../../_data/recordingsData';
-
-const initialState: types.RecordingsState = mockRecordingsData.reduce((state: types.RecordingsState, rec) => {
-    state.byId[rec.id] = rec;
-    state.allIds.push(rec.id);
-    return state;
-}, {byId: {}, allIds: []});
+const initialState: types.RecordingsState = {
+    byId: {},
+    allIds: []
+}
 
 const recordingsReducer = (
     state = initialState, 
     action: types.RecordingsActionTypes
 ): types.RecordingsState => {
     switch(action.type) {
+        case types.RECORDINGS_LOADED:
+            return action.payload.recordings.reduce((out: types.RecordingsState, recording) => {
+                out.byId[recording.id] = recording;
+                out.allIds = [...out.allIds, recording.id];
+                return out;
+            }, {byId: {}, allIds: []});
         case types.RECORDING_CREATED:
             const { recording } = action.payload;
 

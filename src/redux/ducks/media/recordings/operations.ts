@@ -3,7 +3,22 @@ import { ThunkAction } from 'redux-thunk';
 import * as types from './types';
 import * as actions from './actions';
 
-import { RecordingModel } from '../../../_data/recordingsData';
+import Recording from '../../../../db/models/Recording';
+
+/** 
+*  Summary:
+*  Loads the users recordings into the store
+*/
+
+export const loadRecordings = (
+    recordings: Recording[]
+): LoadRecordingsThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.loadRecordings(recordings));
+}
+
+type LoadRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsLoadedAction>;
 
 /** 
 *  Summary:
@@ -17,7 +32,7 @@ import { RecordingModel } from '../../../_data/recordingsData';
 */
 
 export const createRecording = (
-    recording: RecordingModel
+    recording: Recording
 ): CreateRecordingThunkAction => (
     dispatch
 ): void => {
@@ -39,7 +54,7 @@ type CreateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.Re
 */
 
 export const overwriteRecording = (
-    recording: RecordingModel
+    recording: Recording
 ): OverwriteRecordingThunkAction => (
     dispatch
 ): void => {

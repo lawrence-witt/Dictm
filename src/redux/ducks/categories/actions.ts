@@ -1,9 +1,18 @@
 import * as types from './types';
 
-import { CategoryModel } from '../../_data/categoriesData';
+import Category from '../../../db/models/Category';
+
+export const loadCategories = (
+    categories: Category[]
+): types.CategoriesLoadedAction => ({
+    type: types.CATEGORIES_LOADED,
+    payload: {
+        categories
+    }
+})
 
 export const createCategory = (
-    category: CategoryModel
+    category: Category
 ): types.CategoryCreatedAction => ({
     type: types.CATEGORY_CREATED,
     payload: {
@@ -12,7 +21,7 @@ export const createCategory = (
 });
 
 export const overwriteCategory = (
-    category: CategoryModel
+    category: Category
 ): types.CategoryOverwrittenAction => ({
     type: types.CATEGORY_OVERWRITTEN,
     payload: {

@@ -1,18 +1,21 @@
 import * as types from './types';
 
-import mockNotesData from '../../../_data/notesData';
-
-const initialState: types.NotesState = mockNotesData.reduce((state: types.NotesState, note) => {
-    state.byId[note.id] = note;
-    state.allIds.push(note.id);
-    return state;
-}, {byId: {}, allIds: []});
+const initialState: types.NotesState = {
+    byId: {},
+    allIds: []
+}
 
 const notesReducer = (
     state = initialState, 
     action: types.NotesActionTypes
 ): types.NotesState => {
     switch(action.type) {
+        case types.NOTES_LOADED:
+            return action.payload.notes.reduce((out: types.NotesState, note) => {
+                out.byId[note.id] = note;
+                out.allIds = [...out.allIds, note.id];
+                return out;
+            }, {byId: {}, allIds: []})
         case types.NOTE_CREATED: {
             const { note } = action.payload;
 

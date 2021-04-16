@@ -1,18 +1,21 @@
 import * as types from './types';
 
-import mockCategoriesData from '../../_data/categoriesData';
-
-const initialState: types.CategoriesState = mockCategoriesData.reduce((state: types.CategoriesState, cat) => {
-    state.byId[cat.id] = cat;
-    state.allIds.push(cat.id);
-    return state;
-}, {byId: {}, allIds: []});
+const initialState: types.CategoriesState = {
+    byId: {},
+    allIds: []
+}
 
 const categoriesReducer = (
     state = initialState, 
     action: types.CategoriesActionTypes
 ): types.CategoriesState => {
     switch(action.type) {
+        case types.CATEGORIES_LOADED:
+            return action.payload.categories.reduce((out: types.CategoriesState, category) => {
+                out.byId[category.id] = category;
+                out.allIds = [...out.allIds, category.id];
+                return out;
+            }, {byId: {}, allIds: []});
         case types.CATEGORY_CREATED: {
             const { category } = action.payload;
             

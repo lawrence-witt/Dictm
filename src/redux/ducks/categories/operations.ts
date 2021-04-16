@@ -3,21 +3,36 @@ import { ThunkAction } from 'redux-thunk';
 import * as types from './types';
 import * as actions from './actions';
 
-import { CategoryModel } from '../../_data/categoriesData';
+import Category from '../../../db/models/Category';
 
 /** 
 *  Summary:
-*  Persists a new Category Model.
+*  Loads the users categories into the store
+*/
+
+export const loadCategories = (
+    categories: Category[]
+): LoadCategoriesThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.loadCategories(categories));
+}
+
+type LoadCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesLoadedAction>;
+
+/** 
+*  Summary:
+*  Persists a new Category.
 *  
 *  Description:
-*  Adds the Category Model to the database.
-*  Adds the Category Model to the store.
+*  Adds the Category to the database.
+*  Adds the Category to the store.
 *
 *  @param {object} category The new Category Model.
 */
 
 export const createCategory = (
-    category: CategoryModel
+    category: Category
 ): CreateCategoryThunkAction => (
     dispatch
 ): void => {
@@ -29,17 +44,17 @@ type CreateCategoryThunkAction = ThunkAction<void, undefined, unknown, types.Cat
 
 /** 
 *  Summary:
-*  Overwrites a Category Model.
+*  Overwrites a Category.
 *
 *  Description:
-*  Overwrites the Category Model in the database.
-*  Overwrites the Category Model in the store.
+*  Overwrites the Category in the database.
+*  Overwrites the Category in the store.
 *
-*  @param {object} category The updated Category Model.
+*  @param {object} category The updated Category.
 */
 
 export const overwriteCategory = (
-    category: CategoryModel
+    category: Category
 ): OverwriteCategoryThunkAction => (
     dispatch
 ): void => {
@@ -51,13 +66,13 @@ type OverwriteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.
 
 /** 
 *  Summary:
-*  Adds an array of resource ids to a Category Model.
+*  Adds an array of resource ids to a Category.
 *
 *  Description:
-*  Adds the Category Model ids in the database.
-*  Adds the Category Model ids in the store.
+*  Adds the Category ids in the database.
+*  Adds the Category ids in the store.
 *
-*  @param {string} id The id identifying the Category Model.
+*  @param {string} id The id identifying the Category.
 *  @param {"recording" | "note"} type The resource type of the ids.
 *  @param {string[]} ids The array of resource ids.
 */
@@ -77,13 +92,13 @@ type AddCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.Cat
 
 /** 
 *  Summary:
-*  Removes an array of resource ids from a Category Model.
+*  Removes an array of resource ids from a Category.
 *
 *  Description:
-*  Removes the Category Model ids in the database.
-*  Removes the Category Model ids in the store.
+*  Removes the Category ids in the database.
+*  Removes the Category ids in the store.
 *
-*  @param {string} id The id identifying the Category Model.
+*  @param {string} id The id identifying the Category.
 *  @param {"recording" | "note"} type The resource type of the ids.
 *  @param {string[]} ids The array of resource ids.
 */
@@ -102,14 +117,14 @@ export const removeCategoryIds = (
 type RemoveCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.CategoryIdsRemovedAction>;
 
 /** 
-*  Summary:
-*  Deletes a Category Model.
+*  Summary
+*  Deletes a Category.
 *
 *  Description:
-*  Deletes the Category Model from the database.
-*  Deletes the Category Model from the store.
+*  Deletes the Category from the database.
+*  Deletes the Category from the store.
 *
-*  @param {string} id The id identifying the Category Model.
+*  @param {string} id The id identifying the Category.
 */
 
 export const deleteCategory = (

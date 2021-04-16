@@ -7,11 +7,12 @@ export interface UserState {
     profile: User;
 }
 
-interface UserLoadedAction {
+export interface UserLoadedAction {
     type: typeof USER_LOADED;
     payload: {
         profile: User;
     }
 }
 
-export type UserActionTypes = UserLoadedAction;
+export type UserActionTypes = 
+|   UserLoadedAction;
