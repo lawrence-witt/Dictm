@@ -1,6 +1,6 @@
-import { RecordingModel } from '../../_data/recordingsData';
-import { NoteModel } from '../../_data/notesData';
-import { CategoryModel } from '../../_data/categoriesData';
+import Recording from '../../../db/models/Recording';
+import Note from '../../../db/models/Note';
+import Category from '../../../db/models/Category';
 
 import { recordingTypes } from './recording';
 import { noteTypes } from './note';
@@ -98,7 +98,7 @@ export type EditorActionTypes =
 // Unionised Model Types
 
 export type ContentModelTypes = "recording" | "note" | "category";
-export type ContentModels = RecordingModel | NoteModel | CategoryModel;
+export type ContentModels = Recording | Note | Category;
 
 export type EditorModelTypes = "choose" | ContentModelTypes;
 export type EditorModels = { type: "choose" } | ContentModels;

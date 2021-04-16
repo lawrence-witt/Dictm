@@ -1,9 +1,9 @@
 import { RootState } from '../../store';
 import { ContentModelTypes, ContentModels, EditorModelTypes, EditorModels, EditorContexts } from './types';
 
-import { generateNewRecordingModel, RecordingModel } from '../../_data/recordingsData';
-import { generateNewNoteModel, NoteModel } from '../../_data/notesData';
-import { generateNewCategoryModel, CategoryModel } from '../../_data/categoriesData';
+import Recording from '../../../db/models/Recording';
+import Note from '../../../db/models/Note';
+import Category from '../../../db/models/Category';
 
 /* 
 *   Create and find content models
@@ -17,11 +17,11 @@ export const generateContentModel = (
         case "choose":
             return { type };
         case "recording":
-            return generateNewRecordingModel(userId);
+            return new Recording(userId);
         case "note":
-            return generateNewNoteModel(userId);
+            return new Note(userId);
         case "category":
-            return generateNewCategoryModel(userId);
+            return new Category(userId);
         default:
             throw Error('generateContentModel: invalid params');
     }
@@ -72,7 +72,7 @@ const generateChooseContext = (): EditorContexts["choose"] => ({
 
 const generateRecordingContext = (
     isNew: boolean,
-    model: RecordingModel
+    model: Recording
 ): EditorContexts["recording"] => ({
     type: "recording",
     mode: isNew ? "edit" : "play",
@@ -83,7 +83,7 @@ const generateRecordingContext = (
 });
 
 const generateNoteContext = (
-    model: NoteModel
+    model: Note
 ): EditorContexts["note"] => ({
     type: "note",
     data: {
@@ -93,7 +93,7 @@ const generateNoteContext = (
 });
 
 const generateCategoryContext = (
-    model: CategoryModel
+    model: Category
 ): EditorContexts["category"] => ({
     type: "category",
     data: {

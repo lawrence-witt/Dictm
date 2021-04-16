@@ -1,6 +1,6 @@
 import * as types from './types';
 
-import { NoteModel } from '../../../_data/notesData';
+import Note from '../../../../db/models/Note';
 
 export const updateNoteEditorTitle = (
     title: string
@@ -21,7 +21,7 @@ export const updateNoteEditorCategory = (
 });
 
 export const updateNoteEditorData = (
-    data: NoteModel["data"]
+    data: Note["data"]
 ): types.NoteEditorDataUpdatedAction => ({
     type: types.NOTE_EDITOR_DATA_UPDATED,
     payload: {

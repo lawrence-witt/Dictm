@@ -1,9 +1,10 @@
 import { createSelector } from "reselect";
 
 import { RootState } from "../../store";
-import { RecordingModel } from '../../_data/recordingsData';
-import { NoteModel } from "../../_data/notesData";
 import { ContentModels } from './types';
+
+import Recording from '../../../db/models/Recording';
+import Note from '../../../db/models/Note';
 
 import { formatLongTimestamp, formatDuration } from '../../../lib/utils/FormatTime';
 import { formatByteLength, formatStringBytes } from '../../../lib/utils/FormatFileSize';
@@ -102,7 +103,7 @@ const createStampDetails = (
 // Media
 
 const createDurationDetail = (
-    model: RecordingModel
+    model: Recording
 ) => createDetail(
     "Duration",
     (() => {
@@ -112,21 +113,21 @@ const createDurationDetail = (
 );
 
 const createSampleRateDetail = (
-    model: RecordingModel
+    model: Recording
 ) => createDetail(
     "Sample Rate",
     model.data.audio.attributes.sampleRate.toString()
 );
 
 const createNoteCountDetail = (
-    model: NoteModel
+    model: Note
 ) => ([
     createDetail("Word Count", model.data.wordCount.toString()),
     createDetail("Charater Count", model.data.charCount.toString())
 ])
 
 const createSizeDetail = (
-    model: RecordingModel | NoteModel
+    model: Recording | Note
 ) => createDetail(
     "Size",
     model.type === "recording" ?
@@ -146,7 +147,7 @@ const createWrappedDetails = (
 ]);
 
 const createRecodingDetails = (
-    model: RecordingModel
+    model: Recording
 ) => createWrappedDetails(
     model,
     [
@@ -157,7 +158,7 @@ const createRecodingDetails = (
 );
 
 const createNoteDetails = (
-    model: NoteModel
+    model: Note
 ) => createWrappedDetails(
     model,
     [

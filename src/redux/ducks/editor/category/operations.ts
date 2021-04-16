@@ -6,6 +6,7 @@ import * as actions from './actions';
 import * as types from './types';
 
 import { editorOperations, editorHelpers } from '..';
+
 import { recordingOperations } from '../../media/recordings';
 import { noteOperations } from '../../media/notes';
 import { categoryOperations } from '../../categories';

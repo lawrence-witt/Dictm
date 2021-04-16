@@ -1,6 +1,6 @@
 import * as types from './types';
 
-import { RecordingModel } from '../../../_data/recordingsData';
+import Recording from '../../../../db/models/Recording';
 
 export const updateRecordingEditorMode = (
     mode: "edit" | "play"
@@ -30,7 +30,7 @@ export const updateRecordingEditorCategory = (
 });
 
 export const updateRecordingEditorData = (
-    data: RecordingModel["data"]
+    data: Recording["data"]
 ): types.RecordingEditorDataUpdatedAction => ({
     type: types.RECORDING_EDITOR_DATA_UPDATED,
     payload: {

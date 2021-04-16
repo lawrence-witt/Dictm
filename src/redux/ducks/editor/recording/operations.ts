@@ -2,7 +2,7 @@ import { ThunkAction } from 'redux-thunk';
 
 import { RootState } from '../../../store';
 
-import { RecordingModel } from '../../../_data/recordingsData';
+import Recording from '../../../../db/models/Recording';
 
 import { editorOperations, editorHelpers } from '..';
 import { categoryOperations } from '../../categories';
@@ -70,7 +70,7 @@ type UpdateRecordingCategoryThunkAction = ThunkAction<void, undefined, unknown, 
 */
 
 export const updateRecordingEditorData = (
-    data: RecordingModel["data"]
+    data: Recording["data"]
 ): UpdateRecordingDataThunkAction => (
     dispatch
 ): void => {

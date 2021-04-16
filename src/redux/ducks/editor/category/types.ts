@@ -1,11 +1,11 @@
-import { CategoryModel } from '../../../_data/categoriesData';
+import Category from '../../../../db/models/Category';
 
 import { EditorContext, EditorOpenedAction } from '../types';
 
 export const CATEGORY_EDITOR_TITLE_UPDATED      = "dictm/editor/category/CATEGORY_TITLE_UPDATED";
 export const CATEGORY_EDITOR_IDS_UPDATED        = "dictm/editor/category/CATEGORY_IDS_UPDATED";
 
-export type CategoryEditorContext = EditorContext<CategoryModel>;
+export type CategoryEditorContext = EditorContext<Category>;
 
 export interface CategoryEditorTitleUpdatedAction {
     type: typeof CATEGORY_EDITOR_TITLE_UPDATED;

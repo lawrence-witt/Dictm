@@ -1,4 +1,4 @@
-import { RecordingModel } from '../../../_data/recordingsData';
+import Recording from '../../../../db/models/Recording';
 
 import { EditorContext, EditorOpenedAction } from '../types';
 
@@ -7,7 +7,7 @@ export const RECORDING_EDITOR_TITLE_UPDATED     = "dictm/editor/recording/RECORD
 export const RECORDING_EDITOR_CATEGORY_UPDATED  = "dictm/editor/recording/RECORDING_CATEGORY_UPDATED";
 export const RECORDING_EDITOR_DATA_UPDATED      = "dictm/editor/recording/RECORDING_DATA_UPDATED";
 
-export interface RecordingEditorContext extends EditorContext<RecordingModel> {
+export interface RecordingEditorContext extends EditorContext<Recording> {
     mode: "edit" | "play";
 }
 
@@ -35,7 +35,7 @@ export interface RecordingEditorCategoryUpdatedAction {
 export interface RecordingEditorDataUpdatedAction {
     type: typeof RECORDING_EDITOR_DATA_UPDATED;
     payload: {
-        data: RecordingModel["data"];
+        data: Recording["data"];
     }
 }
 

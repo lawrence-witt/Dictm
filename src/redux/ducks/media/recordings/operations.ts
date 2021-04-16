@@ -22,11 +22,11 @@ type LoadRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.Rec
 
 /** 
 *  Summary:
-*  Persists a new Recording Model.
+*  Persists a new Recording.
 *
 *  Description:
-*  Adds the Recording Model to the database.
-*  Adds the Recording Model to the store.
+*  Adds the Recording to the database.
+*  Adds the Recording to the store.
 *
 *  @param {object} recording The new Recording Model.
 */
@@ -44,13 +44,13 @@ type CreateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.Re
 
 /** 
 *  Summary:
-*  Overwrites a Recording Model.
+*  Overwrites a Recording.
 *
 *  Description:
-*  Updates the Recording Model in the database.
-*  Updates the NotRecordinge Model in the store.
+*  Updates the Recording in the database.
+*  Updates the Recording in the store.
 *
-*  @param {object} recording The updated Recording Model.
+*  @param {object} recording The updated Recording.
 */
 
 export const overwriteRecording = (
@@ -66,13 +66,13 @@ type OverwriteRecordingThunkAction = ThunkAction<void, undefined, unknown, types
 
 /** 
 *  Summary:
-*  Updates the category of a Recording Model.
+*  Updates the category of a Recording.
 *
 *  Description:
 *  Updates the model's category in the database.
 *  Updates the model's category in the store.
 *
-*  @param {string} id The id identifying the Recording Model.
+*  @param {string} id The id identifying the Recording.
 *  @param {string | undefined} categoryId The id (or undefined) identifying the new category.
 */
 
@@ -89,13 +89,13 @@ type UpdateRecordingCategoryThunkAction = ThunkAction<void, undefined, unknown, 
 
 /** 
 *  Summary:
-*  Deletes a Recording Model.
+*  Deletes a Recording.
 *
 *  Description:
-*  Deletes the Recording Model from the database.
-*  Deletes the Recording Model from the store.
+*  Deletes the Recording from the database.
+*  Deletes the Recording from the store.
 *
-*  @param {string} id The id identifying the Recording Model.
+*  @param {string} id The id identifying the Recording.
 */
 
 export const deleteRecording = (
