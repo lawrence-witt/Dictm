@@ -20,31 +20,20 @@ export const createNote = (
     }
 });
 
-export const overwriteNote = (
-    note: Note
-): types.NoteOverwrittenAction => ({
-    type: types.NOTE_OVERWRITTEN,
+export const overwriteNotes = (
+    notes: Note[]
+): types.NotesOverwrittenAction => ({
+    type: types.NOTES_OVERWRITTEN,
     payload: {
-        note
+        notes
     }
 });
 
-export const updateNoteCategory = (
-    id: string,
-    categoryId: string | undefined
-): types.NoteCategoryUpdatedAction => ({
-    type: types.NOTE_CATEGORY_UPDATED,
+export const deleteNotes = (
+    ids: string[]
+): types.NotesDeletedAction => ({
+    type: types.NOTES_DELETED,
     payload: {
-        id,
-        categoryId
-    }
-});
-
-export const deleteNote = (
-    id: string
-): types.NoteDeletedAction => ({
-    type: types.NOTE_DELETED,
-    payload: {
-        id
+        ids
     }
 });

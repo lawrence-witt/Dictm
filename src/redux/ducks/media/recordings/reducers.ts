@@ -26,45 +26,27 @@ const recordingsReducer = (
                 },
                 allIds: [recording.id, ...state.allIds]
             }
-        case types.RECORDING_OVERWRITTEN: {
-            const { recording } = action.payload;
+        case types.RECORDINGS_OVERWRITTEN: {
+            const { recordings } = action.payload;
+            const clonedState = {...state, byId: { ...state.byId }};
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [recording.id]: recording
-                }
-            }
+            return recordings.reduce((out, recording) => {
+                out.byId[recording.id] = recording;
+                return out;
+            }, clonedState);
         }
-        case types.RECORDING_CATEGORY_UPDATED: {
-            const { id, categoryId } = action.payload;
+        case types.RECORDINGS_DELETED: {
+            const { ids } = action.payload;
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [id]: {
-                        ...state.byId[id],
-                        relationships: {
-                            ...state.byId[id].relationships,
-                            category: {
-                                id: categoryId
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        case types.RECORDING_DELETED: {
-            const { id } = action.payload;
+            const clonedState = {
+                byId: {...state.byId}, 
+                allIds: [...state.allIds]
+            };
 
-            const clone = {...state};
+            ids.forEach(id => delete clonedState.byId[id]);
+            clonedState.allIds = clonedState.allIds.filter(id => !ids.includes(id));
 
-            delete clone.byId[id];
-            clone.allIds = clone.allIds.filter(i => i !== id);
-
-            return clone;
+            return clonedState;
         }
         default:
             return state;

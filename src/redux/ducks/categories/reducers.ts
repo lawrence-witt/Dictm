@@ -10,12 +10,15 @@ const categoriesReducer = (
     action: types.CategoriesActionTypes
 ): types.CategoriesState => {
     switch(action.type) {
-        case types.CATEGORIES_LOADED:
-            return action.payload.categories.reduce((out: types.CategoriesState, category) => {
+        case types.CATEGORIES_LOADED: {
+            const { categories } = action.payload;
+
+            return categories.reduce((out: types.CategoriesState, category) => {
                 out.byId[category.id] = category;
                 out.allIds = [...out.allIds, category.id];
                 return out;
             }, {byId: {}, allIds: []});
+        }
         case types.CATEGORY_CREATED: {
             const { category } = action.payload;
             
@@ -27,16 +30,14 @@ const categoriesReducer = (
                 allIds: [category.id, ...state.allIds]
             }
         }
-        case types.CATEGORY_OVERWRITTEN: {
-            const { category } = action.payload;
+        case types.CATEGORIES_OVERWRITTEN: {
+            const { categories } = action.payload;
+            const clonedState = { ...state, byId: {...state.byId} };
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [category.id]: category
-                }
-            }
+            return categories.reduce((out, category) => {
+                out.byId[category.id] = category;
+                return out;
+            }, clonedState);
         }
         case types.CATEGORY_IDS_ADDED: {
             const { id, type, ids } = action.payload;

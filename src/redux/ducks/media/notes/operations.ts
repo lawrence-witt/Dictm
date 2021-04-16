@@ -3,11 +3,14 @@ import { ThunkAction } from 'redux-thunk';
 import * as types from './types';
 import * as actions from './actions';
 
+import { categoryOperations } from '../../categories';
+
 import Note from '../../../../db/models/Note';
+import { NoteController } from '../../../../db/controllers/Note';
 
 /** 
 *  Summary:
-*  Loads the user's Notes into the store
+*  Loads the user's Notes into the store from DB.
 */
 
 export const loadNotes = (
@@ -22,89 +25,99 @@ type NotesLoadedThunkAction = ThunkAction<void, undefined, unknown, types.NotesL
 
 /** 
 *  Summary:
-*  Persists a new Note.
-*
-*  Description:
-*  Adds the Note to the database.
-*  Adds the Note to the store.
+*  Saves a single new Note in store and DB.
 *
 *  @param {object} note The new Note Model.
 */
 
-export const createNote = (
+export const createNote = async (
     note: Note
-): CreateNoteThunkAction => (
+): Promise<CreateNoteThunkAction> => async (
     dispatch
-): void => {
-    // TODO: add to database
-    dispatch(actions.createNote(note));
+) => {
+    const data = await (async () => {
+        try {
+            return await NoteController.insertNote(note);
+        } catch (err) {
+            // handle no note creation
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const { note: insertedNote, updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.createNote(insertedNote));
 }
 
 type CreateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NoteCreatedAction>;
 
 /** 
 *  Summary:
-*  Overwrites a Note.
-*
-*  Description:
-*  Updates the Note in the database.
-*  Updates the Note in the store.
-*
-*  @param {object} note The updated Note Model.
+*  Saves a single updated Note in store and DB.
 */
 
-export const overwriteNote = (
+export const updateNote = async (
     note: Note
-): OverwriteNoteThunkAction => (
+): Promise<UpdateNoteThunkAction> => async (
     dispatch
-): void => {
-    // TODO: update in database
-    dispatch(actions.overwriteNote(note));
+) => {
+    const data = await (async () => {
+        try {
+            return await NoteController.updateNote(note);
+        } catch (err) {
+            // handle no note update
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const { note: updatedNote, updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.overwriteNotes([updatedNote]));
 }
 
-type OverwriteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NoteOverwrittenAction>;
+type UpdateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesOverwrittenAction>;
 
 /** 
 *  Summary:
-*  Updates the category of a Note.
+*  Overwrites multiple updated Notes in store according to id.
 *
-*  Description:
-*  Updates the category in the database.
-*  Updates the category in the store.
-*
-*  @param {string} id The id identifying the Note Model.
-*  @param {string | undefined} categoryId The id (or undefined) identifying the new category.
+*  @param {array} notes The updated Notes to overwrite with.
 */
 
-export const updateNoteCategory = (
-    id: string,
-    categoryId: string | undefined
-): UpdateNoteCategoryThunkAction => (
+export const overwriteNotes = (
+    notes: Note[]
+): OverwriteNotesThunkAction => (
     dispatch
 ): void => {
-    dispatch(actions.updateNoteCategory(id, categoryId));
+    dispatch(actions.overwriteNotes(notes));
 }
 
-type UpdateNoteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.NoteCategoryUpdatedAction>;
+type OverwriteNotesThunkAction = ThunkAction<void, undefined, unknown, types.NotesOverwrittenAction>;
 
 /** 
 *  Summary:
-*  Deletes a Note.
-*
-*  Description:
-*  Deletes the Note from the database.
-*  Deletes the Note from the store.
-*
-*  @param {string} id The id identifying the Note Model.
+*  Deletes multiple Notes from store and DB.
 */
 
-export const deleteNote = (
-    id: string
+export const deleteNotes = (
+    ids: string[]
 ): DeleteNoteThunkAction => (
     dispatch
 ): void => {
     // TODO: remove database record
-    dispatch(actions.deleteNote(id));
+    dispatch(actions.deleteNotes(ids));
 }
 
-type DeleteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NoteDeletedAction>;
+type DeleteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesDeletedAction>;

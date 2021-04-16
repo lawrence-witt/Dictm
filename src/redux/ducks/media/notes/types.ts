@@ -1,10 +1,9 @@
 import Note from '../../../../db/models/Note';
 
-export const NOTES_LOADED           = "dictm/media/notes/NOTES_LOADED";
-export const NOTE_CREATED           = "dictm/media/notes/NOTE_CREATED";
-export const NOTE_OVERWRITTEN       = "dictm/media/notes/NOTE_OVERWRITTEN";
-export const NOTE_CATEGORY_UPDATED  = "dictm/media/notes/NOTE_CATEGORY_UPDATED";
-export const NOTE_DELETED           = "dictm/media/notes/NOTE_DELETED";
+export const NOTES_LOADED       = "dictm/media/notes/NOTES_LOADED";
+export const NOTE_CREATED       = "dictm/media/notes/NOTE_CREATED";
+export const NOTES_OVERWRITTEN  = "dictm/media/notes/NOTES_OVERWRITTEN";
+export const NOTES_DELETED      = "dictm/media/notes/NOTES_DELETED";
 
 export interface NotesState {
     byId: Record<string, Note>;
@@ -25,31 +24,22 @@ export interface NoteCreatedAction {
     }
 }
 
-export interface NoteOverwrittenAction {
-    type: typeof NOTE_OVERWRITTEN;
+export interface NotesOverwrittenAction {
+    type: typeof NOTES_OVERWRITTEN;
     payload: {
-        note: Note;
+        notes: Note[];
     }
 }
 
-export interface NoteCategoryUpdatedAction {
-    type: typeof NOTE_CATEGORY_UPDATED;
+export interface NotesDeletedAction {
+    type: typeof NOTES_DELETED;
     payload: {
-        id: string;
-        categoryId: string | undefined;
-    }
-}
-
-export interface NoteDeletedAction {
-    type: typeof NOTE_DELETED;
-    payload: {
-        id: string;
+        ids: string[];
     }
 }
 
 export type NotesActionTypes = 
 |   NotesLoadedAction
 |   NoteCreatedAction
-|   NoteOverwrittenAction
-|   NoteCategoryUpdatedAction
-|   NoteDeletedAction;
+|   NotesOverwrittenAction
+|   NotesDeletedAction;

@@ -1,12 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { RootState } from '../../../store';
-
 import Recording from '../../../../db/models/Recording';
-
-import { editorOperations, editorHelpers } from '..';
-import { categoryOperations } from '../../categories';
-import { recordingOperations } from '../../media/recordings';
 
 import * as actions from './actions';
 import * as types from './types';
@@ -78,55 +72,3 @@ export const updateRecordingEditorData = (
 }
 
 type UpdateRecordingDataThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;
-
-/** 
-*  Summary:
-*  Saves the currently editing Recording Model.
-*
-*  Description
-*  Updates any categories it has been added to or removed from.
-*  Persists or overwrites the Recording depending on its isNew status.
-*/
-
-export const saveRecordingEditorModel = (): SaveRecordingEditorThunkAction => (
-    dispatch,
-    getState
-): void => {
-    dispatch(editorOperations.setEditorSaving());
-
-    const { editor } = getState();
-
-    if (!editor.context || editor.context.type !== "recording") {
-        throw new Error('Recording Editor context has not been initialised.');
-    }
-
-    const { data } = editor.context;
-    
-    const originalCategory = data.original.relationships.category?.id;
-    const editingCategory = data.editing.relationships.category?.id;
-
-    if (originalCategory !== editingCategory) {
-        originalCategory &&
-            dispatch(categoryOperations.removeCategoryIds(originalCategory, "recordings", [data.editing.id]));
-        editingCategory &&
-            dispatch(categoryOperations.addCategoryIds(editingCategory, "recordings", [data.editing.id]));
-    }
-
-    const stamped = editorHelpers.stampContentModel(data.editing);
-
-    if (editor.attributes.isNew) {
-        dispatch(recordingOperations.createRecording(stamped));
-    } else {
-        dispatch(recordingOperations.overwriteRecording(stamped));
-    }
-
-    const { save } = editor.dialogs;
-
-    if (save.isOpen) {
-        dispatch(editorOperations.closeEditor());
-    } else {
-        dispatch(editorOperations.openEditor("recording", data.editing.id));
-    }
-}
-
-type SaveRecordingEditorThunkAction = ThunkAction<void, RootState, unknown, any>;

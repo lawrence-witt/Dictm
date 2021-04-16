@@ -6,6 +6,14 @@ import * as helpers from './helpers';
 
 import { RootState } from '../../store';
 
+import { recordingOperations } from '../media/recordings';
+import { noteOperations } from '../media/notes';
+import { categoryOperations } from '../categories';
+
+const { createRecording, updateRecording } = recordingOperations;
+const { createNote, updateNote } = noteOperations;
+const { createCategory, updateCategory } = categoryOperations;
+
 /** 
 *  Summary 
 *  Opens the editor modal.
@@ -65,6 +73,53 @@ type SetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.Ed
 
 /** 
 *  Summary:
+*  Saves the content model currently being edited.
+*/
+
+export const saveEditor = (): SaveEditorThunkAction => (
+    dispatch,
+    getState
+) => {
+    dispatch(actions.setEditorSaving());
+
+    const { context, attributes: { isNew }, dialogs } = getState().editor;
+    
+    if (!context || context.type === "choose") {
+        throw new Error('An editable context has not been initialised.');
+    }
+
+    const stamped = helpers.stampContentModel(
+        context.data.editing
+    );
+
+    const persist = () => {
+        switch(stamped.type) {
+            case "recording":
+                return isNew ? createRecording(stamped) : updateRecording(stamped);
+            case "note":
+                return isNew ? createNote(stamped) : updateNote(stamped);
+            case "category":
+                return isNew ? createCategory(stamped) : updateCategory(stamped);  
+        }
+    }
+
+    persist()
+    .then(() => {
+        if (dialogs.save.isOpen) {
+            dispatch(closeEditor());
+        } else {
+            dispatch(openEditor(context.type, stamped.id));
+        }
+    })
+    .catch(() => {
+        dispatch(actions.unsetEditorSaving());
+    });
+}
+
+type SaveEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
+
+/** 
+*  Summary:
 *  Sets the editor isSaving flag to false.
 */
 
@@ -116,12 +171,8 @@ export const closeDialog = (): CloseDialogThunkAction => (
 type CloseDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorCloseDialogAction>;
 
 /** 
-*  Summary 
+*  Summar:
 *  Closes the editor modal.
-*
-*  Description 
-*  Sets the editor open property to false.
-*  Additionally sets any open dialog's isOpen property to false.
 */
 
 export const closeEditor = (): CloseEditorThunkAction => (
@@ -140,12 +191,8 @@ export const closeEditor = (): CloseEditorThunkAction => (
 type CloseEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
 
 /** 
-*  Summary
-*  Clears the editor modal.
-*
-*  Description
-*  Resets the editor to its initialState.
-*  Removes the editorType and contentId from sessionStorage.
+*  Summary:
+*  Clears context from closed editor.
 */
 
 export const clearEditor = (): ClearEditorThunkAction => (

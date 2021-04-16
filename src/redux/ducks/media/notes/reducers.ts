@@ -27,45 +27,27 @@ const notesReducer = (
                 allIds: [note.id, ...state.allIds]
             }
         }
-        case types.NOTE_OVERWRITTEN: {
-            const { note } = action.payload;
+        case types.NOTES_OVERWRITTEN: {
+            const { notes } = action.payload;
+            const clonedState = {...state, byId: { ...state.byId }};
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [note.id]: note
-                }
-            }
+            return notes.reduce((out, note) => {
+                out.byId[note.id] = note;
+                return out;
+            }, clonedState);
         }
-        case types.NOTE_CATEGORY_UPDATED: {
-            const { id, categoryId } = action.payload;
+        case types.NOTES_DELETED: {
+            const { ids } = action.payload;
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [id]: {
-                        ...state.byId[id],
-                        relationships: {
-                            ...state.byId[id].relationships,
-                            category: {
-                                id: categoryId
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        case types.NOTE_DELETED: {
-            const { id } = action.payload;
+            const clonedState = {
+                byId: {...state.byId}, 
+                allIds: [...state.allIds]
+            };
 
-            const clone = {...state};
+            ids.forEach(id => delete clonedState.byId[id]);
+            clonedState.allIds = clonedState.allIds.filter(id => !ids.includes(id));
 
-            delete clone.byId[id];
-            clone.allIds = clone.allIds.filter(i => i !== id);
-
-            return clone;
+            return clonedState;
         }
         default:
             return state;

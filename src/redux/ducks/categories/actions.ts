@@ -20,46 +20,20 @@ export const createCategory = (
     }
 });
 
-export const overwriteCategory = (
-    category: Category
-): types.CategoryOverwrittenAction => ({
-    type: types.CATEGORY_OVERWRITTEN,
+export const overwriteCategories = (
+    categories: Category[]
+): types.CategoriesOverwrittenAction => ({
+    type: types.CATEGORIES_OVERWRITTEN,
     payload: {
-        category
+        categories
     }
 });
 
-export const addCategoryIds = (
-    id: string,
-    type: "recordings" | "notes",
+export const deleteCategories = (
     ids: string[]
-): types.CategoryIdsAddedAction => ({
-    type: types.CATEGORY_IDS_ADDED,
+): types.CategoriesDeletedAction => ({
+    type: types.CATEGORIES_DELETED,
     payload: {
-        id,
-        type,
         ids
-    }
-});
-
-export const removeCategoryIds = (
-    id: string,
-    type: "recordings" | "notes",
-    ids: string[]
-): types.CategoryIdsRemovedAction => ({
-    type: types.CATEGORY_IDS_REMOVED,
-    payload: {
-        id,
-        type,
-        ids
-    }
-});
-
-export const deleteCategory = (
-    id: string
-): types.CategoryDeletedAction => ({
-    type: types.CATEGORY_DELETED,
-    payload: {
-        id
     }
 });

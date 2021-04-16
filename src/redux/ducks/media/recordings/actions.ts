@@ -20,31 +20,20 @@ export const createRecording = (
     }
 });
 
-export const overwriteRecording = (
-    recording: Recording
-): types.RecordingOverwrittenAction => ({
-    type: types.RECORDING_OVERWRITTEN,
+export const overwriteRecordings = (
+    recordings: Recording[]
+): types.RecordingsOverwrittenAction => ({
+    type: types.RECORDINGS_OVERWRITTEN,
     payload: {
-        recording
+        recordings
     }
 });
 
-export const updateRecordingCategory = (
-    id: string,
-    categoryId: string | undefined
-): types.RecordingCategoryUpdatedAction => ({
-    type: types.RECORDING_CATEGORY_UPDATED,
+export const deleteRecordings = (
+    ids: string[]
+): types.RecordingsDeletedAction => ({
+    type: types.RECORDINGS_DELETED,
     payload: {
-        id,
-        categoryId
-    }
-});
-
-export const deleteRecording = (
-    id: string
-): types.RecordingDeletedAction => ({
-    type: types.RECORDING_DELETED,
-    payload: {
-        id
+        ids
     }
 });

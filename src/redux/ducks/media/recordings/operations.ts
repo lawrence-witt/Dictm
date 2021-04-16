@@ -3,11 +3,14 @@ import { ThunkAction } from 'redux-thunk';
 import * as types from './types';
 import * as actions from './actions';
 
+import { categoryOperations } from '../../categories';
+
 import Recording from '../../../../db/models/Recording';
+import { RecordingController } from '../../../../db/controllers/Recording';
 
 /** 
 *  Summary:
-*  Loads the users recordings into the store
+*  Loads the users Recordings into the store from DB.
 */
 
 export const loadRecordings = (
@@ -22,89 +25,96 @@ type LoadRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.Rec
 
 /** 
 *  Summary:
-*  Persists a new Recording.
-*
-*  Description:
-*  Adds the Recording to the database.
-*  Adds the Recording to the store.
-*
-*  @param {object} recording The new Recording Model.
+*  Saves a single new Recording in store and DB.
 */
 
-export const createRecording = (
+export const createRecording = async (
     recording: Recording
-): CreateRecordingThunkAction => (
+): Promise<CreateRecordingThunkAction> => async (
     dispatch
-): void => {
-    // TODO: add to database
-    dispatch(actions.createRecording(recording));
+) => {
+    const data = await (async () => {
+        try {
+            return await RecordingController.insertRecording(recording);
+        } catch (err) {
+            // handle no recording creation
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const { recording: newRecording, updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.createRecording(newRecording));
 }
 
 type CreateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingCreatedAction>;
 
 /** 
 *  Summary:
-*  Overwrites a Recording.
-*
-*  Description:
-*  Updates the Recording in the database.
-*  Updates the Recording in the store.
-*
-*  @param {object} recording The updated Recording.
+*  Saves a single updated Recording in store and DB.
 */
 
-export const overwriteRecording = (
+export const updateRecording = async (
     recording: Recording
+): Promise<UpdateRecordingThunkAction> => async (
+    dispatch
+) => {
+    const data = await (async () => {
+        try {
+            return await RecordingController.updateRecording(recording);
+        } catch (err) {
+            // handle no recording update
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const { recording: updatedRecording, updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.overwriteRecordings([updatedRecording]));
+}
+
+type UpdateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
+
+/** 
+*  Summary:
+*  Overwrites multiple updated Recordings in store according to id.
+*/
+
+export const overwriteRecordings = (
+    recordings: Recording[]
 ): OverwriteRecordingThunkAction => (
     dispatch
 ): void => {
-    // TODO: update in database
-    dispatch(actions.overwriteRecording(recording));
+    dispatch(actions.overwriteRecordings(recordings));
 }
 
-type OverwriteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingOverwrittenAction>;
+type OverwriteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
 
 /** 
 *  Summary:
-*  Updates the category of a Recording.
+*  Deletes multiple Recordings from store and DB.
 *
-*  Description:
-*  Updates the model's category in the database.
-*  Updates the model's category in the store.
-*
-*  @param {string} id The id identifying the Recording.
-*  @param {string | undefined} categoryId The id (or undefined) identifying the new category.
 */
 
-export const updateRecordingCategory = (
-    id: string,
-    categoryId: string | undefined
-): UpdateRecordingCategoryThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.updateRecordingCategory(id, categoryId));
-}
-
-type UpdateRecordingCategoryThunkAction = ThunkAction<void, undefined, unknown, types.RecordingCategoryUpdatedAction>;
-
-/** 
-*  Summary:
-*  Deletes a Recording.
-*
-*  Description:
-*  Deletes the Recording from the database.
-*  Deletes the Recording from the store.
-*
-*  @param {string} id The id identifying the Recording.
-*/
-
-export const deleteRecording = (
-    id: string
+export const deleteRecordings = (
+    ids: string[]
 ): DeleteRecordingThunkAction => (
     dispatch
 ): void => {
-    // TODO: remove database record
-    dispatch(actions.deleteRecording(id));
+    // TODO: remove database records
+    dispatch(actions.deleteRecordings(ids));
 }
 
-type DeleteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingDeletedAction>;
+type DeleteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsDeletedAction>;

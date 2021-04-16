@@ -1,13 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { RootState } from '../../../store';
-
-import { noteOperations } from '../../media/notes';
-import { categoryOperations } from '../../categories';
-
-import { editorHelpers } from '..';
-import { editorOperations } from '..';
-
 import * as actions from './actions';
 import * as types from './types';
 
@@ -71,55 +63,3 @@ export const updateNoteEditorData = (
 }
 
 type UpdateNoteDataThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
-
-/** 
-*  Summary:
-*  Saves the currently editing Note Model.
-*
-*  Description
-*  Updates any categories it has been added to or removed from.
-*  Persists or overwrites the Note depending on its isNew status.
-*/
-
-export const saveNoteEditorModel = (): SaveNoteEditorThunkAction => (
-    dispatch,
-    getState
-): void => {
-    dispatch(editorOperations.setEditorSaving());
-
-    const { editor } = getState();
-
-    if (!editor.context || editor.context.type !== "note") {
-        throw new Error('Note Editor context has not been initialised.');
-    }
-
-    const { data } = editor.context;
-    
-    const originalCategory = data.original.relationships.category?.id;
-    const editingCategory = data.editing.relationships.category?.id;
-
-    if (originalCategory !== editingCategory) {
-        originalCategory &&
-            dispatch(categoryOperations.removeCategoryIds(originalCategory, "notes", [data.editing.id]));
-        editingCategory &&
-            dispatch(categoryOperations.addCategoryIds(editingCategory, "notes", [data.editing.id]));
-    }
-
-    const stamped = editorHelpers.stampContentModel(data.editing);
-
-    if (editor.attributes.isNew) {
-        dispatch(noteOperations.createNote(stamped));
-    } else {
-        dispatch(noteOperations.overwriteNote(stamped));
-    }
-
-    const { save } = editor.dialogs;
-
-    if (save.isOpen) {
-        dispatch(editorOperations.closeEditor());
-    } else {
-        dispatch(editorOperations.openEditor("note", data.editing.id));
-    }
-}
-
-type SaveNoteEditorThunkAction = ThunkAction<void, RootState, unknown, any>;

@@ -4,10 +4,13 @@ import * as types from './types';
 import * as actions from './actions';
 
 import Category from '../../../db/models/Category';
+import { CategoryController } from '../../../db/controllers/Category';
+import { recordingOperations } from '../media/recordings';
+import { noteOperations } from '../media/notes';
 
 /** 
 *  Summary:
-*  Loads the users categories into the store
+*  Loads the users Categories into the store from DB.
 */
 
 export const loadCategories = (
@@ -22,118 +25,119 @@ type LoadCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.Cat
 
 /** 
 *  Summary:
-*  Persists a new Category.
-*  
-*  Description:
-*  Adds the Category to the database.
-*  Adds the Category to the store.
-*
-*  @param {object} category The new Category Model.
+*  Saves a single new Category in store and DB.
 */
 
-export const createCategory = (
+export const createCategory = async (
     category: Category
-): CreateCategoryThunkAction => (
+): Promise<CreateCategoryThunkAction> => async (
     dispatch
-): void => {
-    // TODO: create database record
-    dispatch(actions.createCategory(category));
+) => {
+    const data = await (async () => {
+        try {
+            return await CategoryController.insertCategory(category);
+        } catch (err) {
+            // handle no category create
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const { 
+        category: insertedCategory, 
+        updatedRecordings, 
+        updatedNotes, 
+        updatedCategories 
+    } = data;
+
+    if (updatedRecordings.length > 0) {
+        dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
+    }
+
+    if (updatedNotes.length > 0) {
+        dispatch(noteOperations.overwriteNotes(updatedNotes));
+    }
+
+    if (updatedCategories.length > 0) {
+        dispatch(actions.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.createCategory(insertedCategory));
 }
 
-type CreateCategoryThunkAction = ThunkAction<void, undefined, unknown, types.CategoryCreatedAction>;
+type CreateCategoryThunkAction = ThunkAction<void, undefined, unknown, 
+    types.CategoriesOverwrittenAction | 
+    types.CategoryCreatedAction
+>;
 
 /** 
 *  Summary:
-*  Overwrites a Category.
-*
-*  Description:
-*  Overwrites the Category in the database.
-*  Overwrites the Category in the store.
-*
-*  @param {object} category The updated Category.
+*  Saves a single updated Category in store and DB.
 */
 
-export const overwriteCategory = (
+export const updateCategory = async (
     category: Category
-): OverwriteCategoryThunkAction => (
+): Promise<UpdateCategoryThunkAction> => async (
     dispatch
-): void => {
-    // TODO: update database record
-    dispatch(actions.overwriteCategory(category));
+) => {
+    const data = await (async () => {
+        try {
+            return await CategoryController.updateCategory(category);
+        } catch (err) {
+            // handle no category update
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+
+    const {
+        updatedRecordings,
+        updatedNotes,
+        updatedCategories
+    } = data;
+
+    if (updatedRecordings.length > 0) {
+        dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
+    }
+
+    if (updatedNotes.length > 0) {
+        dispatch(noteOperations.overwriteNotes(updatedNotes));
+    }
+
+    return dispatch(actions.overwriteCategories(updatedCategories));
 }
 
-type OverwriteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.CategoryOverwrittenAction>;
+type UpdateCategoryThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesOverwrittenAction>;
 
 /** 
 *  Summary:
-*  Adds an array of resource ids to a Category.
-*
-*  Description:
-*  Adds the Category ids in the database.
-*  Adds the Category ids in the store.
-*
-*  @param {string} id The id identifying the Category.
-*  @param {"recording" | "note"} type The resource type of the ids.
-*  @param {string[]} ids The array of resource ids.
+*  Overwrites multiple updated categories in store accoring to id.
 */
 
-export const addCategoryIds = (
-    id: string,
-    type: "recordings" | "notes",
-    ids: string[]
-): AddCategoryIdsThunkAction => (
+export const overwriteCategories = (
+    categories: Category[]
+): OverwriteCategoriesThunkAction => (
     dispatch
 ): void => {
-    // TODO: update database record
-    dispatch(actions.addCategoryIds(id, type, ids));
+    dispatch(actions.overwriteCategories(categories));
 }
 
-type AddCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.CategoryIdsAddedAction>;
-
-/** 
-*  Summary:
-*  Removes an array of resource ids from a Category.
-*
-*  Description:
-*  Removes the Category ids in the database.
-*  Removes the Category ids in the store.
-*
-*  @param {string} id The id identifying the Category.
-*  @param {"recording" | "note"} type The resource type of the ids.
-*  @param {string[]} ids The array of resource ids.
-*/
-
-export const removeCategoryIds = (
-    id: string,
-    type: "recordings" | "notes",
-    ids: string[]
-): RemoveCategoryIdsThunkAction => (
-    dispatch
-): void => {
-    // TODO: update database record
-    dispatch(actions.removeCategoryIds(id, type, ids));
-}
-
-type RemoveCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.CategoryIdsRemovedAction>;
+type OverwriteCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesOverwrittenAction>;
 
 /** 
 *  Summary
-*  Deletes a Category.
-*
-*  Description:
-*  Deletes the Category from the database.
-*  Deletes the Category from the store.
-*
-*  @param {string} id The id identifying the Category.
+*  Deletes multiple Categories from store and DB.
 */
 
-export const deleteCategory = (
-    id: string
-): DeleteCategoryThunkAction => (
+export const deleteCategories = (
+    ids: string[]
+): DeleteCategoriesThunkAction => (
     dispatch
 ): void => {
     // TODO: remove database record
-    dispatch(actions.deleteCategory(id));
+    dispatch(actions.deleteCategories(ids));
 }
 
-type DeleteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.CategoryDeletedAction>;
+type DeleteCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesDeletedAction>;

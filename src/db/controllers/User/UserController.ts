@@ -35,8 +35,8 @@ export const createNewUser = (name: string, greeting: string): Promise<User> => 
     return db.transaction('rw', db.users, async () => {
         const user = new User(name, greeting);
 
-        const userId = await db.users.add(user);
-        const fetched = await db.users.get(userId);
+        await db.users.add(user);
+        const fetched = await db.users.get(user.id);
 
         if (!fetched) throw new Error('Could not retrieve user.');
 
