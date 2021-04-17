@@ -55,7 +55,7 @@ export const loadLocalUsers = (): LoadLocalUsersThunkAction => async (
 ): Promise<void> => {
     const users = await (async () => {
         try {
-            return await UserController.getLocalUsers();
+            return await UserController.selectLocalUsers();
         } catch (err) {
             // handle bad db connection
             console.log(err);
@@ -178,7 +178,7 @@ export const createNewUser = (): CreateNewUserThunkAction => async (
 
     const user = await (async () => {
         try {
-            return await UserController.createNewUser(name, greeting);
+            return await UserController.insertUser(name, greeting);
         } catch (err) {
             // handle no creation
             console.log(err);

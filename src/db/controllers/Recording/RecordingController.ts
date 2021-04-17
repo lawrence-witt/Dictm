@@ -1,9 +1,21 @@
 import { db } from '../../db';
 
 import Category from '../../models/Category';
+import { CategoryController } from '../Category';
+
 import Recording from '../../models/Recording';
 
 // SELECT
+
+export const selectRecording = async (id: string): Promise<Recording> => {
+    const recording = await db.recordings.get(id);
+    if (!recording) throw new Error('Note could not be retrieved.');
+    return recording;
+}
+
+export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
+    return db.recordings.where({"relationships.user.id": userId}).toArray();
+}
 
 // INSERT
 
@@ -12,26 +24,17 @@ export const insertRecording = (recording: Recording): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
-        const updatedCategories = await (async () => {
-            const { id } = recording.relationships.category;
+        const { id, relationships: { category } } = recording;
 
-            const result: Category[] = [];
-
-            if (id) {
-                await db.categories.where('id').equals(id).modify(category => {
-                    category.relationships.recordings.ids.push(recording.id);
-                });
-    
-                const updated = await db.categories.get(id);
-                if (updated) result.push(updated);
-            }
-
-            return result;
-        })();
+        const updatedCategories = category.id ? ([
+            await CategoryController.updateCategoryRelationships(
+                'add', category.id, [id], []
+            )
+        ]) : [];
         
         const insertedRecording = await (async () => {
             await db.recordings.add(recording);
-            return await db.recordings.get(recording.id);
+            return await db.recordings.get(id);
         })();
 
         if (!insertedRecording) throw new Error('Recording could not be created.');
@@ -45,41 +48,56 @@ export const insertRecording = (recording: Recording): Promise<{
 
 // UPDATE
 
+export const updateRecordingCategory = (
+    id: string, 
+    categoryId: string | undefined
+): Promise<Recording> => {
+    return db.transaction('rw', db.recordings, db.categories, async () => {
+        if (categoryId) {
+            const category = await db.categories.get(categoryId);
+            if (!category) throw new Error('Recording was assigned a non-existant category.');
+        }
+
+        await db.recordings.where('id').equals(id).modify(recording => {
+            recording.relationships.category.id = categoryId;
+        });
+
+        const updated = await db.recordings.get(id);
+
+        if (!updated) throw new Error('Recording could not be updated.');
+
+        return updated;
+    });
+}
+
 export const updateRecording = (recording: Recording): Promise<{
     recording: Recording;
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
-        const initialRecording = await db.recordings.get(recording.id);
+        const previousRecording = await db.recordings.get(recording.id);
 
-        if (!initialRecording) throw new Error('Recording could not be retrieved');
+        if (!previousRecording) throw new Error('Recording could not be retrieved');
 
         const updatedCategories = await (async () => {
-            const { id: originalId } = initialRecording.relationships.category;
+            const { id: prevId } = previousRecording.relationships.category;
             const { id: newId } = recording.relationships.category;
 
-            const result: Category[] = [];
+            const unEqual = prevId !== newId;
 
-            if (originalId === newId) return result;
+            const removed = unEqual && prevId ? ([
+                await CategoryController.updateCategoryRelationships(
+                    'remove', prevId, [recording.id], []
+                )
+            ]) : [];
 
-            if (originalId) {
-                await db.categories.where('id').equals(originalId).modify(category => {
-                    (ids => ids = ids.filter(id => id !== recording.id))
-                    (category.relationships.recordings.ids);
-                });
-                const updated = await db.categories.get(originalId);
-                if (updated) result.push(updated);
-            }
+            const added = unEqual && newId ? ([
+                await CategoryController.updateCategoryRelationships(
+                    'add', newId, [recording.id], []
+                )
+            ]) : [];
 
-            if (newId) {
-                await db.categories.where('id').equals(newId).modify(category => {
-                    category.relationships.recordings.ids.push(recording.id);
-                });
-                const updated = await db.categories.get(newId);
-                if (updated) result.push(updated);
-            }
-
-            return result;
+            return [...added, ...removed];
         })();
 
         const insertedRecording = await (async () => {
@@ -97,3 +115,50 @@ export const updateRecording = (recording: Recording): Promise<{
 }
 
 // DELETE
+
+export const deleteRecording = (id: string): Promise<{
+    updatedCategories: Category[]
+}> => {
+    return db.transaction('rw', db.recordings, db.categories, async () => {
+        const recording = await db.recordings.get(id);
+
+        if (!recording) throw new Error('Recording could not be retrieved.');
+
+        const categoryId = recording.relationships.category.id;
+
+        const updatedCategories = categoryId ? (
+            [await CategoryController.updateCategoryRelationships(
+                'remove', categoryId, [id], []
+            )]
+        ) : [];
+
+        await db.recordings.delete(id);
+
+        return {
+            updatedCategories
+        };
+    });
+}
+
+export const deleteRecordings = (ids: string[]): Promise<{
+    updatedCategories: Category[]
+}> => {
+    return db.transaction('rw', db.recordings, db.categories, async () => {
+        const updatedCategoryIds: Set<string> = new Set();
+
+        for (const id of ids) {
+            const result = await deleteRecording(id);
+            result.updatedCategories.forEach(category => updatedCategoryIds.add(category.id));
+        }
+
+        const updatedCategories = await (
+            db.categories
+            .where('id').anyOf(Array.from(updatedCategoryIds))
+            .toArray()
+        );
+
+        return {
+            updatedCategories
+        }
+    })
+}
