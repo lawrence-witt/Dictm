@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
 import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
-import { mediaSelectors } from '../../../redux/ducks/media';
+import { contentSelectors } from '../../../redux/ducks/content';
 
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -33,7 +33,7 @@ const mapState = (state: RootState, props: NoteCardProps) => ({
         "notes",
         props.id
     ),
-    createdFormatted: mediaSelectors.getFormattedTimestamp(props.created)
+    createdFormatted: contentSelectors.getFormattedTimestamp(props.created)
 });
 
 const mapDispatch = {

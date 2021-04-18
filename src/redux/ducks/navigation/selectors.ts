@@ -40,7 +40,7 @@ const createNavItem = (
 
 export const getNavLists = createSelector((
     user: RootState["user"], 
-    categories: RootState["categories"],
+    categories: RootState["content"]["categories"],
     push: RouteComponentProps["history"]["push"]
 ): NavMenuLists => {
     const mainList = {
@@ -113,7 +113,7 @@ const getDirectionByStemIndex = (
 const getDirectionByCategoryIndex = (
     prev: string,
     curr: string,
-    categories: RootState["categories"]
+    categories: RootState["content"]["categories"]
 ): 'left' | 'right' => {
     const prevIndex = categories.allIds.indexOf(prev);
     const currIndex = categories.allIds.indexOf(curr);
@@ -136,7 +136,7 @@ const getDirectionByCategoryIndex = (
 */
 
 export const getTemplateAnimation = createSelector((
-    categories: RootState["categories"],
+    categories: RootState["content"]["categories"],
     history: RootState["navigation"]["history"]
 ) => {
     const { previous, current } = history;

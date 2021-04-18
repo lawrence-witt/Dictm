@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { formatDuration } from '../../../../../../lib/utils/FormatTime';
+import { formatDuration } from '../../../../../../lib/utils/formatTime';
 
 import { TimerProps } from './Timer.types';
 

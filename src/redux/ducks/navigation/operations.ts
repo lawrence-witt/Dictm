@@ -45,7 +45,7 @@ export const changeLocation = (
     dispatch,
     getState
 ): void => {
-    const { categories } = getState();
+    const { categories } = getState().content;
 
     const params = helpers.extractParams(location.pathname);
     const title = helpers.extractPageTitle(params, categories);

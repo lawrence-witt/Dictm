@@ -1,6 +1,6 @@
 import { db } from '../../db';
 
-import getArrayModifications from '../../utils/getArrayModifications';
+import getArrayModifications from '../../../lib/utils/getArrayModifications';
 
 import Category from '../../models/Category';
 

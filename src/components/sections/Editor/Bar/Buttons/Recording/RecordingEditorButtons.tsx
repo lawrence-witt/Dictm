@@ -5,7 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import MenuItem from '@material-ui/core/MenuItem';
 
-import DropdownMenu from '../../../../../molecules/Menus/Dropdown/DropdownMenu';
+import DropdownMenu from '../../../../../molecules/DropdownMenu/DropdownMenu';
 
 import { editorOperations } from '../../../../../../redux/ducks/editor';
 import { recordingEditorOperations } from '../../../../../../redux/ducks/editor/recording';

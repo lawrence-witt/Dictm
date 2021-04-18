@@ -6,9 +6,9 @@ import * as helpers from './helpers';
 
 import { RootState } from '../../store';
 
-import { recordingOperations } from '../media/recordings';
-import { noteOperations } from '../media/notes';
-import { categoryOperations } from '../categories';
+import { recordingOperations } from '../content/recordings';
+import { noteOperations } from '../content/notes';
+import { categoryOperations } from '../content/categories';
 
 const { createRecording, updateRecording } = recordingOperations;
 const { createNote, updateNote } = noteOperations;
@@ -34,7 +34,7 @@ export const openEditor = (
     dispatch,
     getState
 ): void => {
-    const { user, media, categories } = getState();
+    const { user, content, categories } = getState();
 
     const isNew = contentId === "new";
     let model: types.EditorModels | undefined;
@@ -42,7 +42,7 @@ export const openEditor = (
     if (editorType === "choose" || isNew) {
         model = helpers.generateContentModel(editorType, user.profile.id);
     } else {
-        model = helpers.findContentModel(media, categories, editorType, contentId);
+        model = helpers.findContentModel(content, categories, editorType, contentId);
     }
 
     if (!model) {

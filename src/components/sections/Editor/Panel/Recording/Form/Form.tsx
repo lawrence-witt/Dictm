@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../../redux/store';
-import { categorySelectors } from '../../../../../../redux/ducks/categories';
+import { categorySelectors } from '../../../../../../redux/ducks/content/categories';
 import { recordingEditorOperations } from '../../../../../../redux/ducks/editor/recording';
 
 import { FormProps } from './Form.types';

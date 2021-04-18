@@ -7,7 +7,7 @@ import { navigationSelectors, navigationOperations, NavMenuLists } from '../../.
 
 import { useBreakContext } from '../../../lib/hooks/useBreakpoints';
 
-import HybridDrawer from '../../molecules/Drawers/HybridDrawer';
+import HybridDrawer from '../../molecules/HybridDrawer/HybridDrawer';
 
 import NavMenuSwitch from './Switch/NavMenuSwitch';
 import NavMenuHeader from './Header/NavMenuHeader';
@@ -20,7 +20,9 @@ import { NavMenuState } from './NavMenu.types';
 
 const mapState = (state: RootState, props: RouteComponentProps) => ({
     isMenuOpen: state.navigation.menu.isOpen,
-    navLists: navigationSelectors.getNavLists(state.user, state.categories, props.history.push)
+    navLists: navigationSelectors.getNavLists(
+        state.user, state.content.categories, props.history.push
+    )
 });
 
 const mapDispatch = {

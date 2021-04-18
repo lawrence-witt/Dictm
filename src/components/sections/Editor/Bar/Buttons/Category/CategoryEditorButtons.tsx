@@ -5,9 +5,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import { RootState } from '../../../../../../redux/store';
 import { editorSelectors, editorOperations } from '../../../../../../redux/ducks/editor';
-import { categoryEditorOperations } from '../../../../../../redux/ducks/editor/category';
 
-import DropdownMenu from '../../../../../molecules/Menus/Dropdown/DropdownMenu';
+import DropdownMenu from '../../../../../molecules/DropdownMenu/DropdownMenu';
 
 import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 
@@ -20,7 +19,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    saveCategory: categoryEditorOperations.saveCategoryEditorModel,
+    saveEditor: editorOperations.saveEditor,
     openDetailsDialog: editorOperations.openDetailsDialog
 }
 
@@ -36,7 +35,7 @@ const CategoryPanelButtons: React.FC<ReduxProps> = (props) => {
     const {
         canSave,
         openDetailsDialog,
-        saveCategory
+        saveEditor
     } = props;
 
     const onDetailsClick = React.useCallback((closeMenu: () => void) => {
@@ -51,7 +50,7 @@ const CategoryPanelButtons: React.FC<ReduxProps> = (props) => {
             <SaveButton
                 color="inherit"
                 disabled={!canSave}
-                onClick={saveCategory}
+                onClick={saveEditor}
             />
             <DropdownMenu>
                 {(closeMenu) => (

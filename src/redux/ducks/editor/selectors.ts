@@ -6,8 +6,8 @@ import { ContentModels } from './types';
 import Recording from '../../../db/models/Recording';
 import Note from '../../../db/models/Note';
 
-import { formatLongTimestamp, formatDuration } from '../../../lib/utils/FormatTime';
-import { formatByteLength, formatStringBytes } from '../../../lib/utils/FormatFileSize';
+import { formatLongTimestamp, formatDuration } from '../../../lib/utils/formatTime';
+import { formatByteLength, formatStringBytes } from '../../../lib/utils/formatFileSize';
 
 const stringArraysEqual = (arr1: string[], arr2: string[]) => {
     const asSet = new Set([...arr1, ...arr2]);

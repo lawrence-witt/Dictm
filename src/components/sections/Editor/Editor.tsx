@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
+import Drawer from '@material-ui/core/Drawer';
+import { makeStyles } from '@material-ui/core/styles';
+
 import { RootState } from '../../../redux/store';
 import { editorOperations, editorSelectors } from '../../../redux/ducks/editor';
-
-import FocusDrawer from '../../molecules/Drawers/FocusDrawer';
 
 import EditorBar from './Bar/EditorBar';
 import EditorPanel from './Panel/EditorPanel';
@@ -34,6 +35,14 @@ type ReduxProps = ConnectedProps<typeof connector>;
 *   Local
 */
 
+const useStyles = makeStyles(() => ({
+    paper: {
+        width: '100%',
+        maxWidth: 450,
+        overflowX: 'hidden'
+    }
+}));
+
 const Editor: React.FC<ReduxProps> = (props) => {
     const {
         isOpen,
@@ -44,16 +53,17 @@ const Editor: React.FC<ReduxProps> = (props) => {
         clearEditor
     } = props;
 
-    const onClose = React.useCallback(() => {
-        if (canSave) {
-            return openSaveDialog();
-        }
+    const classes = useStyles();
 
+    const onClose = React.useCallback(() => {
+        if (canSave) return openSaveDialog();
         closeEditor();
     }, [canSave, openSaveDialog, closeEditor]);
 
     return (
-        <FocusDrawer
+        <Drawer
+            anchor="right"
+            elevation={8}
             open={isOpen}
             onClose={onClose}
             SlideProps={{
@@ -61,6 +71,7 @@ const Editor: React.FC<ReduxProps> = (props) => {
                 unmountOnExit: true,
                 onExited: clearEditor
             }}
+            classes={classes}
         >
             {context ? (
                 <>
@@ -69,7 +80,7 @@ const Editor: React.FC<ReduxProps> = (props) => {
                     <Dialog />
                 </>
             ) : null}
-        </FocusDrawer>
+        </Drawer>
     )
 };
 

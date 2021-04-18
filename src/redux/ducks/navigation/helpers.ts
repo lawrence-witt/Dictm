@@ -22,7 +22,7 @@ export const extractParams = (
 
 export const extractPageTitle = (
     params: Params,
-    categories: RootState["categories"]
+    categories: RootState["content"]["categories"]
 ): string => {
     const { stem, categoryId } = params;
         

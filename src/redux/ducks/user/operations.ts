@@ -5,9 +5,9 @@ import { UserController } from '../../../db/controllers/User';
 
 import * as actions from './actions';
 
-import { recordingOperations } from '../media/recordings';
-import { noteOperations } from '../media/notes';
-import { categoryOperations } from '../categories';
+import { recordingOperations } from '../content/recordings';
+import { noteOperations } from '../content/notes';
+import { categoryOperations } from '../content/categories';
 
 /** 
 *  Summary:
@@ -21,7 +21,7 @@ export const loadUser = (
 ): Promise<void> => {
     const userData = await (async () => {
         try {
-            return await UserController.getUserData(profile);
+            return await UserController.selectUserData(profile);
         } catch (err) {
             // handle cannot get data
             console.log(err);

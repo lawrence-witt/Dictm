@@ -9,7 +9,7 @@ import store from './redux/store';
 import ThemeProvider from './lib/providers/ThemeProvider';
 import BreakpointsProvider from './lib/providers/BreakpointsProvider';
 
-import App from './components/views/App/App';
+import App from '../offcuts/App/App';
 
 const rootHtml = (
   <StoreProvider store={store}>

@@ -5,7 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../../../redux/store';
-import { categorySelectors } from '../../../../../redux/ducks/categories';
+import { categorySelectors } from '../../../../../redux/ducks/content/categories';
 import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
 
 import CustomSelect from '../../../../atoms/Inputs/CustomSelect';

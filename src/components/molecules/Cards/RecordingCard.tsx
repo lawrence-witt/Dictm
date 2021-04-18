@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../redux/store';
 import { editorOperations } from '../../../redux/ducks/editor';
 import { toolOperations, toolSelectors } from '../../../redux/ducks/tools';
-import { mediaSelectors } from '../../../redux/ducks/media';
+import { contentSelectors } from '../../../redux/ducks/content';
 
 import Play from '@material-ui/icons/PlayArrow';
 
@@ -28,8 +28,8 @@ const mapState = (state: RootState, props: RecordingCardProps) => ({
         "recordings",
         props.id
     ),
-    durationFormatted: mediaSelectors.getFormattedDuration(props.duration),
-    createdFormatted: mediaSelectors.getFormattedTimestamp(props.created)
+    durationFormatted: contentSelectors.getFormattedDuration(props.duration),
+    createdFormatted: contentSelectors.getFormattedTimestamp(props.created)
 });
 
 const mapDispatch = {
