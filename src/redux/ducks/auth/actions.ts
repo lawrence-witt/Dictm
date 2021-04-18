@@ -2,21 +2,6 @@ import * as types from './types';
 
 import User from '../../../db/models/User';
 
-// Auth Panel Actions
-
-export const popAuthPanel = (): types.AuthPanelPoppedAction => ({
-    type: types.AUTH_PANEL_POPPED
-});
-
-export const pushAuthPanel = (
-    panel: types.PanelTypes
-): types.AuthPanelPushedAction => ({
-    type: types.AUTH_PANEL_PUSHED,
-    payload: {
-        panel
-    }
-});
-
 // Local Users Actions
 
 export const loadLocalUsers = (

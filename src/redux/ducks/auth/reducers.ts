@@ -2,34 +2,6 @@ import { combineReducers } from 'redux';
 
 import * as types from './types';
 
-// Auth Panel Reducer
-
-const initialPanelState: types.AuthPanelState = {
-    prev: undefined,
-    current: "home"
-}
-
-const panelReducer = (
-    state = initialPanelState,
-    action: types.AuthPanelActions
-): types.AuthPanelState => {
-    switch(action.type) {
-        case types.AUTH_PANEL_POPPED:
-            if (!state.prev) return state;
-            return {
-                prev: state.current,
-                current: state.prev
-            }
-        case types.AUTH_PANEL_PUSHED:
-            return {
-                prev: state.current,
-                current: action.payload.panel
-            }
-        default:
-            return state;
-    }
-}
-
 // Local Users Reducer
 
 const initialLocalUsersState: types.LocalUsersState = {
@@ -92,7 +64,6 @@ const newUserReducer = (
 }
 
 const reducer = combineReducers({
-    panel: panelReducer,
     local: localUsersReducer,
     new: newUserReducer
 });

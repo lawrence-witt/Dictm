@@ -5,5 +5,6 @@ type CustomComponentProps = RouteComponentProps<{categoryId: 'string'}, StaticCo
 
 export interface CustomRouteProps extends RouteProps {
     name: 'recordings' | 'notes' | 'categories' | 'settings';
+    path: string;
     render(routeProps: CustomComponentProps): JSX.Element;
 } 

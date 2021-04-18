@@ -5,13 +5,13 @@ import { useHistory } from 'react-router-dom';
 import { a } from 'react-spring';
 
 import { RootState } from '../../src/redux/store';
-import { navigationOperations, navigationSelectors } from '../../src/redux/ducks/navigation';
+import { navigationOperations, navigationSelectors } from '../../src/redux/ducks/history';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import AppSwitch from '../routes/AppSwitch/AppSwitch';
 
-import ToolBar from '../../src/components/organisms/ToolBar/ToolBar';
+import ToolBar from '../../src/components/organisms/AppBar/AppBar';
 import NavBar from '../../src/components/organisms/NavBar/NavBar';
 import NavMenu from '../../src/components/organisms/NavMenu/NavMenu';
 import Editor from '../../src/components/organisms/Editor/Editor';

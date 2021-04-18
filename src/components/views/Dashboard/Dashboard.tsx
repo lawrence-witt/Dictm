@@ -2,7 +2,7 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import ToolBar from '../../organisms/ToolBar/ToolBar';
+import AppBar from '../../organisms/AppBar/AppBar';
 import NavBar from '../../organisms/NavBar/NavBar';
 import NavMenu from '../../organisms/NavMenu/NavMenu';
 import Editor from '../../organisms/Editor/Editor';
@@ -21,16 +21,6 @@ const useStyles = makeStyles(() => ({
         minWidth: 300,
         display: 'flex',
         flexDirection: 'column'
-    },
-    contentBase: {
-        width: '100%',
-        height: '100%',
-        position: 'relative'
-    },
-    templateFrame: {
-        width: '100%',
-        height: '100%',
-        position: 'absolute'
     }
 }));
 
@@ -41,7 +31,7 @@ const Dashboard: React.FC = () => {
         <div className={classes.fixedBase}>
             <NavMenu/>
             <div className={classes.pageBase}>
-                <ToolBar/>
+                <AppBar/>
                 <DashboardSwitch />
                 <Editor />
                 <NavBar />

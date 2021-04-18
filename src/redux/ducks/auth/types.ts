@@ -1,32 +1,5 @@
 import User from '../../../db/models/User';
 
-// Auth Panel Types
-
-export const AUTH_PANEL_PUSHED = "dictm/auth/panel/PUSHED";
-export const AUTH_PANEL_POPPED = "dictm/auth/panel/POPPED";
-
-export type PanelTypes = "home" | "local" | "new";
-
-export interface AuthPanelState {
-    prev?: PanelTypes;
-    current: PanelTypes;
-}
-
-export interface AuthPanelPushedAction {
-    type: typeof AUTH_PANEL_PUSHED;
-    payload: {
-        panel: PanelTypes;
-    }
-}
-
-export interface AuthPanelPoppedAction {
-    type: typeof AUTH_PANEL_POPPED;
-}
-
-export type AuthPanelActions =
-|   AuthPanelPushedAction
-|   AuthPanelPoppedAction;
-
 // Local Users Types
 
 export const LOCAL_USERS_LOADED         = "dictm/auth/users/local/LOADED";

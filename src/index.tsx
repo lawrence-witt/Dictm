@@ -9,14 +9,14 @@ import store from './redux/store';
 import ThemeProvider from './lib/providers/ThemeProvider';
 import BreakpointsProvider from './lib/providers/BreakpointsProvider';
 
-import App from '../offcuts/App/App';
+import Root from './root/Root';
 
 const rootHtml = (
   <StoreProvider store={store}>
     <BrowserRouter>
       <ThemeProvider>
         <BreakpointsProvider>
-          <App />
+          <Root />
         </BreakpointsProvider>
       </ThemeProvider>
     </BrowserRouter>

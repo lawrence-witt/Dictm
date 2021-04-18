@@ -5,6 +5,27 @@ import { RootState } from '../../store';
 import * as types from './types';
 import * as actions from './actions';
 
+/* Nav Menu Operations */
+
+/** 
+*  Summary:
+*  Toggle the open state of the navigation menu.
+*/
+
+export const toggleNavMenu = (): ToggleNavMenuThunkAction => (
+    dispatch,
+    getState
+): void => {
+    const { isOpen } = getState().tools.menu;
+
+    dispatch(isOpen ? actions.closeNavMenu() : actions.openNavMenu());
+}
+
+type ToggleNavMenuThunkAction = ThunkAction<void, RootState, unknown, 
+    types.NavMenuOpenedAction | 
+    types.NavMenuClosedAction
+>;
+
 /* Search Tool Operations */
 
 /* 

@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
-import { navigationSelectors } from '../../../redux/ducks/navigation';
+import { navigationSelectors } from '../../../redux/ducks/history';
 
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';

@@ -1,4 +1,4 @@
-import { NavMenuList } from '../../../../redux/ducks/navigation';
+import { NavMenuList } from '../../../../redux/ducks/tools';
 
 export interface NavMenuSwitchProps {
     list: NavMenuList;

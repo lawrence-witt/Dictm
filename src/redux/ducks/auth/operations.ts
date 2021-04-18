@@ -10,38 +10,6 @@ import * as actions from './actions';
 import { userOperations } from '../user';
 
 /* 
-*   Auth Panel Operations
-*/
-
-/** 
-*  Summary:
-*  Move the auth panel state one view back
-*/
-
-export const popAuthPanel = (): PopAuthPanelThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.popAuthPanel());
-}
-
-type PopAuthPanelThunkAction = ThunkAction<void, undefined, unknown, types.AuthPanelPoppedAction>;
-
-/** 
-*  Summary:
-*  Move the auth panel state to a new view
-*/
-
-export const pushAuthPanel = (
-    panel: types.PanelTypes
-): PushAuthPanelThunkAction => (
-    dispatch
-): void => {
-    dispatch(actions.pushAuthPanel(panel));
-}
-
-type PushAuthPanelThunkAction = ThunkAction<void, undefined, unknown, types.AuthPanelPushedAction>;
-
-/* 
 *   Local Users Operations
 */
 

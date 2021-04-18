@@ -2,6 +2,29 @@ import { combineReducers } from 'redux';
 
 import * as types from './types';
 
+/* Nav Menu Reducer */
+
+const initialMenuState: types.NavMenuState = {
+    isOpen: false
+}
+
+const navMenuReducer = (
+    state = initialMenuState,
+    action: types.NavMenuActionTypes
+): types.NavMenuState => {
+    switch(action.type) {
+        case types.NAV_MENU_OPENED:
+            return {
+                isOpen: true
+            }
+        case types.NAV_MENU_CLOSED:
+            return {
+                isOpen: false
+            }
+        default: return state;
+    }
+};
+
 /* Search Tool Reducer */
 
 const initialSearchState: types.SearchToolState = {
@@ -90,6 +113,7 @@ const deleteToolReducer = (
 /* Root Reducer */
 
 const reducer = combineReducers({
+    menu: navMenuReducer,
     search: searchToolReducer,
     delete: deleteToolReducer
 });

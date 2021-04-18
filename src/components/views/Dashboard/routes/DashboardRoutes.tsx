@@ -9,7 +9,7 @@ const RecordingsRoute: CustomRouteProps = {
     name: "recordings",
     exact: true,
     path: "/recordings",
-    render: function RecordingsContent(): JSX.Element {
+    render: function RecordingsContent() {
         return <Content context="recordings" />;
     }
 }
@@ -18,7 +18,7 @@ const NotesRoute: CustomRouteProps = {
     name: "notes",
     exact: true,
     path: "/notes",
-    render: function NotesContent(): JSX.Element {
+    render: function NotesContent() {
         return <Content context="notes"/>;
     }
 }
@@ -27,7 +27,7 @@ const CategoriesRoute: CustomRouteProps = {
     name: "categories",
     exact: true,
     path: "/categories/:categoryId?",
-    render: function CategoriesContent({match}): JSX.Element {
+    render: function CategoriesContent({match}) {
         return <Content context="categories" categoryId={match.params.categoryId} />;
     }
 }
@@ -41,11 +41,11 @@ const SettingsRoute: CustomRouteProps = {
     }
 }
 
-const routes = [
+export const routes = [
     RecordingsRoute,
     NotesRoute,
     CategoriesRoute,
     SettingsRoute
 ]
 
-export default routes;
+export const paths = routes.map(r => r.path);
