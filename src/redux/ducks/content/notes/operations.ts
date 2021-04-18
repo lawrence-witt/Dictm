@@ -121,3 +121,17 @@ export const deleteNotes = (
 }
 
 type DeleteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesDeletedAction>;
+
+/** 
+*  Summary:
+*  Clears notes from the store on user sign out.
+*
+*/
+
+export const clearNotes = (): ClearNotesThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.clearNotes());
+}
+
+type ClearNotesThunkAction = ThunkAction<void, undefined, unknown, types.NotesClearedAction>;

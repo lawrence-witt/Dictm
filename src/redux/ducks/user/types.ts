@@ -1,6 +1,7 @@
 import User from '../../../db/models/User';
 
-export const USER_LOADED = 'dictm/user/LOADED';
+export const USER_LOADED    = "dictm/user/LOADED";
+export const USER_CLEARED   = "dictm/user/CLEARED"
 
 export interface UserState {
     isLoaded: boolean;
@@ -14,5 +15,10 @@ export interface UserLoadedAction {
     }
 }
 
+export interface UserClearedAction {
+    type: typeof USER_CLEARED;
+}
+
 export type UserActionTypes = 
-|   UserLoadedAction;
+|   UserLoadedAction
+|   UserClearedAction;

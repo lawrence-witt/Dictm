@@ -49,6 +49,8 @@ const notesReducer = (
 
             return clonedState;
         }
+        case types.NOTES_CLEARED:
+            return initialState;
         default:
             return state;
     }

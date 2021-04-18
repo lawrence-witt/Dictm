@@ -37,3 +37,7 @@ export const deleteNotes = (
         ids
     }
 });
+
+export const clearNotes = (): types.NotesClearedAction => ({
+    type: types.NOTES_CLEARED
+});

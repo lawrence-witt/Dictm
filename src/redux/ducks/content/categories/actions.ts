@@ -37,3 +37,7 @@ export const deleteCategories = (
         ids
     }
 });
+
+export const clearCategories = (): types.CategoriesClearedAction => ({
+    type: types.CATEGORIES_CLEARED
+});

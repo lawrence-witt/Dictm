@@ -39,54 +39,21 @@ const categoriesReducer = (
                 return out;
             }, clonedState);
         }
-        case types.CATEGORY_IDS_ADDED: {
-            const { id, type, ids } = action.payload;
+        case types.CATEGORIES_DELETED: {
+            const { ids } = action.payload;
 
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [id]: {
-                        ...state.byId[id],
-                        relationships: {
-                            ...state.byId[id].relationships,
-                            [type]: {
-                                ids: [...state.byId[id].relationships[type].ids, ...ids]
-                            }
-                        }
-                    }
-                }
-            }
+            const clonedState = {
+                byId: {...state.byId}, 
+                allIds: [...state.allIds]
+            };
+
+            ids.forEach(id => delete clonedState.byId[id]);
+            clonedState.allIds = clonedState.allIds.filter(id => !ids.includes(id));
+
+            return clonedState;
         }
-        case types.CATEGORY_IDS_REMOVED: {
-            const { id, type, ids } = action.payload;
-
-            return {
-                ...state,
-                byId: {
-                    ...state.byId,
-                    [id]: {
-                        ...state.byId[id],
-                        relationships: {
-                            ...state.byId[id].relationships,
-                            [type]: {
-                                ids: state.byId[id].relationships[type].ids.filter(id => !ids.includes(id))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        case types.CATEGORY_DELETED: {
-            const { id } = action.payload;
-
-            const clone = {...state};
-
-            delete clone.byId[id];
-            clone.allIds = clone.allIds.filter(i => i !== id);
-
-            return clone;
-        }
+        case types.CATEGORIES_CLEARED:
+            return initialState;
         default:
             return state;
     }

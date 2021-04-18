@@ -136,8 +136,22 @@ export const deleteCategories = (
 ): DeleteCategoriesThunkAction => (
     dispatch
 ): void => {
-    // TODO: remove database record
+    // TODO: remove database records
     dispatch(actions.deleteCategories(ids));
 }
 
 type DeleteCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesDeletedAction>;
+
+/** 
+*  Summary:
+*  Clears categories from the store on user sign out.
+*
+*/
+
+export const clearCategories = (): ClearCategoriesThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.clearCategories());
+}
+
+type ClearCategoriesThunkAction = ThunkAction<void, undefined, unknown, types.CategoriesClearedAction>;

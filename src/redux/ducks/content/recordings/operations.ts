@@ -94,13 +94,13 @@ type UpdateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.Re
 
 export const overwriteRecordings = (
     recordings: Recording[]
-): OverwriteRecordingThunkAction => (
+): OverwriteRecordingsThunkAction => (
     dispatch
 ): void => {
     dispatch(actions.overwriteRecordings(recordings));
 }
 
-type OverwriteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
+type OverwriteRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
 
 /** 
 *  Summary:
@@ -110,11 +110,25 @@ type OverwriteRecordingThunkAction = ThunkAction<void, undefined, unknown, types
 
 export const deleteRecordings = (
     ids: string[]
-): DeleteRecordingThunkAction => (
+): DeleteRecordingsThunkAction => (
     dispatch
 ): void => {
     // TODO: remove database records
     dispatch(actions.deleteRecordings(ids));
 }
 
-type DeleteRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsDeletedAction>;
+type DeleteRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsDeletedAction>;
+
+/** 
+*  Summary:
+*  Clears recordings from the store on user sign out.
+*
+*/
+
+export const clearRecordings = (): ClearRecordingsThunkAction => (
+    dispatch
+): void => {
+    dispatch(actions.clearRecordings());
+}
+
+type ClearRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsClearedAction>;

@@ -48,6 +48,8 @@ const recordingsReducer = (
 
             return clonedState;
         }
+        case types.RECORDINGS_CLEARED:
+            return initialState;
         default:
             return state;
     }

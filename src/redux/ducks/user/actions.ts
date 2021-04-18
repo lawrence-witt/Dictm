@@ -10,3 +10,7 @@ export const loadUser = (
         profile
     }
 });
+
+export const clearUser = (): types.UserClearedAction => ({
+    type: types.USER_CLEARED
+});

@@ -37,3 +37,7 @@ export const deleteRecordings = (
         ids
     }
 });
+
+export const clearRecordings = (): types.RecordingsClearedAction => ({
+    type: types.RECORDINGS_CLEARED
+});

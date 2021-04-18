@@ -1,9 +1,10 @@
 import Category from '../../../../db/models/Category';
 
-export const CATEGORIES_LOADED      = "dictm/categories/CATEGORIES_LOADED";
-export const CATEGORY_CREATED       = "dictm/categories/CATEGORY_CREATED";
-export const CATEGORIES_OVERWRITTEN = "dictm/categories/CATEGORIES_OVERWRITTEN";
-export const CATEGORIES_DELETED     = "dictm/categories/CATEGORIES_DELETED";
+export const CATEGORIES_LOADED      = "dictm/content/categories/CATEGORIES_LOADED";
+export const CATEGORY_CREATED       = "dictm/content/categories/CATEGORY_CREATED";
+export const CATEGORIES_OVERWRITTEN = "dictm/content/categories/CATEGORIES_OVERWRITTEN";
+export const CATEGORIES_DELETED     = "dictm/content/categories/CATEGORIES_DELETED";
+export const CATEGORIES_CLEARED     = "dictm/content/categories/CATEGORIES_CLEARED";
 
 export interface CategoriesState {
     byId: Record<string, Category>;
@@ -38,8 +39,13 @@ export interface CategoriesDeletedAction {
     }
 }
 
+export interface CategoriesClearedAction {
+    type: typeof CATEGORIES_CLEARED;
+}
+
 export type CategoriesActionTypes =
 |   CategoriesLoadedAction
 |   CategoryCreatedAction
 |   CategoriesOverwrittenAction
-|   CategoriesDeletedAction;
+|   CategoriesDeletedAction
+|   CategoriesClearedAction;

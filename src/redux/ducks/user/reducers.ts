@@ -28,6 +28,8 @@ const userReducer = (
                 isLoaded: true,
                 profile: action.payload.profile
             }
+        case types.USER_CLEARED:
+            return initialState;
         default:
             return state;
     }

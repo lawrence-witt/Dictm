@@ -21,7 +21,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     changeLocation: historyOperations.changeLocation,
-    initialseApp: authOperations.initialiseApp
+    initialiseApp: authOperations.initialiseApp
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -35,7 +35,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 const Root: React.FC<ReduxProps> = (props) => {
     const {
         changeLocation,
-        initialseApp,
+        initialiseApp,
         appInitialised,
         userLoaded
     } = props;
@@ -56,7 +56,7 @@ const Root: React.FC<ReduxProps> = (props) => {
 
     // Initialise the application on page load
 
-    React.useEffect(() => initialseApp(), [initialseApp]);
+    React.useEffect(() => initialiseApp(), [initialiseApp]);
     
     if (!appInitialised) return null;
 
