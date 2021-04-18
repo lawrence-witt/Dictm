@@ -11,10 +11,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import AppSwitch from '../routes/AppSwitch/AppSwitch';
 
-import ToolBar from '../../src/components/sections/ToolBar/ToolBar';
-import NavBar from '../../src/components/sections/NavBar/NavBar';
-import NavMenu from '../../src/components/sections/NavMenu/NavMenu';
-import Editor from '../../src/components/sections/Editor/Editor';
+import ToolBar from '../../src/components/organisms/ToolBar/ToolBar';
+import NavBar from '../../src/components/organisms/NavBar/NavBar';
+import NavMenu from '../../src/components/organisms/NavMenu/NavMenu';
+import Editor from '../../src/components/organisms/Editor/Editor';
 
 import AuthModal from '../../src/components/templates/Portal/Portal';
 

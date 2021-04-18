@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Portal from '../../sections/Portal/Portal';
+import Portal from '../../organisms/Portal/Portal';
 
 const Auth: React.FC = () => {
     return <Portal/>;

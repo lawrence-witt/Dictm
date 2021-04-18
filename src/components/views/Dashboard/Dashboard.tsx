@@ -2,10 +2,10 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import ToolBar from '../../sections/ToolBar/ToolBar';
-import NavBar from '../../sections/NavBar/NavBar';
-import NavMenu from '../../sections/NavMenu/NavMenu';
-import Editor from '../../sections/Editor/Editor';
+import ToolBar from '../../organisms/ToolBar/ToolBar';
+import NavBar from '../../organisms/NavBar/NavBar';
+import NavMenu from '../../organisms/NavMenu/NavMenu';
+import Editor from '../../organisms/Editor/Editor';
 import DashboardSwitch from './switch/DashboardSwitch';
 
 const useStyles = makeStyles(() => ({
