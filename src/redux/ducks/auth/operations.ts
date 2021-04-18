@@ -10,6 +10,18 @@ import * as actions from './actions';
 import { userOperations } from '../user';
 
 /* 
+*   Init App Operations
+*/
+
+export const initialiseApp = (): InitialiseAppThunkAction => (
+    dispatch
+) => {
+    dispatch(actions.initialiseApp());
+}
+
+type InitialiseAppThunkAction = ThunkAction<void, undefined, unknown, types.AppInitalisedAction>;
+
+/* 
 *   Local Users Operations
 */
 

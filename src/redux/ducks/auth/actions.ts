@@ -2,6 +2,12 @@ import * as types from './types';
 
 import User from '../../../db/models/User';
 
+// Init App Actions
+
+export const initialiseApp = (): types.AppInitalisedAction => ({
+    type: types.APP_INITIALISED
+});
+
 // Local Users Actions
 
 export const loadLocalUsers = (

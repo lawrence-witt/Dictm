@@ -2,6 +2,26 @@ import { combineReducers } from 'redux';
 
 import * as types from './types';
 
+// Init App Reducer
+
+const initialAppState: types.InitialAppState = {
+    isInitialising: true
+}
+
+const initialAppReducer = (
+    state = initialAppState,
+    actions: types.InitialAppActions
+): types.InitialAppState => {
+    switch(actions.type) {
+        case types.APP_INITIALISED:
+            return {
+                isInitialising: false
+            }
+        default:
+            return state;
+    }
+}
+
 // Local Users Reducer
 
 const initialLocalUsersState: types.LocalUsersState = {
@@ -64,6 +84,7 @@ const newUserReducer = (
 }
 
 const reducer = combineReducers({
+    init: initialAppReducer,
     local: localUsersReducer,
     new: newUserReducer
 });

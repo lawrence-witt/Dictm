@@ -1,5 +1,19 @@
 import User from '../../../db/models/User';
 
+// Init Application Types
+
+export const APP_INITIALISED            = "dictm/auth/init/INITIALISED";
+
+export interface InitialAppState {
+    isInitialising: boolean;
+}
+
+export interface AppInitalisedAction {
+    type: typeof APP_INITIALISED;
+}
+
+export type InitialAppActions = AppInitalisedAction;
+
 // Local Users Types
 
 export const LOCAL_USERS_LOADED         = "dictm/auth/users/local/LOADED";
