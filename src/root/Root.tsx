@@ -15,7 +15,7 @@ import PrivateRouter from './routers/PrivateRouter';
 */
 
 const mapState = (state: RootState) => ({
-    appInitialised: !state.auth.init.isInitialising,
+    appInitialised: state.auth.init.isInitialised,
     userLoaded: state.user.isLoaded
 })
 

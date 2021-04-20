@@ -28,18 +28,17 @@ export const generateContentModel = (
 }
 
 export const findContentModel = (
-    media: RootState["media"],
-    categories: RootState["categories"],
+    content: RootState["content"],
     type: ContentModelTypes,
     id: string
 ): ContentModels | undefined => {    
     switch (type) {
         case "recording":
-            return media.recordings.byId[id];
+            return content.recordings.byId[id];
         case "note":
-            return media.notes.byId[id];
+            return content.notes.byId[id];
         case "category":
-            return categories.byId[id];
+            return content.categories.byId[id];
         default:
             return undefined;
     }

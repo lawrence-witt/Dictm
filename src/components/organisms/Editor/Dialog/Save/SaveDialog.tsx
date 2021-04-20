@@ -3,9 +3,6 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
 import { editorOperations, editorSelectors } from '../../../../../redux/ducks/editor';
-import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
-import { noteEditorOperations } from '../../../../../redux/ducks/editor/note';
-import { categoryEditorOperations } from '../../../../../redux/ducks/editor/category';
 
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
@@ -19,13 +16,13 @@ import { SaveDialogProps } from './SaveDialog.types';
 */
 
 const mapState = (state: RootState) => ({
+    type: state.editor.context?.type,
+    isNew: state.editor.attributes.isNew,
     canSave: editorSelectors.getSaveAvailability(state.editor)
 });
 
 const mapDispatch = {
-    saveRecording: recordingEditorOperations.saveRecordingEditorModel,
-    saveNote: noteEditorOperations.saveNoteEditorModel,
-    saveCategory: categoryEditorOperations.saveCategoryEditorModel,
+    saveEditor: editorOperations.saveEditor,
     closeDialog: editorOperations.closeDialog,
     closeEditor: editorOperations.closeEditor
 }
@@ -38,14 +35,12 @@ type ReduxProps = ConnectedProps<typeof connector>;
 *   Local
 */
 
-const SaveDialog: React.FC<SaveDialogProps & ReduxProps> = (props) => {
+const SaveDialog: React.FC<ReduxProps> = (props) => {
     const {
-        type = "invalid",
+        type,
         isNew,
         canSave,
-        saveRecording,
-        saveNote,
-        saveCategory,
+        saveEditor,
         closeDialog,
         closeEditor
     } = props;
@@ -53,15 +48,6 @@ const SaveDialog: React.FC<SaveDialogProps & ReduxProps> = (props) => {
     const text = isNew ? 
     `Save your ${type} or discard it?` : 
     'Save your changes or discard them?';
-
-    const saveAction = React.useMemo(() => {
-        switch(type) {
-            case "recording": return saveRecording;
-            case "note": return saveNote;
-            case "category": return saveCategory;
-            default: return () => ({});
-        }
-    }, [type, saveRecording, saveCategory, saveNote]);
 
     return (
         <>
@@ -80,7 +66,7 @@ const SaveDialog: React.FC<SaveDialogProps & ReduxProps> = (props) => {
                 <Button 
                     color="primary"
                     disabled={!canSave}
-                    onClick={saveAction}
+                    onClick={saveEditor}
                 >
                     Save
                 </Button>

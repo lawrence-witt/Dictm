@@ -4,9 +4,12 @@ import React from 'react';
 
 import { useTransition, UseTransitionProps, TransitionFn } from 'react-spring';
 
-function useUniqueTransition<K extends string>(
+function useUniqueTransition<
+    I extends {[key: string]: any}, 
+    K extends keyof I
+>(
     key: K,
-    item: Record<string, any>,
+    item: I,
     transitionProps: UseTransitionProps
 ): TransitionFn {
     const [store, setStore] = React.useState(item);

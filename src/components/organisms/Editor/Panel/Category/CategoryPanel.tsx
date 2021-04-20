@@ -5,7 +5,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
 import { categoryEditorOperations } from '../../../../../redux/ducks/editor/category';
-import { mediaSelectors } from '../../../../../redux/ducks/content';
+import { contentSelectors } from '../../../../../redux/ducks/content';
 
 import MediaAutocomplete, { MediaOption } from '../../../../atoms/Inputs/MediaAutocomplete';
 
@@ -16,8 +16,8 @@ import { CategoryPanelProps } from './CategoryPanel.types';
 */
 
 const mapState = (state: RootState) => ({
-    recordingOptions: mediaSelectors.getMediaByTitleAndCategory(state, "recordings"),
-    noteOptions: mediaSelectors.getMediaByTitleAndCategory(state, "notes")
+    recordingOptions: contentSelectors.getMediaByTitleAndCategory(state.content, "recordings"),
+    noteOptions: contentSelectors.getMediaByTitleAndCategory(state.content, "notes")
 });
 
 const mapDispatch = {

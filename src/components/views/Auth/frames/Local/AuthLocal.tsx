@@ -44,7 +44,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const useStyles = makeStyles(theme => ({
     container: {
-        //
+        flex: 1,
     },
     toolbar: {
         minHeight: 56
@@ -53,14 +53,14 @@ const useStyles = makeStyles(theme => ({
         margin: 'unset'
     },
     radio: {
-        paddingLeft: 'unset',
+        marginLeft: -theme.spacing(1),
         marginRight: theme.spacing(1)
     }
 }))
 
 const AuthLocal: React.FC<ReduxProps> = (props) => {
     const {
-        selectedUser,
+        selectedUser = "",
         usersByName,
         selectLocalUser,
         loadUser
@@ -110,7 +110,9 @@ const AuthLocal: React.FC<ReduxProps> = (props) => {
                     </RadioGroup>
                 </FormControl>
             </div>
-            <Toolbar>
+            <Toolbar
+                disableGutters
+            >
                 <DirectionButton
                     edge="start"
                     design="arrow" 

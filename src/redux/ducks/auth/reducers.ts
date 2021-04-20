@@ -5,7 +5,7 @@ import * as types from './types';
 // Init App Reducer
 
 const initialAppState: types.InitialAppState = {
-    isInitialising: true
+    isInitialised: false
 }
 
 const initialAppReducer = (
@@ -15,7 +15,7 @@ const initialAppReducer = (
     switch(actions.type) {
         case types.APP_INITIALISED:
             return {
-                isInitialising: false
+                isInitialised: true
             }
         default:
             return state;

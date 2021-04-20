@@ -34,7 +34,7 @@ export const openEditor = (
     dispatch,
     getState
 ): void => {
-    const { user, content, categories } = getState();
+    const { user, content } = getState();
 
     const isNew = contentId === "new";
     let model: types.EditorModels | undefined;
@@ -42,7 +42,7 @@ export const openEditor = (
     if (editorType === "choose" || isNew) {
         model = helpers.generateContentModel(editorType, user.profile.id);
     } else {
-        model = helpers.findContentModel(content, categories, editorType, contentId);
+        model = helpers.findContentModel(content, editorType, contentId);
     }
 
     if (!model) {

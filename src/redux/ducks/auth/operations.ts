@@ -168,6 +168,8 @@ export const createNewUser = (): CreateNewUserThunkAction => async (
 
     if (!user) return;
 
+    console.log(user);
+
     dispatch(userOperations.loadUser(user));
 }
 

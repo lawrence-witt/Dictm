@@ -17,7 +17,7 @@ import CustomSelect from '../../../../../atoms/Inputs/CustomSelect';
 */
 
 const mapState = (state: RootState) => ({
-    categoryTitles: categorySelectors.getCategoriesByTitle(state.categories)
+    categoryTitles: categorySelectors.getCategoriesByTitle(state.content.categories)
 });
 
 const mapDispatch = {

@@ -14,8 +14,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 
 const mapState = (state: RootState) => ({
-    type: state.editor.context?.type,
-    isNew: state.editor.attributes.isNew,
     dialogs: state.editor.dialogs
 });
 
@@ -41,8 +39,6 @@ const useDialogStyles = makeStyles(() => ({
 
 const Dialog: React.FC<ReduxProps> = (props) => {
     const {
-        type,
-        isNew,
         dialogs
     } = props;
 
@@ -54,14 +50,11 @@ const Dialog: React.FC<ReduxProps> = (props) => {
 
     const RenderedDialog = React.useMemo(() => {
         switch(dialogKey) {
-            case "save":
-                return <SaveDialog type={type} isNew={isNew}/>;
-            case "details":
-                return <DetailsDialog/>;
-            default:
-                return null;
+            case "save": return <SaveDialog />;
+            case "details": return <DetailsDialog/>;
+            default: return null;
         }
-    }, [dialogKey, type, isNew]);
+    }, [dialogKey]);
 
     return (
         <MuiDialog

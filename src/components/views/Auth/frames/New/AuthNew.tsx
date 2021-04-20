@@ -40,7 +40,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const useStyles = makeStyles(theme => ({
     content: {
-        //
+        flex: 1
     },
     toolbar: {
         minHeight: 56
@@ -102,7 +102,9 @@ const AuthNew: React.FC<ReduxProps> = (props) => {
                     onChange={handleFieldChange}
                 />
             </div>
-            <Toolbar>
+            <Toolbar
+                disableGutters
+            >
                 <DirectionButton
                     edge="start"
                     design="arrow" 

@@ -14,15 +14,20 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
     content: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center'
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        flex: 1,
     },
     button: {
         margin: `${theme.spacing(1)}px 0`,
         padding: `${theme.spacing(2)}px`,
-        borderWidth: 2
-    }
+        borderWidth: 2,
+        '&:disabled': {
+            borderWidth: 2
+        }
+    },
+    disabled: {}
 }))
 
 /* 
@@ -89,7 +94,9 @@ const AuthHome: React.FC<ReduxProps> = (props) => {
                     Create User
                 </Button>
             </div>
-            <Toolbar>
+            <Toolbar
+                disableGutters
+            >
                 <IconButton
                     edge="start"
                     onClick={handleLeaveAuth}

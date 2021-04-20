@@ -12,5 +12,6 @@
 		"moduleResolution": "node",
 		"downlevelIteration": true,
 		"strict": true
-	}
+	},
+	"exclude": ["offcuts/**/*"]
 }

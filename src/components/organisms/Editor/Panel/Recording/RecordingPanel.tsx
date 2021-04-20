@@ -2,7 +2,7 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../../../redux/store';
-import { editorSelectors } from '../../../../../redux/ducks/editor';
+import { editorSelectors, editorOperations } from '../../../../../redux/ducks/editor';
 import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
 
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
@@ -28,7 +28,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     updateData: recordingEditorOperations.updateRecordingEditorData,
-    saveRecording: recordingEditorOperations.saveRecordingEditorModel
+    saveEditor: editorOperations.saveEditor
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -45,7 +45,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         model,
         canSave,
         updateData,
-        saveRecording
+        saveEditor
     } = props;
 
     /* 
@@ -141,9 +141,9 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     // Commit the recording model
 
     const handleSave = React.useCallback(async () => {
-        saveRecording();
+        saveEditor();
         handleScan("to", 0);
-    }, [saveRecording, handleScan]);
+    }, [saveEditor, handleScan]);
 
     /* 
     *   Handle play resume after scan control

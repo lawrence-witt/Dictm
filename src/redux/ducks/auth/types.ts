@@ -5,7 +5,7 @@ import User from '../../../db/models/User';
 export const APP_INITIALISED            = "dictm/auth/init/INITIALISED";
 
 export interface InitialAppState {
-    isInitialising: boolean;
+    isInitialised: boolean;
 }
 
 export interface AppInitalisedAction {
