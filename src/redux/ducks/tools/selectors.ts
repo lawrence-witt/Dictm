@@ -33,17 +33,21 @@ export const getPageTitle = createSelector((
 export const getDashboardAnimation = createSelector((
     categories: RootState["content"]["categories"],
     history: RootState["history"]
-) => {
-    const { getDirectionByStemIndex, getDirectionByCategoryIndex } = helpers;
+): { dir: 'left' | 'right'; active: boolean; } => {
+    const { 
+        getDirectionByStemIndex, 
+        getDirectionByCategoryIndex,
+        extractParams
+    } = helpers;
 
-    const leftAnimate = { dir: 'left', active: true };
-    const rightAnimate = { dir: 'right', active: true };
-    const noAnimate = { dir: 'left', active: false};
+    const leftAnimate = { dir: 'left' as const, active: true };
+    const rightAnimate = { dir: 'right' as const, active: true };
+    const noAnimate = { dir: 'left' as const, active: false};
 
     const { previous, current } = history;
 
-    const prevParams =  previous && helpers.extractParams(previous.pathname);
-    const currParams = helpers.extractParams(current.pathname);
+    const prevParams =  previous && extractParams(previous.pathname);
+    const currParams = extractParams(current.pathname);
 
     if (!prevParams?.stem || !currParams.stem) return noAnimate;
 

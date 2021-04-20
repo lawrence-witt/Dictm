@@ -70,7 +70,12 @@ const Dashboard: React.FC<ReduxProps> = (props) => {
             <NavMenu/>
             <div className={classes.pageBase}>
                 <AppBar/>
-                <Slider item={item}>
+                <Slider 
+                    item={item}
+                    enter={transition.dir}
+                    exit={transition.dir}
+                    disabled={!transition.active}
+                >
                     {(location) => (
                         <Switch location={location}>
                             <Route 

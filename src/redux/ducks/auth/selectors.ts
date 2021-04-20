@@ -3,6 +3,8 @@ import { LocalUsersState, NewUserState } from './types';
 
 import { RootState } from '../../store';
 
+import * as helpers from './helpers';
+
 /** 
 *  Summary:
 *  Checks whether any local users have been found for this device.
@@ -50,5 +52,17 @@ export const getCanCreateUser = createSelector((
 export const getAuthAnimation = createSelector((
     history: RootState["history"]
 ) => {
-    return null;
+    const { previous, current } = history;
+
+    const leftAnimate = { dir: 'left' as const, active: true };
+    const rightAnimate = { dir: 'right' as const, active: true };
+    const noAnimate = { dir: 'left' as const, active: false};
+
+    const prevSlide = previous && helpers.extractAuthSlide(previous.pathname);
+    const currSlide = helpers.extractAuthSlide(current.pathname);
+
+    if (!prevSlide && currSlide) return leftAnimate;
+    if (!currSlide && prevSlide) return rightAnimate;
+
+    return noAnimate;
 }, animation => animation);

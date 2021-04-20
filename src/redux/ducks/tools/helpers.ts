@@ -58,7 +58,7 @@ export const getDirectionByCategoryIndex = (
 
 /** 
 *  Summary:
-*  Extracts the location parameters required to render a Dashboard context.
+*  Extracts the location parameters required to render a Dashboard slide.
 */
 
 export const extractParams = (

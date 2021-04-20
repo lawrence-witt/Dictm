@@ -90,6 +90,9 @@ const Auth: React.FC<ReduxProps> = (props) => {
         >
             <Slider 
                 item={item}
+                enter={transition.dir}
+                exit={transition.dir}
+                disabled={!transition.active}
                 classes={{
                     root: classes.sliderRoot,
                     frame: classes.sliderFrame
