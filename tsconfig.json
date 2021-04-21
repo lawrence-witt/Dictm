@@ -5,13 +5,12 @@
 		"noImplicitAny": true,
 		"target": "es5",
 		"lib": ["ES2019", "DOM"],
-		"module": "ESNext",
+		"module": "CommonJS",
 		"jsx": "react",
         "allowJs": true,
         "esModuleInterop": true,
 		"moduleResolution": "node",
 		"downlevelIteration": true,
 		"strict": true
-	},
-	"exclude": ["offcuts/**/*"]
+	}
 }

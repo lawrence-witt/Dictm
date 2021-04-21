@@ -1,5 +1,6 @@
 import { ThunkResult } from '../../store';
 
+import User from '../../../db/models/User';
 import { UserController } from '../../../db/controllers/User';
 
 import * as types from './types';
@@ -147,9 +148,11 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
 
     if (!name || name.length === 0) return;
 
-    const user = await (async () => {
+    const newUser = new User(name, greeting);
+
+    const insertedUser = await (async () => {
         try {
-            return await UserController.insertUser(name, greeting);
+            return await UserController.insertUser(newUser);
         } catch (err) {
             // handle no creation
             console.log(err);
@@ -157,7 +160,7 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
         }
     })();
 
-    if (!user) return;
+    if (!insertedUser) return;
 
-    dispatch(userOperations.loadUser(user));
+    dispatch(userOperations.loadUser(insertedUser));
 }

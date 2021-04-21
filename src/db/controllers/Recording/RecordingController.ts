@@ -14,7 +14,11 @@ export const selectRecording = async (id: string): Promise<Recording> => {
 }
 
 export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
-    return db.recordings.where({"relationships.user.id": userId}).toArray();
+    return db.transaction("r", db.users, db.recordings, async () => {
+        const user = await db.users.get(userId);
+        if (!user) throw new Error("User could not be retrieved.");
+        return db.recordings.where({"relationships.user.id": userId}).toArray();
+    });
 }
 
 // INSERT

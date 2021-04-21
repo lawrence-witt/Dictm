@@ -19,7 +19,11 @@ export const selectCategory = async (id: string): Promise<Category> => {
 }
 
 export const selectUserCategories = (userId: string): Promise<Category[]> => {
-    return db.categories.where({"relationships.user.id": userId}).toArray();
+    return db.transaction("r", db.users, db.categories, async () => {
+        const user = await db.users.get(userId);
+        if (!user) throw new Error("User could not be retrieved.");
+        return db.categories.where({"relationships.user.id": userId}).toArray();
+    });
 }
 
 // INSERT

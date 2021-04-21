@@ -14,7 +14,11 @@ export const selectNote = async (id: string): Promise<Note> => {
 }
 
 export const selectUserNotes = (userId: string): Promise<Note[]> => {
-    return db.notes.where({"relationships.user.id": userId}).toArray();
+    return db.transaction("r", db.users, db.notes, async () => {
+        const user = await db.users.get(userId);
+        if (!user) throw new Error("User could not be retrieved.");
+        return db.notes.where({"relationships.user.id": userId}).toArray();
+    });
 }
 
 // INSERT

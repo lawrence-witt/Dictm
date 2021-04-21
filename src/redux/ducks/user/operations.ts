@@ -22,7 +22,7 @@ export const loadUser = (
 ) => {
     const userData = await (async () => {
         try {
-            return await UserController.selectUserData(profile);
+            return await UserController.selectUserData(profile.id);
         } catch (err) {
             // handle cannot get data
             console.log(err);

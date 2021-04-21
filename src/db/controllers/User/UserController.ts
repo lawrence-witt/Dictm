@@ -23,28 +23,26 @@ export const selectUser = async (id: string): Promise<User> => {
     return user;
 }
 
-export const selectUserData = (user: User): Promise<{
+export const selectUserData = (id: string): Promise<{
     recordings: Recording[],
     notes: Note[],
     categories: Category[]
 }> => {
-    return db.transaction('r', db.recordings, db.notes, db.categories, async () => ({
-        recordings: await RecordingController.selectUserRecordings(user.id),
-        notes: await NoteController.selectUserNotes(user.id),
-        categories: await CategoryController.selectUserCategories(user.id)
+    return db.transaction('r', db.users, db.recordings, db.notes, db.categories, async () => ({
+        recordings: await RecordingController.selectUserRecordings(id),
+        notes: await NoteController.selectUserNotes(id),
+        categories: await CategoryController.selectUserCategories(id)
     }));
 }
 
 // INSERT
 
-export const insertUser = (name: string, greeting: string): Promise<User> => {
+export const insertUser = (user: User): Promise<User> => {
     return db.transaction('rw', db.users, async () => {
-        const user = new User(name, greeting);
-
         await db.users.add(user);
         const fetched = await db.users.get(user.id);
 
-        if (!fetched) throw new Error('Could not retrieve user.');
+        if (!fetched) throw new Error('User could not be retrieved.');
 
         return fetched;
     });
