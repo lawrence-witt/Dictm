@@ -22,3 +22,13 @@ export interface UserClearedAction {
 export type UserActionTypes = 
 |   UserLoadedAction
 |   UserClearedAction;
+
+export interface UserSession {
+    user: {
+        id: string;
+    };
+    timestamps: {
+        created: number;
+        modified: number;
+    }
+}

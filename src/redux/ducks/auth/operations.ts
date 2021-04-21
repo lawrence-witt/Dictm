@@ -5,16 +5,25 @@ import { UserController } from '../../../db/controllers/User';
 import * as types from './types';
 import * as actions from './actions';
 
-import { userOperations } from '../user';
+import { userOperations, userHelpers } from '../user';
 
 /* 
 *   Init App Operations
 */
 
-export const initialiseApp = (): ThunkResult<void> => (
+export const initialiseApp = (): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
-    dispatch(actions.initialiseApp());
+    const user = await userHelpers.retrieveSession();
+
+    const lastly = () => dispatch(actions.initialiseApp());
+
+    if (user) {
+        dispatch(userOperations.loadUser(user)).then(lastly);
+        return;
+    }
+
+    lastly();
 }
 
 /* 
@@ -69,7 +78,7 @@ export const unselectLocalUser = (): ThunkResult<void> => (
 
 /** 
 *  Summary:
-*  Initialise application load with the selected user
+*  Begin loading application with the selected user
 */
 
 export const loadSelectedUser = (): ThunkResult<void> => (
@@ -127,7 +136,7 @@ export const updateNewUser = (
 
 /** 
 *  Summary:
-*  Create a new user and initialise application load
+*  Create a new user and begin loading application
 */
 
 export const createNewUser = (): ThunkResult<Promise<void>> => async (

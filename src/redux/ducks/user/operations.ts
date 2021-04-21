@@ -4,7 +4,7 @@ import User from '../../../db/models/User';
 import { UserController } from '../../../db/controllers/User';
 
 import * as actions from './actions';
-import * as types from './types';
+import * as helpers from './helpers';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -15,11 +15,9 @@ import { categoryOperations } from '../content/categories';
 *  Load a user and their data into the application
 */
 
-// TODO: create a session object
-
 export const loadUser = (
     profile: User
-): ThunkResult<Promise<any>> => async (
+): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
     const userData = await (async () => {
@@ -39,15 +37,13 @@ export const loadUser = (
     dispatch(categoryOperations.loadCategories(userData.categories));
     dispatch(actions.loadUser(profile));
 
-    // create session object
+    helpers.persistSession(profile.id);
 }
 
 /** 
 *  Summary:
 *  Clear a user and their data from the store
 */
-
-// TODO: clear the session object
 
 export const clearUser = (): ThunkResult<void> => (
     dispatch
@@ -57,5 +53,5 @@ export const clearUser = (): ThunkResult<void> => (
     dispatch(categoryOperations.clearCategories());
     dispatch(actions.clearUser());
 
-    // clear session object
+    helpers.clearSession();
 }
