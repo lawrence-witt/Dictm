@@ -1,6 +1,5 @@
-import { ThunkAction } from 'redux-thunk';
-
 import Recording from '../../../../db/models/Recording';
+import { ThunkResult } from '../../../store';
 
 import * as actions from './actions';
 import * as types from './types';
@@ -14,13 +13,11 @@ import * as types from './types';
 
 export const updateRecordingEditorMode = (
     mode: "edit" | "play"
-): UpdateRecordingModeThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateRecordingEditorMode(mode));
 }
-
-type UpdateRecordingModeThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorModeUpdatedAction>;
 
 /** 
 *  Summary
@@ -31,13 +28,11 @@ type UpdateRecordingModeThunkAction = ThunkAction<void, undefined, unknown, type
 
 export const updateRecordingEditorTitle = (
     title: string
-): UpdateRecordingTitleThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateRecordingEditorTitle(title));
 }
-
-type UpdateRecordingTitleThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorTitleUpdatedAction>;
 
 /** 
 *  Summary
@@ -48,13 +43,11 @@ type UpdateRecordingTitleThunkAction = ThunkAction<void, undefined, unknown, typ
 
 export const updateRecordingEditorCategory = (
     id?: string
-): UpdateRecordingCategoryThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateRecordingEditorCategory(id));
 }
-
-type UpdateRecordingCategoryThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorCategoryUpdatedAction>;
 
 /** 
 *  Summary:
@@ -65,10 +58,8 @@ type UpdateRecordingCategoryThunkAction = ThunkAction<void, undefined, unknown, 
 
 export const updateRecordingEditorData = (
     data: Recording["data"]
-): UpdateRecordingDataThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateRecordingEditorData(data));
 }
-
-type UpdateRecordingDataThunkAction = ThunkAction<void, undefined, unknown, types.RecordingEditorDataUpdatedAction>;

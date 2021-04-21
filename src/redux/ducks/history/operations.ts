@@ -1,4 +1,4 @@
-import { ThunkAction } from 'redux-thunk';
+import { ThunkResult } from '../../store';
 import { Location } from 'history';
 
 import * as types from './types';
@@ -15,10 +15,8 @@ import * as actions from './actions';
 
 export const changeLocation = (
     location: Location
-): ChangeLocationThunkAction => (
+): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.changeLocation({...location}));
 }
-
-type ChangeLocationThunkAction = ThunkAction<void, undefined, unknown, types.LocationChangedAction>;

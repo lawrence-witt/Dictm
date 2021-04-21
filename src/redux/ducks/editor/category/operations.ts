@@ -1,4 +1,4 @@
-import { ThunkAction } from 'redux-thunk';
+import { ThunkResult } from '../../../store';
 
 import * as actions from './actions';
 import * as types from './types';
@@ -12,13 +12,11 @@ import * as types from './types';
 
 export const updateCategoryEditorTitle = (
     title: string
-): UpdateCategoryTitleThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateCategoryEditorTitle(title));
 }
-
-type UpdateCategoryTitleThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorTitleUpdatedAction>;
 
 /** 
 *  Summary:
@@ -31,10 +29,8 @@ type UpdateCategoryTitleThunkAction = ThunkAction<void, undefined, unknown, type
 export const updateCategoryEditorIds = (
     type: "recordings" | "notes",
     ids: string[]
-): UpdateCategoryIdsThunkAction => (
+): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.updateCategoryEditorIds(type, ids));
 }
-
-type UpdateCategoryIdsThunkAction = ThunkAction<void, undefined, unknown, types.CategoryEditorIdsUpdatedAction>;

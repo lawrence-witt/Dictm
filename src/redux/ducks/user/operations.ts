@@ -1,4 +1,4 @@
-import { ThunkAction } from 'redux-thunk';
+import { ThunkResult } from '../../store';
 
 import User from '../../../db/models/User';
 import { UserController } from '../../../db/controllers/User';
@@ -19,9 +19,9 @@ import { categoryOperations } from '../content/categories';
 
 export const loadUser = (
     profile: User
-): LoadUserThunkAction => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
-): Promise<void> => {
+) => {
     const userData = await (async () => {
         try {
             return await UserController.selectUserData(profile);
@@ -42,8 +42,6 @@ export const loadUser = (
     // create session object
 }
 
-type LoadUserThunkAction = ThunkAction<void, undefined, unknown, types.UserLoadedAction>;
-
 /** 
 *  Summary:
 *  Clear a user and their data from the store
@@ -51,7 +49,7 @@ type LoadUserThunkAction = ThunkAction<void, undefined, unknown, types.UserLoade
 
 // TODO: clear the session object
 
-export const clearUser = (): ClearUserThunkAction => (
+export const clearUser = (): ThunkResult<void> => (
     dispatch
 ) => {
     dispatch(recordingOperations.clearRecordings());
@@ -61,5 +59,3 @@ export const clearUser = (): ClearUserThunkAction => (
 
     // clear session object
 }
-
-type ClearUserThunkAction = ThunkAction<void, undefined, unknown, types.UserClearedAction>;

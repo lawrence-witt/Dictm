@@ -68,7 +68,9 @@ const Auth: React.FC<ReduxProps> = (props) => {
 
     const classes = useStyles();
 
-    React.useEffect(() => loadLocalUsers(), [loadLocalUsers]);
+    React.useEffect(() => {
+        loadLocalUsers()
+    }, [loadLocalUsers]);
 
     const item = React.useMemo(() => {
         return {

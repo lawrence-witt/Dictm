@@ -115,7 +115,10 @@ const Content: React.FC<types.ContentTemplateProps & ReduxProps> = (props) => {
 
     return (
         <div className={classes.content}>
-            <MasonryGrid>
+            <MasonryGrid
+                gridClass="card-grid"
+                columnClass="card-col"
+            >
                 {contentList.allIds.map(id => {
                     const item = contentList.byId[id];
 

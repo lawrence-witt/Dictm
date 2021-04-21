@@ -6,7 +6,7 @@ export interface MasonryGridProps {
     min?: number;
     max?: MinMax;
     gridClass?: string;
-    colClass?: string;
+    columnClass?: string;
 }
 
 export interface MasonryGridState {

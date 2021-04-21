@@ -1,6 +1,4 @@
-import { ThunkAction } from 'redux-thunk';
-
-import { RootState } from '../../store';
+import { ThunkResult } from '../../store';
 
 import { UserController } from '../../../db/controllers/User';
 
@@ -13,13 +11,11 @@ import { userOperations } from '../user';
 *   Init App Operations
 */
 
-export const initialiseApp = (): InitialiseAppThunkAction => (
+export const initialiseApp = (): ThunkResult<void> => (
     dispatch
 ) => {
     dispatch(actions.initialiseApp());
 }
-
-type InitialiseAppThunkAction = ThunkAction<void, undefined, unknown, types.AppInitalisedAction>;
 
 /* 
 *   Local Users Operations
@@ -30,9 +26,9 @@ type InitialiseAppThunkAction = ThunkAction<void, undefined, unknown, types.AppI
 *  Load local user profiles from IndexedDB
 */
 
-export const loadLocalUsers = (): LoadLocalUsersThunkAction => async (
+export const loadLocalUsers = (): ThunkResult<Promise<void>> => async (
     dispatch
-): Promise<void> => {
+) => {
     const users = await (async () => {
         try {
             return await UserController.selectLocalUsers();
@@ -47,8 +43,6 @@ export const loadLocalUsers = (): LoadLocalUsersThunkAction => async (
     dispatch(actions.loadLocalUsers(users));
 }
 
-type LoadLocalUsersThunkAction = ThunkAction<void, undefined, unknown, types.LocalUsersLoadedAction>;
-
 /** 
 *  Summary:
 *  Select a local user profile
@@ -56,36 +50,32 @@ type LoadLocalUsersThunkAction = ThunkAction<void, undefined, unknown, types.Loc
 
 export const selectLocalUser = (
     id: string
-): SelectLocalUserThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.selectLocalUser(id))
 }
-
-type SelectLocalUserThunkAction = ThunkAction<void, undefined, unknown, types.LocalUserSelectedAction>;
 
 /** 
 *  Summary:
 *  Unselect a local user profile
 */
 
-export const unselectLocalUser = (): UnselectLocalUserThunkAction => (
+export const unselectLocalUser = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.unselectLocalUser());
 }
-
-type UnselectLocalUserThunkAction = ThunkAction<void, undefined, unknown, types.LocalUserUnselectedAction>;
 
 /** 
 *  Summary:
 *  Initialise application load with the selected user
 */
 
-export const loadSelectedUser = (): LoadSelectedUserThunkAction => (
+export const loadSelectedUser = (): ThunkResult<void> => (
     dispatch,
     getState
-): void => {
+) => {
     const { selectedId, byId } = getState().auth.local;
 
     if (!selectedId) return;
@@ -95,20 +85,16 @@ export const loadSelectedUser = (): LoadSelectedUserThunkAction => (
     dispatch(userOperations.loadUser(user));
 }
 
-type LoadSelectedUserThunkAction = ThunkAction<void, RootState, unknown, any>;
-
 /** 
 *  Summary:
 *  Clear the local users information from Redux store
 */
 
-export const clearLocalUsers = (): ClearLocalUsersThunkAction => (
+export const clearLocalUsers = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.clearLocalUsers());
 }
-
-type ClearLocalUsersThunkAction = ThunkAction<void, undefined, unknown, types.LocalUsersClearedAction>;
 
 /* 
 *   New User Operations 
@@ -119,13 +105,11 @@ type ClearLocalUsersThunkAction = ThunkAction<void, undefined, unknown, types.Lo
 *  Reset the new user state with fresh fields
 */
 
-export const startNewUser = (): StartNewUserThunkAction => (
+export const startNewUser = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.startNewUser());
 }
-
-type StartNewUserThunkAction = ThunkAction<void, undefined, unknown, types.NewUserStartedAction>;
 
 /** 
 *  Summary:
@@ -135,20 +119,18 @@ type StartNewUserThunkAction = ThunkAction<void, undefined, unknown, types.NewUs
 export const updateNewUser = (
     key: keyof types.NewUserState,
     value: string
-): UpdateNewUserThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateNewUser(key, value));
 }
-
-type UpdateNewUserThunkAction = ThunkAction<void, undefined, unknown, types.NewUserUpdatedAction>;
 
 /** 
 *  Summary:
 *  Create a new user and initialise application load
 */
 
-export const createNewUser = (): CreateNewUserThunkAction => async (
+export const createNewUser = (): ThunkResult<Promise<void>> => async (
     dispatch,
     getState
 ): Promise<void> => {
@@ -168,9 +150,5 @@ export const createNewUser = (): CreateNewUserThunkAction => async (
 
     if (!user) return;
 
-    console.log(user);
-
     dispatch(userOperations.loadUser(user));
 }
-
-type CreateNewUserThunkAction = ThunkAction<void, RootState, unknown, any>;

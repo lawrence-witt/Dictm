@@ -1,10 +1,10 @@
-import { ThunkAction } from 'redux-thunk';
+import { Action } from 'redux';
 
 import * as types from './types';
 import * as actions from './actions';
 import * as helpers from './helpers';
 
-import { RootState } from '../../store';
+import { RootState, ThunkResult } from '../../store';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -30,10 +30,10 @@ const { createCategory, updateCategory } = categoryOperations;
 export const openEditor = (
     editorType: types.EditorModelTypes,
     contentId: string
-): OpenEditorThunkAction => (
+): ThunkResult<void> => (
     dispatch,
     getState
-): void => {
+) => {
     const { user, content } = getState();
 
     const isNew = contentId === "new";
@@ -56,27 +56,23 @@ export const openEditor = (
     dispatch(actions.openEditor(title, isNew, context));
 }
 
-type OpenEditorThunkAction = ThunkAction<void, RootState, unknown, types.EditorOpenedAction>;
-
 /** 
 *  Summary:
 *  Sets the editor isSaving flag to true.
 */
 
-export const setEditorSaving = (): SetEditorSavingThunkAction => (
+export const setEditorSaving = (): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.setEditorSaving());
 }
-
-type SetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.EditorSetSavingAction>;
 
 /** 
 *  Summary:
 *  Saves the content model currently being edited.
 */
 
-export const saveEditor = (): SaveEditorThunkAction => (
+export const saveEditor = (): ThunkResult<void> => (
     dispatch,
     getState
 ) => {
@@ -99,11 +95,11 @@ export const saveEditor = (): SaveEditorThunkAction => (
             case "note":
                 return isNew ? createNote(stamped) : updateNote(stamped);
             case "category":
-                return isNew ? createCategory(stamped) : updateCategory(stamped);  
+                return isNew ? createCategory(stamped) : updateCategory(stamped);
         }
     }
 
-    persist()
+    dispatch(persist())
     .then(() => {
         if (dialogs.save.isOpen) {
             dispatch(closeEditor());
@@ -116,66 +112,56 @@ export const saveEditor = (): SaveEditorThunkAction => (
     });
 }
 
-type SaveEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
-
 /** 
 *  Summary:
 *  Sets the editor isSaving flag to false.
 */
 
-export const unsetEditorSaving = (): UnsetEditorSavingThunkAction => (
+export const unsetEditorSaving = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.unsetEditorSaving());
 }
-
-type UnsetEditorSavingThunkAction = ThunkAction<void, undefined, unknown, types.EditorUnsetSavingAction>;
 
 /** 
 *  Summary:
 *  Opens the save editor dialog.
 */
 
-export const openSaveDialog = (): OpenSaveDialogThunkAction => (
+export const openSaveDialog = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.openSaveDialog());
 }
-
-type OpenSaveDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorOpenSaveDialogAction>;
 
 /** 
 *  Summary:
 *  Opens the details editor dialog.
 */
 
-export const openDetailsDialog = (): OpenDetailsDialogThunkAction => (
+export const openDetailsDialog = (): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.openDetailsDialog());
 }
-
-type OpenDetailsDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorOpenDetailsDialogAction>;
 
 /** 
 *  Summary:
 *  Closes any open editor dialogs.
 */
 
-export const closeDialog = (): CloseDialogThunkAction => (
+export const closeDialog = (): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.closeDialog());
 }
-
-type CloseDialogThunkAction = ThunkAction<void, undefined, unknown, types.EditorCloseDialogAction>;
 
 /** 
 *  Summar:
 *  Closes the editor modal.
 */
 
-export const closeEditor = (): CloseEditorThunkAction => (
+export const closeEditor = (): ThunkResult<void> => (
     dispatch,
     getState
 ): void => {
@@ -188,18 +174,14 @@ export const closeEditor = (): CloseEditorThunkAction => (
     dispatch(actions.closeEditor());
 }
 
-type CloseEditorThunkAction = ThunkAction<void, RootState, unknown, any>;
-
 /** 
 *  Summary:
 *  Clears context from closed editor.
 */
 
-export const clearEditor = (): ClearEditorThunkAction => (
+export const clearEditor = (): ThunkResult<void> => (
     dispatch
 ): void => {
     // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.clearEditor());
 }
-
-type ClearEditorThunkAction = ThunkAction<void, undefined, unknown, types.EditorClearedAction>;

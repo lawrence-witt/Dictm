@@ -1,42 +1,39 @@
-import { ThunkAction } from 'redux-thunk';
-
-import { RootState } from '../../store';
+import { ThunkResult } from '../../store';
 
 import * as types from './types';
 import * as actions from './actions';
 
-/* Nav Menu Operations */
+/* 
+*   Nav Menu Operations 
+*/
 
 /** 
 *  Summary:
 *  Toggle the open state of the navigation menu.
 */
 
-export const toggleNavMenu = (): ToggleNavMenuThunkAction => (
+export const toggleNavMenu = (): ThunkResult<void> => (
     dispatch,
     getState
-): void => {
+) => {
     const { isOpen } = getState().tools.menu;
 
     dispatch(isOpen ? actions.closeNavMenu() : actions.openNavMenu());
 }
 
-type ToggleNavMenuThunkAction = ThunkAction<void, RootState, unknown, 
-    types.NavMenuOpenedAction | 
-    types.NavMenuClosedAction
->;
-
-/* Search Tool Operations */
+/* 
+*   Search Tool Operations 
+*/
 
 /* 
 *   Summary:
 *   Toggle the open state of the search tool.
 */
 
-export const toggleSearchTool = (): ToggleSearchToolThunkAction => (
+export const toggleSearchTool = (): ThunkResult<void> => (
     dispatch,
     getState
-): void => {
+) => {
     const { isOpen } = getState().tools.search;
     const { isDeleting } = getState().tools.delete;
 
@@ -45,11 +42,6 @@ export const toggleSearchTool = (): ToggleSearchToolThunkAction => (
     dispatch(isOpen ? actions.closeSearchTool() : actions.openSearchTool());
 };
 
-type ToggleSearchToolThunkAction = ThunkAction<void, RootState, unknown, 
-    types.SearchToolOpenedAction |
-    types.SearchToolClosedAction
->
-
 /* 
 *   Summary:
 *   Update the value of the search term.
@@ -57,22 +49,22 @@ type ToggleSearchToolThunkAction = ThunkAction<void, RootState, unknown,
 
 export const setSearchTerm = (
     term: string
-): SetSearchTermThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.setSearchTerm(term));
 }
 
-type SetSearchTermThunkAction = ThunkAction<void, undefined, unknown, types.SearchTermSetAction>;
-
-/* Delete Tool Operations */
+/* 
+*   Delete Tool Operations 
+*/
 
 /* 
 *   Summary:
 *   Toggle the open state of the search tool.
 */
 
-export const toggleDeleteTool = (): ToggleDeleteToolThunkAction => (
+export const toggleDeleteTool = (): ThunkResult<void> => (
     dispatch,
     getState
 ): void => {
@@ -82,11 +74,6 @@ export const toggleDeleteTool = (): ToggleDeleteToolThunkAction => (
 
     dispatch(isOpen ? actions.closeDeleteTool() : actions.openDeleteTool());
 };
-
-type ToggleDeleteToolThunkAction = ThunkAction<void, RootState, unknown, 
-    types.DeleteToolOpenedAction |
-    types.DeleteToolClosedAction
->
 
 /** 
 *  Summary:
@@ -99,7 +86,7 @@ type ToggleDeleteToolThunkAction = ThunkAction<void, RootState, unknown,
 export const toggleDeleteResource = (
     type: "recording" | "note" | "category",
     id: string
-): ToggleDeleteResourceThunkAction => (
+): ThunkResult<void> => (
     dispatch,
     getState
 ): void => {
@@ -116,14 +103,12 @@ export const toggleDeleteResource = (
     dispatch(actions.toggleDeleteResource(bucket, id));
 }
 
-type ToggleDeleteResourceThunkAction = ThunkAction<void, RootState, unknown, types.DeleteToolToggleResourceAction>;
-
 /* 
 *   Summary:
 *   Deletes the resources marked by the delete tool.
 */
 
-export const commitDeleteTool = (): CommitDeleteToolThunkAction => (
+export const commitDeleteTool = (): ThunkResult<void> => (
     dispatch,
     getState
 ): void => {
@@ -133,7 +118,5 @@ export const commitDeleteTool = (): CommitDeleteToolThunkAction => (
 
     dispatch(actions.setDeleteToolDeleting());
 
-    //
+    // delete the resources from DB
 }
-
-type CommitDeleteToolThunkAction = ThunkAction<void, RootState, unknown, any>;

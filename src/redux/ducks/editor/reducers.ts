@@ -132,9 +132,8 @@ const editorReducer = (
         case recordingTypes.RECORDING_EDITOR_TITLE_UPDATED:
         case recordingTypes.RECORDING_EDITOR_CATEGORY_UPDATED:
         case recordingTypes.RECORDING_EDITOR_DATA_UPDATED:
-            if (!state.context) throw new Error('Editor has not been provided with a context.');
-            if (state.context.type !== "recording") {
-                throw new Error(`Recording Editor action cannot be executed on ${state.context.type} context.`);
+            if (!state.context || state.context.type !== "recording") {
+                throw new Error(`Recording Editor action cannot be executed on ${state.context?.type} context.`);
             }
 
             return {
@@ -144,9 +143,8 @@ const editorReducer = (
         case noteTypes.NOTE_EDITOR_TITLE_UPDATED:
         case noteTypes.NOTE_EDITOR_CATEGORY_UPDATED:
         case noteTypes.NOTE_EDITOR_DATA_UPDATED:
-            if (!state.context) throw new Error('Editor has not been provided with a context.');
-            if (state.context.type !== "note") {
-                throw new Error(`Note Editor action cannot be executed on ${state.context.type} context.`);
+            if (!state.context || state.context.type !== "note") {
+                throw new Error(`Note Editor action cannot be executed on ${state.context?.type} context.`);
             }
 
             return {
@@ -155,9 +153,8 @@ const editorReducer = (
             }
         case categoryTypes.CATEGORY_EDITOR_TITLE_UPDATED:
         case categoryTypes.CATEGORY_EDITOR_IDS_UPDATED:
-            if (!state.context) throw new Error('Editor has not been provided with a context.');
-            if (state.context.type !== "category") {
-                throw new Error(`Category Editor action cannot be executed on ${state.context.type} context.`);
+            if (!state.context || state.context.type !== "category") {
+                throw new Error(`Category Editor action cannot be executed on ${state.context?.type} context.`);
             }
 
             return {

@@ -37,13 +37,13 @@ const Masonry: React.FC<types.MasonryGridProps> = (props) => {
         repeat = 'auto-fit',
         min = 300,
         max = '1fr',
-        gridClass = '',
-        colClass = '',
+        gridClass,
+        columnClass,
         children
     } = props;
 
     const gridClassName = gridClass || 'rpt-masonry-grid';
-    const colClassName = colClass || 'rpt-masonry-col';
+    const colClassName = columnClass || 'rpt-masonry-col';
 
     const [state, setState] = React.useState<types.MasonryGridState>({
         width: undefined,

@@ -1,5 +1,3 @@
-import { ThunkAction } from 'redux-thunk';
-
 import * as types from './types';
 import * as actions from './actions';
 
@@ -7,6 +5,7 @@ import { categoryOperations } from '../categories';
 
 import Recording from '../../../../db/models/Recording';
 import { RecordingController } from '../../../../db/controllers/Recording';
+import { RootState, ThunkResult } from '../../../store';
 
 /** 
 *  Summary:
@@ -15,22 +14,20 @@ import { RecordingController } from '../../../../db/controllers/Recording';
 
 export const loadRecordings = (
     recordings: Recording[]
-): LoadRecordingsThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.loadRecordings(recordings));
 }
-
-type LoadRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsLoadedAction>;
 
 /** 
 *  Summary:
 *  Saves a single new Recording in store and DB.
 */
 
-export const createRecording = async (
+export const createRecording = (
     recording: Recording
-): Promise<CreateRecordingThunkAction> => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
     const data = await (async () => {
@@ -53,16 +50,14 @@ export const createRecording = async (
     return dispatch(actions.createRecording(newRecording));
 }
 
-type CreateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingCreatedAction>;
-
 /** 
 *  Summary:
 *  Saves a single updated Recording in store and DB.
 */
 
-export const updateRecording = async (
+export const updateRecording = (
     recording: Recording
-): Promise<UpdateRecordingThunkAction> => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
     const data = await (async () => {
@@ -85,8 +80,6 @@ export const updateRecording = async (
     return dispatch(actions.overwriteRecordings([updatedRecording]));
 }
 
-type UpdateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
-
 /** 
 *  Summary:
 *  Overwrites multiple updated Recordings in store according to id.
@@ -94,13 +87,11 @@ type UpdateRecordingThunkAction = ThunkAction<void, undefined, unknown, types.Re
 
 export const overwriteRecordings = (
     recordings: Recording[]
-): OverwriteRecordingsThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.overwriteRecordings(recordings));
 }
-
-type OverwriteRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsOverwrittenAction>;
 
 /** 
 *  Summary:
@@ -110,14 +101,12 @@ type OverwriteRecordingsThunkAction = ThunkAction<void, undefined, unknown, type
 
 export const deleteRecordings = (
     ids: string[]
-): DeleteRecordingsThunkAction => (
+): ThunkResult<void> => (
     dispatch
 ): void => {
     // TODO: remove database records
     dispatch(actions.deleteRecordings(ids));
 }
-
-type DeleteRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsDeletedAction>;
 
 /** 
 *  Summary:
@@ -125,10 +114,8 @@ type DeleteRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.R
 *
 */
 
-export const clearRecordings = (): ClearRecordingsThunkAction => (
+export const clearRecordings = (): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.clearRecordings());
 }
-
-type ClearRecordingsThunkAction = ThunkAction<void, undefined, unknown, types.RecordingsClearedAction>;

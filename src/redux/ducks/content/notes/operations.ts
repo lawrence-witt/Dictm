@@ -1,5 +1,3 @@
-import { ThunkAction } from 'redux-thunk';
-
 import * as types from './types';
 import * as actions from './actions';
 
@@ -7,6 +5,7 @@ import { categoryOperations } from '../categories';
 
 import Note from '../../../../db/models/Note';
 import { NoteController } from '../../../../db/controllers/Note';
+import { ThunkResult } from '../../../store';
 
 /** 
 *  Summary:
@@ -15,13 +14,11 @@ import { NoteController } from '../../../../db/controllers/Note';
 
 export const loadNotes = (
     notes: Note[]
-): NotesLoadedThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.loadNotes(notes));
 }
-
-type NotesLoadedThunkAction = ThunkAction<void, undefined, unknown, types.NotesLoadedAction>;
 
 /** 
 *  Summary:
@@ -30,9 +27,13 @@ type NotesLoadedThunkAction = ThunkAction<void, undefined, unknown, types.NotesL
 *  @param {object} note The new Note Model.
 */
 
-export const createNote = async (
+/* const createNote = (): ThunkAction<any, any, any, Action> => async (dispatch) => {
+    dispatch(() => Promise.resolve()).then(() => 'thing');
+} */
+
+export const createNote = (
     note: Note
-): Promise<CreateNoteThunkAction> => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
     const data = await (async () => {
@@ -55,16 +56,14 @@ export const createNote = async (
     return dispatch(actions.createNote(insertedNote));
 }
 
-type CreateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NoteCreatedAction>;
-
 /** 
 *  Summary:
 *  Saves a single updated Note in store and DB.
 */
 
-export const updateNote = async (
+export const updateNote = (
     note: Note
-): Promise<UpdateNoteThunkAction> => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
     const data = await (async () => {
@@ -87,8 +86,6 @@ export const updateNote = async (
     return dispatch(actions.overwriteNotes([updatedNote]));
 }
 
-type UpdateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesOverwrittenAction>;
-
 /** 
 *  Summary:
 *  Overwrites multiple updated Notes in store according to id.
@@ -98,13 +95,11 @@ type UpdateNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesOv
 
 export const overwriteNotes = (
     notes: Note[]
-): OverwriteNotesThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.overwriteNotes(notes));
 }
-
-type OverwriteNotesThunkAction = ThunkAction<void, undefined, unknown, types.NotesOverwrittenAction>;
 
 /** 
 *  Summary:
@@ -113,14 +108,12 @@ type OverwriteNotesThunkAction = ThunkAction<void, undefined, unknown, types.Not
 
 export const deleteNotes = (
     ids: string[]
-): DeleteNoteThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     // TODO: remove database record
     dispatch(actions.deleteNotes(ids));
 }
-
-type DeleteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesDeletedAction>;
 
 /** 
 *  Summary:
@@ -128,10 +121,8 @@ type DeleteNoteThunkAction = ThunkAction<void, undefined, unknown, types.NotesDe
 *
 */
 
-export const clearNotes = (): ClearNotesThunkAction => (
+export const clearNotes = (): ThunkResult<void> => (
     dispatch
 ): void => {
     dispatch(actions.clearNotes());
 }
-
-type ClearNotesThunkAction = ThunkAction<void, undefined, unknown, types.NotesClearedAction>;

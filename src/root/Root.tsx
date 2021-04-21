@@ -56,7 +56,9 @@ const Root: React.FC<ReduxProps> = (props) => {
 
     // Initialise the application on page load
 
-    React.useEffect(() => initialiseApp(), [initialiseApp]);
+    React.useEffect(() => {
+        initialiseApp()
+    }, [initialiseApp]);
     
     if (!appInitialised) return null;
 

@@ -1,4 +1,4 @@
-import { ThunkAction } from 'redux-thunk';
+import { ThunkResult } from '../../../store';
 
 import * as actions from './actions';
 import * as types from './types';
@@ -12,13 +12,11 @@ import * as types from './types';
 
 export const updateNoteEditorTitle = (
     title: string
-): UpdateNoteTitleThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateNoteEditorTitle(title));
 }
-
-type UpdateNoteTitleThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorTitleUpdatedAction>;
 
 /** 
 *  Summary
@@ -29,13 +27,11 @@ type UpdateNoteTitleThunkAction = ThunkAction<void, undefined, unknown, types.No
 
 export const updateNoteEditorCategory = (
     id?: string
-): UpdateNoteCategoryThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
     dispatch(actions.updateNoteEditorCategory(id));
 }
-
-type UpdateNoteCategoryThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorCategoryUpdatedAction>;
 
 /** 
 *  Summary
@@ -46,9 +42,9 @@ type UpdateNoteCategoryThunkAction = ThunkAction<void, undefined, unknown, types
 
 export const updateNoteEditorData = (
     content: string
-): UpdateNoteDataThunkAction => (
+): ThunkResult<void> => (
     dispatch
-): void => {
+) => {
 
     const fullData = {
         content,
@@ -61,5 +57,3 @@ export const updateNoteEditorData = (
 
     dispatch(actions.updateNoteEditorData(fullData));
 }
-
-type UpdateNoteDataThunkAction = ThunkAction<void, undefined, unknown, types.NoteEditorDataUpdatedAction>;
