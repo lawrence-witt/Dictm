@@ -18,10 +18,13 @@ test("it inserts a new Recording model into the database", async done => {
     const newRecording = new Recording(seeded.user.id);
 
     await RecordingController.insertRecording(newRecording);
-    const retrieved = await RecordingController.selectRecording(newRecording.id);
+    const retrieved = await db.recordings.get(newRecording.id);
 
-    expect(retrieved).toBeInstanceOf(Recording);
-    expect(retrieved.id).toBe(newRecording.id);
+    expect(retrieved).toEqual(
+        expect.objectContaining({
+            id: newRecording.id
+        })
+    );
 
     done();
 });

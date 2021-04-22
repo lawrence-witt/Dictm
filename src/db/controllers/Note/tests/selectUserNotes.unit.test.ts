@@ -1,4 +1,4 @@
-import { RecordingController } from '..';
+import { NoteController } from '..';
 import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
@@ -7,29 +7,29 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it returns every Recording owned by a User in an array", async done => {
+test("it returns every Note owned by a User in an array", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const userRecordings = await RecordingController.selectUserRecordings(seeded.user.id);
+    const userNotes = await NoteController.selectUserNotes(seeded.user.id);
 
-    expect(userRecordings).toEqual(
+    expect(userNotes).toEqual(
         expect.arrayContaining([
             expect.objectContaining({
-                id: seeded.recordings[0].id
+                id: seeded.notes[0].id
             }),
             expect.objectContaining({
-                id: seeded.recordings[1].id
+                id: seeded.notes[1].id
             })
         ])
     );
-    expect(userRecordings).toHaveLength(2);
+    expect(userNotes).toHaveLength(2);
 
     done();
 });
 
 test("it throws an error when the User does not exist", async done => {
     await expect(async () => {
-        await RecordingController.selectUserRecordings("bad-id");
+        await NoteController.selectUserNotes("bad-id");
     }).rejects.toThrow("User does not exist.");
 
     done();

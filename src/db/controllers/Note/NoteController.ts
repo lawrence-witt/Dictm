@@ -9,7 +9,7 @@ import Note from '../../models/Note';
 
 export const selectNote = async (id: string): Promise<Note> => {
     const note = await db.notes.get(id);
-    if (!note) throw new Error('Note could not be retrieved.');
+    if (!note) throw new Error('Note does not exist.');
     return note;
 }
 
@@ -26,8 +26,10 @@ export const insertNote = (note: Note): Promise<{
     note: Note;
     updatedCategories: Category[]
 }> => {
-    return db.transaction('rw', db.notes, db.categories, async () => {
-        const { id, relationships: { category } } = note;
+    return db.transaction('rw', db.users, db.notes, db.categories, async () => {
+        const { id, relationships: { category, user } } = note;
+
+        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
 
         const insertedModel = await (async () => {
             await db.notes.add(note);
@@ -75,7 +77,7 @@ export const updateNote = (note: Note): Promise<{
     note: Note,
     updatedCategories: Category[];
 }> => {
-    return db.transaction('rw', db.notes, db.categories, async () => {
+    return db.transaction('rw', db.users, db.notes, db.categories, async () => {
         const { id, relationships: { user } } = note;
 
         const existing = await db.notes.get(id);
@@ -146,7 +148,7 @@ export const deleteNote = (id: string): Promise<{
 export const deleteNotes = (ids: string[]): Promise<{
     updatedCategories: Category[]
 }> => {
-    return db.transaction('rw', db.recordings, db.categories, async () => {
+    return db.transaction('rw', db.notes, db.categories, async () => {
         const updatedCategoryIds: Set<string> = new Set();
 
         for (const id of ids) {
