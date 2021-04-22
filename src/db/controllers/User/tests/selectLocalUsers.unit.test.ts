@@ -3,6 +3,10 @@ import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
 
+afterEach(async () => {
+    await handler.clearTestDatabase();
+});
+
 test("it returns an array of all User models", async done => {
     const seeded = await handler.seedTestDatabase();
 
@@ -10,9 +14,8 @@ test("it returns an array of all User models", async done => {
 
     expect(Array.isArray(users)).toBe(true);
     expect(users).toHaveLength(1);
-    expect(users[0]).toHaveProperty('id', seeded.userId);
+    expect(users[0]).toHaveProperty('id', seeded.user.id);
 
-    await handler.clearTestDatabase();
     done();
 });
 

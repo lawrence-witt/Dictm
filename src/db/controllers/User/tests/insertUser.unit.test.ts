@@ -7,28 +7,41 @@ import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
 
-test("it inserts a new User model into the database", async done => {
-    const tmpUser = new User("Temp User", "");
-
-    const inserted = await UserController.insertUser(tmpUser);
-    const retrieved = await UserController.selectUser(inserted.id);
-
-    expect(inserted).toBeDefined();
-    expect(retrieved).toBeDefined();
-    expect(tmpUser.id).toBe(retrieved.id);
-
+afterEach(async () => {
     await handler.clearTestDatabase();
+});
+
+test("it inserts a new User model into the database", async done => {
+    const newUser = new User("Temp User", "");
+
+    await UserController.insertUser(newUser);
+    const retrieved = await UserController.selectUser(newUser.id);
+
+    expect(retrieved).toBeInstanceOf(User);
+    expect(newUser.id).toBe(retrieved.id);
+
     done();
 });
 
-test("it throws an error when the new User's id already exists in the database", async done => {
+test("it returns the inserted User model", async done => {
+    const newUser = new User("Temp User", "");
+
+    const inserted = await UserController.insertUser(newUser);
+
+    expect(inserted).toBeInstanceOf(User);
+    expect(newUser.id).toBe(inserted.id);
+
+    done();
+})
+
+test("it throws an error if the User has an id already in the database", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const tmpUser = new User("Temp User", "");
-    tmpUser.id = seeded.userId;
+    const newUser = new User("Temp User", "");
+    newUser.id = seeded.user.id;
 
     await expect(async () => {
-        await UserController.insertUser(tmpUser);
+        await UserController.insertUser(newUser);
     }).rejects.toThrow(Dexie.ConstraintError);
 
     done();

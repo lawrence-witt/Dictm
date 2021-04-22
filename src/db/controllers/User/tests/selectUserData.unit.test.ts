@@ -7,10 +7,14 @@ import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
 
-test("it retrieves every content model owned by a User in an object", async done => {
+afterEach(async () => {
+    await handler.clearTestDatabase();
+});
+
+test("it returns every content model owned by a User in an object", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const userData = await UserController.selectUserData(seeded.userId);
+    const userData = await UserController.selectUserData(seeded.user.id);
 
     expect(userData).toEqual(
         expect.objectContaining({
@@ -24,14 +28,15 @@ test("it retrieves every content model owned by a User in an object", async done
     expect(userData.notes).toHaveLength(2);
     expect(userData.categories).toHaveLength(2);
 
-    await handler.clearTestDatabase();
     done();
 });
+
+// TODO: add tests for relationship validatation/correction
 
 test("it throws an error when the User does not exist", async done => {
     await expect(async () => {
         await UserController.selectUserData("bad-id");
-    }).rejects.toThrow("User could not be retrieved.");
+    }).rejects.toThrow("User does not exist.");
 
     done();
 })

@@ -5,58 +5,58 @@ import Recording from '../models/Recording';
 import Note from '../models/Note';
 import Category from '../models/Category';
 
-const recordings = [
+const recordingTitles = [
     "User 1: Recording 1",
     "User 1: Recording 2"
 ];
 
-const notes = [
+const noteTitles = [
     "User 1: Note 1",
     "User 1: Note 2"
 ];
 
-const categories = [
+const categoryTitles = [
     "User 1: Category 1",
     "User 2: Category 2"
 ];
 
 export const seedTestDatabase = (): Promise<{
-    userId: string;
-    recordingIds: string[];
-    noteIds: string[];
-    categoryIds: string[];
+    user: User;
+    recordings: Recording[];
+    notes: Note[];
+    categories: Category[];
 }>  => {
     return db.transaction('rw', db.users, db.categories, db.notes, db.recordings, async () => {
         const user = new User("User 1", "");
 
         await db.users.add(user);
 
-        const recordingIds = await Promise.all(recordings.map(async title => {
+        const recordings = await Promise.all(recordingTitles.map(async title => {
             const recording = new Recording(user.id);
             recording.attributes.title = title;
             await db.recordings.add(recording);
-            return recording.id;
+            return recording;
         }));
 
-        const noteIds = await Promise.all(notes.map(async title => {
+        const notes = await Promise.all(noteTitles.map(async title => {
             const note = new Note(user.id);
             note.attributes.title = title;
             await db.notes.add(note);
-            return note.id;
+            return note;
         }));
 
-        const categoryIds = await Promise.all(categories.map(async title => {
+        const categories = await Promise.all(categoryTitles.map(async title => {
             const category = new Category(user.id);
             category.attributes.title = title;
             await db.categories.add(category);
-            return category.id;
+            return category;
         }));
 
         return {
-            userId: user.id,
-            recordingIds,
-            noteIds,
-            categoryIds
+            user,
+            recordings,
+            notes,
+            categories
         }
     })
 }

@@ -15,8 +15,7 @@ export const selectNote = async (id: string): Promise<Note> => {
 
 export const selectUserNotes = (userId: string): Promise<Note[]> => {
     return db.transaction("r", db.users, db.notes, async () => {
-        const user = await db.users.get(userId);
-        if (!user) throw new Error("User could not be retrieved.");
+        if (!(await db.users.get(userId))) throw new Error('User does not exist.');
         return db.notes.where({"relationships.user.id": userId}).toArray();
     });
 }
@@ -30,21 +29,21 @@ export const insertNote = (note: Note): Promise<{
     return db.transaction('rw', db.notes, db.categories, async () => {
         const { id, relationships: { category } } = note;
 
+        const insertedModel = await (async () => {
+            await db.notes.add(note);
+            const model = await db.notes.get(id);
+            if (!model) throw new Error('Note could not be inserted.');
+            return model;
+        })();
+
         const updatedCategories = category.id ? ([
             await CategoryController.updateCategoryRelationships(
                 'add', category.id, [], [id]
             )
         ]) : [];
-        
-        const insertedNote = await (async () => {
-            await db.notes.add(note);
-            return db.notes.get(id);
-        })();
-
-        if (!insertedNote) throw new Error('Note could not be created.');
 
         return {
-            note: insertedNote,
+            note: insertedModel,
             updatedCategories
         }
     });
@@ -57,9 +56,8 @@ export const updateNoteCategory = (
     categoryId: string | undefined
 ): Promise<Note> => {
     return db.transaction('rw', db.notes, db.categories, async () => {
-        if (categoryId) {
-            const category = await db.categories.get(categoryId);
-            if (!category) throw new Error('Note was assigned a non-existant category.');
+        if (categoryId && !(await db.categories.get(categoryId))) {
+            throw new Error('Category does not exist.');
         }
 
         await db.notes.where('id').equals(id).modify(note => {
@@ -67,8 +65,7 @@ export const updateNoteCategory = (
         });
 
         const updated = await db.notes.get(id);
-
-        if (!updated) throw new Error('Note could not be updated.');
+        if (!updated) throw new Error('Note does not exist.');
         
         return updated;
     });
@@ -79,12 +76,22 @@ export const updateNote = (note: Note): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.notes, db.categories, async () => {
-        const previousNote = await db.notes.get(note.id);
+        const { id, relationships: { user } } = note;
 
-        if (!previousNote) throw new Error('Note could not be retrieved');
+        const existing = await db.notes.get(id);
+        if (!existing) throw new Error('Note does not exist.');
+
+        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
+
+        const updatedModel = await (async () => {
+            await db.notes.update(id, note);
+            const model = await db.notes.get(id);
+            if (!model) throw new Error("Note does not exist.");
+            return model;
+        })();
 
         const updatedCategories = await (async () => {
-            const { id: prevId } = previousNote.relationships.category;
+            const { id: prevId } = existing.relationships.category;
             const { id: newId } = note.relationships.category;
 
             const unEqual = prevId !== newId;
@@ -104,15 +111,8 @@ export const updateNote = (note: Note): Promise<{
             return [...added, ...removed];
         })();
 
-        const insertedNote = await (async () => {
-            await db.notes.put(note);
-            return db.notes.get(note.id);
-        })();
-
-        if (!insertedNote) throw new Error('Note could not be updated.');
-
         return {
-            note: insertedNote,
+            note: updatedModel,
             updatedCategories
         }
     });
@@ -124,11 +124,10 @@ export const deleteNote = (id: string): Promise<{
     updatedCategories: Category[]
 }> => {
     return db.transaction('rw', db.notes, db.categories, async () => {
-        const note = await db.notes.get(id);
+        const existing = await db.notes.get(id);
+        if (!existing) throw new Error('Note does not exist.');
 
-        if (!note) throw new Error('Note could not be retrieved.');
-
-        const categoryId = note.relationships.category.id;
+        const categoryId = existing.relationships.category.id;
 
         const updatedCategories = categoryId ? (
             [await CategoryController.updateCategoryRelationships(

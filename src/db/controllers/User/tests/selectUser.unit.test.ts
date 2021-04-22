@@ -3,15 +3,18 @@ import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
 
-test("it retrieves the correct User model", async done => {
+afterEach(async () => {
+    await handler.clearTestDatabase();
+});
+
+test("it returns the correct User model", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const user = await UserController.selectUser(seeded.userId);
+    const user = await UserController.selectUser(seeded.user.id);
 
     expect(user).toBeDefined();
-    expect(user.attributes.name).toEqual("User 1");
+    expect(user.attributes.name).toEqual(seeded.user.attributes.name);
 
-    await handler.clearTestDatabase();
     done();
 });
 

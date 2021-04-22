@@ -9,14 +9,13 @@ import Recording from '../../models/Recording';
 
 export const selectRecording = async (id: string): Promise<Recording> => {
     const recording = await db.recordings.get(id);
-    if (!recording) throw new Error('Note could not be retrieved.');
+    if (!recording) throw new Error('Recording does not exist.');
     return recording;
 }
 
 export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
     return db.transaction("r", db.users, db.recordings, async () => {
-        const user = await db.users.get(userId);
-        if (!user) throw new Error("User could not be retrieved.");
+        if (!(await db.users.get(userId))) throw new Error('User does not exist.');
         return db.recordings.where({"relationships.user.id": userId}).toArray();
     });
 }
@@ -27,24 +26,26 @@ export const insertRecording = (recording: Recording): Promise<{
     recording: Recording;
     updatedCategories: Category[];
 }> => {
-    return db.transaction('rw', db.recordings, db.categories, async () => {
-        const { id, relationships: { category } } = recording;
+    return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
+        const { id, relationships: { category, user } } = recording;
+
+        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
+
+        const insertedModel = await (async () => {
+            await db.recordings.add(recording);
+            const model =  await db.recordings.get(id);
+            if (!model) throw new Error('Recording could not be inserted.');
+            return model;
+        })();
 
         const updatedCategories = category.id ? ([
             await CategoryController.updateCategoryRelationships(
                 'add', category.id, [id], []
             )
         ]) : [];
-        
-        const insertedRecording = await (async () => {
-            await db.recordings.add(recording);
-            return await db.recordings.get(id);
-        })();
-
-        if (!insertedRecording) throw new Error('Recording could not be created.');
 
         return {
-            recording: insertedRecording,
+            recording: insertedModel,
             updatedCategories
         }
     });
@@ -57,9 +58,8 @@ export const updateRecordingCategory = (
     categoryId: string | undefined
 ): Promise<Recording> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
-        if (categoryId) {
-            const category = await db.categories.get(categoryId);
-            if (!category) throw new Error('Recording was assigned a non-existant category.');
+        if (categoryId && !(await db.categories.get(categoryId))) {
+            throw new Error('Category does not exist.');
         }
 
         await db.recordings.where('id').equals(id).modify(recording => {
@@ -67,8 +67,7 @@ export const updateRecordingCategory = (
         });
 
         const updated = await db.recordings.get(id);
-
-        if (!updated) throw new Error('Recording could not be updated.');
+        if (!updated) throw new Error('Recording does not exist.');
 
         return updated;
     });
@@ -78,13 +77,23 @@ export const updateRecording = (recording: Recording): Promise<{
     recording: Recording;
     updatedCategories: Category[];
 }> => {
-    return db.transaction('rw', db.recordings, db.categories, async () => {
-        const previousRecording = await db.recordings.get(recording.id);
+    return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
+        const { id, relationships: { user } } = recording;
 
-        if (!previousRecording) throw new Error('Recording could not be retrieved');
+        const existing = await db.recordings.get(id);
+        if (!existing) throw new Error('Recording does not exist.');
+
+        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
+
+        const updatedModel = await (async () => {
+            await db.recordings.update(id, recording);
+            const model = await db.recordings.get(id);
+            if (!model) throw new Error('Recording does not exist.');
+            return model;
+        })();
 
         const updatedCategories = await (async () => {
-            const { id: prevId } = previousRecording.relationships.category;
+            const { id: prevId } = existing.relationships.category;
             const { id: newId } = recording.relationships.category;
 
             const unEqual = prevId !== newId;
@@ -104,15 +113,8 @@ export const updateRecording = (recording: Recording): Promise<{
             return [...added, ...removed];
         })();
 
-        const insertedRecording = await (async () => {
-            await db.recordings.put(recording);
-            return await db.recordings.get(recording.id);
-        })();
-
-        if (!insertedRecording) throw new Error('Recording could not be updated.');
-
         return {
-            recording: insertedRecording,
+            recording: updatedModel,
             updatedCategories
         }
     });
@@ -124,11 +126,10 @@ export const deleteRecording = (id: string): Promise<{
     updatedCategories: Category[]
 }> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
-        const recording = await db.recordings.get(id);
+        const existing = await db.recordings.get(id);
+        if (!existing) throw new Error('Recording does not exist.');
 
-        if (!recording) throw new Error('Recording could not be retrieved.');
-
-        const categoryId = recording.relationships.category.id;
+        const categoryId = existing.relationships.category.id;
 
         const updatedCategories = categoryId ? (
             [await CategoryController.updateCategoryRelationships(

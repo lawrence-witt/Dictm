@@ -14,14 +14,14 @@ import { NoteController } from '../Note';
 
 export const selectCategory = async (id: string): Promise<Category> => {
     const category = await db.categories.get(id);
-    if (!category) throw new Error('Category could not be retrieved.');
+    if (!category) throw new Error('Category does not exist.');
     return category;
 }
 
 export const selectUserCategories = (userId: string): Promise<Category[]> => {
     return db.transaction("r", db.users, db.categories, async () => {
         const user = await db.users.get(userId);
-        if (!user) throw new Error("User could not be retrieved.");
+        if (!user) throw new Error("User does not exist.");
         return db.categories.where({"relationships.user.id": userId}).toArray();
     });
 }
@@ -37,12 +37,19 @@ export const insertCategory = (category: Category): Promise<{
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
         const { id, relationships: { recordings, notes } } = category;
 
-        const updatedRecordings = await Promise.all(recordings.ids.map(async recId => {
-            return await RecordingController.updateRecordingCategory(recId, id);
-        }));
+        const insertedModel = await (async () => {
+            await db.categories.add(category);
+            const model = await db.categories.get(category.id);
+            if (!model) throw new Error('Category does not exist.');
+            return model;
+        })();
 
-        const updatedNotes = await Promise.all(notes.ids.map(async noteId => {
-            return await NoteController.updateNoteCategory(noteId, id);
+        const updatedRecordings = await Promise.all(recordings.ids.map(recId => {
+            return RecordingController.updateRecordingCategory(recId, id);
+        }))
+
+        const updatedNotes = await Promise.all(notes.ids.map(noteId => {
+            return NoteController.updateNoteCategory(noteId, id);
         }));
 
         const updatedCategories = await (async () => {
@@ -60,15 +67,8 @@ export const insertCategory = (category: Category): Promise<{
             }));
         })();
 
-        const insertedCategory = await (async () => {
-            await db.categories.add(category);
-            return db.categories.get(category.id);
-        })();
-
-        if (!insertedCategory) throw new Error('Category could not be created.');
-
         return {
-            category: insertedCategory,
+            category: insertedModel,
             updatedRecordings,
             updatedNotes,
             updatedCategories
@@ -88,23 +88,26 @@ export const updateCategoryRelationships = (
         const category = db.categories.where('id').equals(id);
 
         const modifier = {
-            add: (target: string[], source: string[]) => target = [...target, ...source],
-            remove: (target: string[], source: string[]) => target = target.filter(id => !source.includes(id))
+            add: (target: {ids: string[]}, source: string[]) => {
+                target.ids = [...target.ids, ...source];
+            },
+            remove: (target: {ids: string[]}, source: string[]) => {
+                target.ids = target.ids.filter(id => !source.includes(id));
+            }
         }[method];
 
         if (recordingIds.length > 0) await category.modify(record => modifier(
-            record.relationships.recordings.ids,
+            record.relationships.recordings,
             recordingIds
         ));
 
         if (noteIds.length > 0) await category.modify(record => modifier(
-            record.relationships.notes.ids,
+            record.relationships.notes,
             noteIds
         ));
 
         const updated = await db.categories.get(id);
-
-        if (!updated) throw new Error('Could not update Category ids.');
+        if (!updated) throw new Error('Category does not exist.');
 
         return updated;
     })
@@ -116,15 +119,21 @@ export const updateCategory = (category: Category): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
-        const previousCategory = await db.categories.get(category.id);
+        const existing = await db.categories.get(category.id);
+        if (!existing) throw new Error('Category does not exist.');
 
-        if (!previousCategory) throw new Error('Category could not be retrieved.');
-
+        const { recordings: prevRecordings, notes: prevNotes } = existing.relationships;
         const { recordings: newRecordings, notes: newNotes } = category.relationships;
-        const { recordings: prevRecordings, notes: prevNotes } = previousCategory.relationships;
 
         const recMods = getArrayModifications(prevRecordings.ids, newRecordings.ids);
         const noteMods = getArrayModifications(prevNotes.ids, newNotes.ids);
+
+        const updatedModel = await (async () => {
+            await db.categories.update(category.id, category);
+            const model = await db.categories.get(category.id);
+            if (!model) throw new Error('Category does not exist.');
+            return model;
+        })();
 
         const updatedRecordings = await (async () => {
             const added = await Promise.all(recMods.added.map(recId => {
@@ -165,17 +174,10 @@ export const updateCategory = (category: Category): Promise<{
             }));
         })();
 
-        const insertedCategory = await (async () => {
-            await db.categories.put(category);
-            return db.categories.get(category.id);
-        })();
-
-        if (!insertedCategory) throw new Error('Category could not be updated.');
-
         return {
             updatedRecordings,
             updatedNotes,
-            updatedCategories: [insertedCategory, ...updatedCategories]
+            updatedCategories: [updatedModel, ...updatedCategories]
         }
     });
 }
@@ -187,11 +189,10 @@ export const deleteCategory = (id: string): Promise<{
     updatedNotes: Note[];
 }> => {
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
-        const category = await db.categories.get(id);
+        const existing = await db.categories.get(id);
+        if (!existing) throw new Error('Category could not be retrieved');
 
-        if (!category) throw new Error('Category could not be retrieved');
-
-        const {relationships: { recordings, notes }} = category;
+        const {relationships: { recordings, notes }} = existing;
 
         const updatedRecordings = await Promise.all(recordings.ids.map(recId => (
             RecordingController.updateRecordingCategory(recId, undefined)

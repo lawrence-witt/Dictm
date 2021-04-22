@@ -23,6 +23,9 @@ export const selectUser = async (id: string): Promise<User> => {
     return user;
 }
 
+/* TODO: Validate (and correct) links between resources before returning them to user */
+/* By catching them here, it should be possible to correct otherwise unrecoverable relationship errors by simply refreshing the page */
+
 export const selectUserData = (id: string): Promise<{
     recordings: Recording[],
     notes: Note[],
