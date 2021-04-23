@@ -18,6 +18,20 @@ export const selectUserCategories = (userId: string): Promise<Category[]> => {
     return CommonController.selectModelsByUserId("categories", userId);
 }
 
+export const selectCategoriesByResourceIds = (
+    recordingIds: string[],
+    noteIds: string[],
+    exclude?: string[]
+): Promise<Category[]> => {
+    return (
+        db.categories
+        .where('relationships.recordings.ids').anyOf(recordingIds)
+        .or('relationships.notes.ids').anyOf(noteIds)
+        .and(category => exclude ? !exclude.includes(category.id) : true)
+        .toArray()
+    )
+}
+
 // INSERT
 
 export const insertCategory = (category: Category): Promise<{
@@ -40,11 +54,10 @@ export const insertCategory = (category: Category): Promise<{
         }));
 
         const updatedCategories = await (async () => {
-            const targettedCategories = await (
-                db.categories
-                .where('relationships.recordings.ids').anyOf(recordings.ids)
-                .or('relationships.notes.ids').anyOf(notes.ids)
-                .toArray()
+            const targettedCategories = await selectCategoriesByResourceIds(
+                recordings.ids,
+                notes.ids,
+                [category.id]
             );
 
             return Promise.all(targettedCategories.map(category => {
@@ -104,11 +117,10 @@ export const updateCategory = (category: Category): Promise<{
         })();
 
         const updatedCategories = await (async () => {
-            const targettedCategories = await (
-                db.categories
-                .where('relationships.recordings.ids').anyOf(recMods.added)
-                .or('relationships.notes.ids').anyOf(noteMods.added)
-                .toArray()
+            const targettedCategories = await selectCategoriesByResourceIds(
+                recMods.added,
+                noteMods.added,
+                [category.id]
             );
 
             return Promise.all(targettedCategories.map(category => {

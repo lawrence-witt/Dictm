@@ -47,6 +47,8 @@ export const createCategory = (
         updatedCategories 
     } = data;
 
+    dispatch(actions.createCategory(insertedCategory));
+
     if (updatedRecordings.length > 0) {
         dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
     }
@@ -58,8 +60,6 @@ export const createCategory = (
     if (updatedCategories.length > 0) {
         dispatch(actions.overwriteCategories(updatedCategories));
     }
-
-    return dispatch(actions.createCategory(insertedCategory));
 }
 
 /** 
@@ -89,6 +89,8 @@ export const updateCategory = (
         updatedCategories
     } = data;
 
+    dispatch(actions.overwriteCategories(updatedCategories));
+
     if (updatedRecordings.length > 0) {
         dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
     }
@@ -96,8 +98,6 @@ export const updateCategory = (
     if (updatedNotes.length > 0) {
         dispatch(noteOperations.overwriteNotes(updatedNotes));
     }
-
-    return dispatch(actions.overwriteCategories(updatedCategories));
 }
 
 /** 
@@ -120,11 +120,33 @@ export const overwriteCategories = (
 
 export const deleteCategories = (
     ids: string[]
-): ThunkResult<void> => (
+): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
-    // TODO: remove database records
+    if (ids.length === 0) return Promise.resolve();
+    
+    const data = await (async () => {
+        try {
+            return await CategoryController.deleteCategories(ids);
+        } catch (err) {
+            // handle no categories delete
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject()
+    
+    const { updatedRecordings, updatedNotes } = data;
+
     dispatch(actions.deleteCategories(ids));
+
+    if (updatedRecordings.length > 0) {
+        dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
+    }
+
+    if (updatedNotes.length > 0) {
+        dispatch(noteOperations.overwriteNotes(updatedNotes));
+    }
 }
 
 /** 

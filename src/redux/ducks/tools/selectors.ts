@@ -179,8 +179,8 @@ export const getDeleteQuantity = createSelector((
 ) => {
     const { recordings, notes, categories } = deleteState;
 
-    return [recordings, notes, categories].reduce((count: number, type) => {
-        return count + Object.keys(type).length;
+    return [recordings, notes, categories].reduce((count: number, bucket) => {
+        return count + bucket.length;
     }, 0);
 }, quantity => quantity);
 
@@ -216,5 +216,5 @@ export const getDeleteToggledStatus = createSelector((
     bucket: "recordings" | "notes" | "categories",
     id: string
 ) => {
-    return Boolean(deleteState[bucket][id]);
+    return deleteState[bucket].includes(id);
 }, isToggled => isToggled)

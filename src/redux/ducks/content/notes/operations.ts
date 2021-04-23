@@ -1,11 +1,11 @@
-import * as types from './types';
+import { ThunkResult } from '../../../store';
+
 import * as actions from './actions';
 
 import { categoryOperations } from '../categories';
 
 import Note from '../../../../db/models/Note';
 import { NoteController } from '../../../../db/controllers/Note';
-import { ThunkResult } from '../../../store';
 
 /** 
 *  Summary:
@@ -108,11 +108,29 @@ export const overwriteNotes = (
 
 export const deleteNotes = (
     ids: string[]
-): ThunkResult<void> => (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
-    // TODO: remove database record
-    dispatch(actions.deleteNotes(ids));
+    if (ids.length === 0) return Promise.resolve();
+    
+    const data = await (async () => {
+        try {
+            return await NoteController.deleteNotes(ids);
+        } catch (err) {
+            // handle cannot delete
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+    
+    const { updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.deleteNotes(ids));
 }
 
 /** 

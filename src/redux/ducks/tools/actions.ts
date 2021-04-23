@@ -48,7 +48,11 @@ export const toggleDeleteResource = (
 
 export const setDeleteToolDeleting = (): types.DeleteToolSetDeletingAction => ({
     type: types.DELETE_TOOL_SET_DELETING
-})
+});
+
+export const unsetDeleteToolDeleting = (): types.DeleteToolUnsetDeletingAction => ({
+    type: types.DELETE_TOOL_UNSET_DELETING
+});
 
 export const commitDeleteTool = (): types.DeleteToolDeletedAction => ({
     type: types.DELETE_TOOL_DELETED

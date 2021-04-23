@@ -60,9 +60,9 @@ const searchToolReducer = (
 const initialDeleteState: types.DeleteToolState = {
     isOpen: false,
     isDeleting: false,
-    recordings: {},
-    notes: {},
-    categories: {}
+    recordings: [],
+    notes: [],
+    categories: []
 }
 
 const deleteToolReducer = (
@@ -78,12 +78,14 @@ const deleteToolReducer = (
         case types.DELETE_TOOL_RESOURCE_TOGGLED: {
             const { bucket, id } = action.payload;
 
-            const bucketClone = {...state[bucket]};
+            const bucketClone = [...state[bucket]];
 
-            if (bucketClone[id]) {
-                delete bucketClone[id];
+            const idx = bucketClone.findIndex(i => i === id);
+
+            if (idx === -1) {
+                bucketClone.push(id);
             } else {
-                bucketClone[id] = true;
+                bucketClone.splice(idx, 1);
             }
 
             return {
@@ -95,6 +97,11 @@ const deleteToolReducer = (
             return {
                 ...state,
                 isDeleting: true
+            }
+        case types.DELETE_TOOL_UNSET_DELETING:
+            return {
+                ...state,
+                isDeleting: false
             }
         case types.DELETE_TOOL_DELETED:
             return {

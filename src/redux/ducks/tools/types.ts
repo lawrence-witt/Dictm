@@ -81,15 +81,16 @@ export type SearchToolActionTypes =
 export const DELETE_TOOL_OPENED             = "dictm/tools/delete/OPENED";
 export const DELETE_TOOL_RESOURCE_TOGGLED   = "dictm/tools/delete/RESOURCE_TOGGLED";
 export const DELETE_TOOL_SET_DELETING       = "dictm/tools/delete/SET_DELETING";
+export const DELETE_TOOL_UNSET_DELETING     = "dictm/tools/delete/UNSET_DELETING";
 export const DELETE_TOOL_DELETED            = "dictm/tools/delete/DELETED";
 export const DELETE_TOOL_CLOSED             = "dictm/tools/delete/CLOSED";
 
 export interface DeleteToolState {
     isOpen: boolean;
     isDeleting: boolean;
-    recordings: Record<string, true>;
-    notes: Record<string, true>;
-    categories: Record<string, true>;
+    recordings: string[];
+    notes: string[];
+    categories: string[];
 }
 
 export interface DeleteToolOpenedAction {
@@ -108,6 +109,10 @@ export interface DeleteToolSetDeletingAction {
     type: typeof DELETE_TOOL_SET_DELETING;
 }
 
+export interface DeleteToolUnsetDeletingAction {
+    type: typeof DELETE_TOOL_UNSET_DELETING;
+}
+
 export interface DeleteToolDeletedAction {
     type: typeof DELETE_TOOL_DELETED;
 }
@@ -120,6 +125,7 @@ export type DeleteToolActionTypes =
     DeleteToolOpenedAction |
     DeleteToolToggleResourceAction |
     DeleteToolSetDeletingAction |
+    DeleteToolUnsetDeletingAction |
     DeleteToolDeletedAction |
     DeleteToolClosedAction |
     SearchToolOpenedAction;

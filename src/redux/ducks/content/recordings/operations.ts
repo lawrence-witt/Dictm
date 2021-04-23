@@ -1,11 +1,11 @@
-import * as types from './types';
-import * as actions from './actions';
+import { ThunkResult } from '../../../store';
 
-import { categoryOperations } from '../categories';
+import * as actions from './actions';
 
 import Recording from '../../../../db/models/Recording';
 import { RecordingController } from '../../../../db/controllers/Recording';
-import { RootState, ThunkResult } from '../../../store';
+
+import { categoryOperations } from '../categories';
 
 /** 
 *  Summary:
@@ -34,7 +34,7 @@ export const createRecording = (
         try {
             return await RecordingController.insertRecording(recording);
         } catch (err) {
-            // handle no recording creation
+            // handle cannot create
             console.log(err);
         }
     })();
@@ -64,7 +64,7 @@ export const updateRecording = (
         try {
             return await RecordingController.updateRecording(recording);
         } catch (err) {
-            // handle no recording update
+            // handle cannot update
             console.log(err);
         }
     })();
@@ -101,11 +101,29 @@ export const overwriteRecordings = (
 
 export const deleteRecordings = (
     ids: string[]
-): ThunkResult<void> => (
+): ThunkResult<Promise<any>> => async (
     dispatch
-): void => {
-    // TODO: remove database records
-    dispatch(actions.deleteRecordings(ids));
+) => {
+    if (ids.length === 0) return Promise.resolve();
+
+    const data = await (async () => {
+        try {
+            return await RecordingController.deleteRecordings(ids);
+        } catch (err) {
+            // handle cannot delete
+            console.log(err);
+        }
+    })();
+
+    if (!data) return Promise.reject();
+    
+    const { updatedCategories } = data;
+
+    if (updatedCategories.length > 0) {
+        dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
+
+    return dispatch(actions.deleteRecordings(ids));
 }
 
 /** 

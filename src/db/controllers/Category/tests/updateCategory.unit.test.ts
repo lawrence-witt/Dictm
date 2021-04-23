@@ -133,6 +133,10 @@ test("it returns an object containing all the updated Resources", async done => 
         })
     );
 
+    expect(updated.updatedRecordings).toHaveLength(1);
+    expect(updated.updatedNotes).toHaveLength(1);
+    expect(updated.updatedCategories).toHaveLength(1);
+
     done();
 });
 

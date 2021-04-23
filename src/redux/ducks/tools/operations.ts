@@ -1,7 +1,10 @@
 import { ThunkResult } from '../../store';
 
-import * as types from './types';
 import * as actions from './actions';
+
+import { recordingOperations } from '../content/recordings';
+import { noteOperations } from '../content/notes';
+import { categoryOperations } from '../content/categories';
 
 /* 
 *   Nav Menu Operations 
@@ -108,15 +111,27 @@ export const toggleDeleteResource = (
 *   Deletes the resources marked by the delete tool.
 */
 
-export const commitDeleteTool = (): ThunkResult<void> => (
+export const commitDeleteTool = (): ThunkResult<Promise<void>> => async (
     dispatch,
     getState
-): void => {
-    const { isDeleting } = getState().tools.delete;
+) => {
+    const { delete: deleteTool } = getState().tools;
 
-    if (isDeleting) return;
+    if (deleteTool.isDeleting) return;
 
     dispatch(actions.setDeleteToolDeleting());
 
-    // delete the resources from DB
+    const { recordings, notes, categories } = deleteTool;
+
+    Promise.all([
+        dispatch(recordingOperations.deleteRecordings(recordings)),
+        dispatch(noteOperations.deleteNotes(notes)),
+        dispatch(categoryOperations.deleteCategories(categories))
+    ])
+    .then(() => {
+        dispatch(actions.commitDeleteTool());
+    })
+    .catch(() => {
+        dispatch(actions.unsetDeleteToolDeleting());
+    });
 }

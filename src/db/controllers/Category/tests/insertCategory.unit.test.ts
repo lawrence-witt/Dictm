@@ -107,7 +107,7 @@ test("it updates any Categories affected by the insertion", async done => {
     done();
 });
 
-test("it returns the inserted Category and an object containing updated Resources", async done => {
+test("it returns an object containing inserted Category and updated Resources", async done => {
     const seeded = await handler.seedTestDatabase();
 
     const newCategory = new Category(seeded.user.id);
@@ -120,16 +120,30 @@ test("it returns the inserted Category and an object containing updated Resource
 
     expect(updated).toEqual(
         expect.objectContaining({
-            category: expect.objectContaining({id: newCategory.id}),
+            category: expect.objectContaining({
+                id: newCategory.id,
+                relationships: expect.objectContaining({
+                    recordings: expect.objectContaining({
+                        ids: expect.arrayContaining([targetRecording.id])
+                    }),
+                    notes: expect.objectContaining({
+                        ids: expect.arrayContaining([targetNote.id])
+                    })
+                })
+            }),
             updatedRecordings: expect.arrayContaining([
                 expect.objectContaining({id: targetRecording.id})
             ]),
             updatedNotes: expect.arrayContaining([
                 expect.objectContaining({id: targetNote.id})
             ]),
-            updatedCategories: expect.arrayContaining([])
+            updatedCategories: []
         })
     );
+
+    expect(updated.updatedRecordings).toHaveLength(1);
+    expect(updated.updatedNotes).toHaveLength(1);
+    expect(updated.updatedCategories).toHaveLength(0);
 
     done();
 });

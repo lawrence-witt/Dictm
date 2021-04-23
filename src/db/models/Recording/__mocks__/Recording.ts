@@ -1,6 +1,7 @@
 /* 
 *   Manually mock audio data so cassette-js worker code
-*   is not invoked. Hopefully a temporary workaround.
+*   is not invoked. Hopefully a temporary workaround
+*   until the package is shakeable.
 */
 
 import { nanoid } from 'nanoid';
