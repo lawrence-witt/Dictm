@@ -12,7 +12,7 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it deletes an array of Recordings from the database", async done => {
+test("it deletes a list of Recordings from the database", async done => {
     const seeded = await handler.seedTestDatabase();
     const recordingIds = seeded.recordings.map(recording => recording.id);
 

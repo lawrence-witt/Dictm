@@ -12,7 +12,7 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it deletes an array of Notes from the database", async done => {
+test("it deletes a list of Notes from the database", async done => {
     const seeded = await handler.seedTestDatabase();
     const noteIds = seeded.notes.map(note => note.id);
 
@@ -24,7 +24,7 @@ test("it deletes an array of Notes from the database", async done => {
     done();
 });
 
-test("it updates Categories which linked the deleted Notes", async done => {
+test("it updates any Categories which linked the deleted Notes", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link
