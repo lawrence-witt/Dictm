@@ -22,9 +22,7 @@ export const insertRecording = (recording: Recording): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
-        const { id, relationships: { category, user } } = recording;
-
-        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
+        const { id, relationships: { category } } = recording;
 
         const insertedModel = await CommonController.insertModel("recordings", recording);
 
@@ -55,10 +53,6 @@ export const updateRecording = (recording: Recording): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
-        const { relationships: { user } } = recording;
-
-        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
-
         const { previous, current } = await CommonController.updateModel("recordings", recording);
 
         const updatedCategories = await (async () => {

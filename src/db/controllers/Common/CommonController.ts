@@ -16,6 +16,12 @@ const tableMatchesModel = <T extends keyof AllTables>(
     return getSingluarFromPlural(table) === model.type;
 }
 
+const isResource = <T extends keyof AllTables>(
+    model: AllTables[T]["returns"]
+): model is ResourceTables[keyof ResourceTables]["returns"] => {
+    return model.type !== "user";
+}
+
 // SELECT
 
 export const selectTable = <T extends keyof AllTables>(
@@ -49,9 +55,14 @@ export const insertModel = <T extends keyof AllTables>(
     table: T,
     model: AllTables[T]["returns"],
 ): Promise<AllTables[T]["returns"]> => {
-    return db.transaction('rw', db[table], async () => {
+    return db.transaction('rw', db.users, db[table], async () => {
         if (!tableMatchesModel(table, model)) {
             throw new Error(`Table ${table} does not match model ${model.type}.`);
+        }
+
+        if (isResource(model)) {
+            const { relationships: { user } } = model;
+            if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
         }
 
         await db[table].add(model as any);
@@ -74,9 +85,14 @@ export const updateModel = <T extends keyof AllTables>(
     previous: AllTables[T]["returns"];
     current: AllTables[T]["returns"];
 }> => {
-    return db.transaction('rw', db[table], async () => {
+    return db.transaction('rw', db.users, db[table], async () => {
         if (!tableMatchesModel(table, model)) {
             throw new Error(`Table ${table} does not match model ${model.type}.`);
+        }
+
+        if (isResource(model)) {
+            const { relationships: { user } } = model;
+            if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
         }
 
         const previous = await db[table].get(model.id);

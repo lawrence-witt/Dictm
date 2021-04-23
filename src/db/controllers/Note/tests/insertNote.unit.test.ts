@@ -72,7 +72,7 @@ test("it returns the inserted Note and any updated Categories", async done => {
     done();
 });
 
-test("it throws an error if the Note has an id already present in the database", async done => {
+test("it throws an error if the new Note's id is already in the database", async done => {
     const seeded = await handler.seedTestDatabase();
     const newNote = new Note(seeded.user.id);
     newNote.id = seeded.notes[0].id;

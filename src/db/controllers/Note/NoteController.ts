@@ -22,9 +22,7 @@ export const insertNote = (note: Note): Promise<{
     updatedCategories: Category[]
 }> => {
     return db.transaction('rw', db.users, db.notes, db.categories, async () => {
-        const { id, relationships: { category, user } } = note;
-
-        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
+        const { id, relationships: { category } } = note;
 
         const insertedModel = await CommonController.insertModel("notes", note);
 
@@ -55,10 +53,6 @@ export const updateNote = (note: Note): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.users, db.notes, db.categories, async () => {
-        const { relationships: { user } } = note;
-
-        if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
-
         const { previous, current } = await CommonController.updateModel("notes", note);
 
         const updatedCategories = await (async () => {

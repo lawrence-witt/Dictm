@@ -26,7 +26,7 @@ export const insertCategory = (category: Category): Promise<{
     updatedNotes: Note[];
     updatedCategories: Category[];
 }> => {
-    return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
+    return db.transaction('rw', db.users, db.categories, db.recordings, db.notes, async () => {
         const { id, relationships: { recordings, notes } } = category;
 
         const insertedModel = await CommonController.insertModel("categories", category);

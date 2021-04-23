@@ -57,12 +57,12 @@ test("it updates a Category the Note has been removed from", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link
-    const newRecording = new Note(seeded.user.id);
+    const newNote = new Note(seeded.user.id);
     const newCategory = new Category(seeded.user.id);
-    newRecording.relationships.category.id = newCategory.id;
-    newCategory.relationships.notes.ids.push(newRecording.id);
+    newNote.relationships.category.id = newCategory.id;
+    newCategory.relationships.notes.ids.push(newNote.id);
 
-    await db.notes.add(newRecording);
+    await db.notes.add(newNote);
     await db.categories.add(newCategory);
     const insertedCategory = await db.categories.get(newCategory.id);
 
@@ -70,15 +70,15 @@ test("it updates a Category the Note has been removed from", async done => {
         expect.objectContaining({
             relationships: expect.objectContaining({
                 notes: expect.objectContaining({
-                    ids: expect.arrayContaining([newRecording.id])
+                    ids: expect.arrayContaining([newNote.id])
                 })
             })
         })
     );
 
     // Remove link
-    newRecording.relationships.category.id = undefined;
-    await NoteController.updateNote(newRecording);
+    newNote.relationships.category.id = undefined;
+    await NoteController.updateNote(newNote);
     const updatedCategory = await db.categories.get(newCategory.id);
 
     expect(updatedCategory).toEqual(

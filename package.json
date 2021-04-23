@@ -8,7 +8,7 @@
     "start": "webpack serve --config webpack.dev.js --hot",
     "build": "webpack --mode production --config webpack.prod.js",
     "test": "jest --config config/jest/jest.config.ts",
-    "test:db": "jest --runInBand --config config/jest/jest.db.config.ts"
+    "test:db": "jest --config config/jest/jest.db.config.ts"
   },
   "author": "",
   "license": "ISC",
