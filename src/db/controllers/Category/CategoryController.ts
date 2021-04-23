@@ -70,7 +70,7 @@ export const updateCategory = (category: Category): Promise<{
     updatedNotes: Note[];
     updatedCategories: Category[];
 }> => {
-    return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
+    return db.transaction('rw', db.users, db.categories, db.recordings, db.notes, async () => {
         const { previous, current } = await CommonController.updateModel("categories", category);
 
         const { recordings: prevRecordings, notes: prevNotes } = previous.relationships;
@@ -135,7 +135,7 @@ export const deleteCategory = (id: string): Promise<{
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
         const deleted = await CommonController.deleteModel("categories", id);
 
-        const {relationships: { recordings, notes }} = deleted;
+        const { relationships: { recordings, notes } } = deleted;
 
         const updatedRecordings = await Promise.all(recordings.ids.map(recId => (
             CommonController.updateMediaCategory("recordings", recId, undefined)

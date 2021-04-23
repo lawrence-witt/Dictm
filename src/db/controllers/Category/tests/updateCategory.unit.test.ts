@@ -1,9 +1,7 @@
-import Dexie from 'dexie';
-
 import { db } from '../../../db';
 
-import Category from '../../../models/Category';
 import { CategoryController } from '..';
+import Category from '../../../models/Category';
 
 import * as handler from '../../../test/db-handler';
 
@@ -13,31 +11,34 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it inserts a new Category model into the database", async done => {
+test("it updates the Category model in the database", async done => {
     const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
+    const targetCategory = seeded.categories[0];
+    targetCategory.attributes.title = "Updated Title";
 
-    await CategoryController.insertCategory(newCategory);
-    const retrieved = await db.categories.get(newCategory.id);
+    await CategoryController.updateCategory(targetCategory);
+    const retrieved = await db.categories.get(targetCategory.id);
 
     expect(retrieved).toEqual(
         expect.objectContaining({
-            id: newCategory.id
+            attributes: expect.objectContaining({
+                title: "Updated Title"
+            })
         })
     );
 
     done();
 });
 
-test("it updates any Media affected by the insertion", async done => {
+test("it updates any Media affected by the Category update", async done => {
     const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
+    const targetCategory = seeded.categories[0];
     const targetRecording = seeded.recordings[0];
     const targetNote = seeded.notes[0];
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
-    newCategory.relationships.notes.ids.push(targetNote.id);
+    targetCategory.relationships.recordings.ids.push(targetRecording.id);
+    targetCategory.relationships.notes.ids.push(targetNote.id);
 
-    await CategoryController.insertCategory(newCategory);
+    await CategoryController.updateCategory(targetCategory);
     const updatedRecording = await db.recordings.get(targetRecording.id);
     const updatedNote = await db.notes.get(targetNote.id);
 
@@ -45,7 +46,7 @@ test("it updates any Media affected by the insertion", async done => {
         expect.objectContaining({
             relationships: expect.objectContaining({
                 category: expect.objectContaining({
-                    id: newCategory.id
+                    id: targetCategory.id
                 })
             })
         })
@@ -55,7 +56,7 @@ test("it updates any Media affected by the insertion", async done => {
         expect.objectContaining({
             relationships: expect.objectContaining({
                 category: expect.objectContaining({
-                    id: newCategory.id
+                    id: targetCategory.id
                 })
             })
         })
@@ -64,7 +65,7 @@ test("it updates any Media affected by the insertion", async done => {
     done();
 });
 
-test("it updates any Categories affected by the insertion", async done => {
+test("it updates any Categories affect by the Category update", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link
@@ -88,10 +89,10 @@ test("it updates any Categories affected by the insertion", async done => {
     );
 
     // Remove link
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
+    const updatedCategory = seeded.categories[1];
+    updatedCategory.relationships.recordings.ids.push(targetRecording.id);
 
-    await CategoryController.insertCategory(newCategory);
+    await CategoryController.updateCategory(updatedCategory);
     const unlinkedCategory = await db.categories.get(targetCategory.id);
 
     expect(unlinkedCategory).toEqual(
@@ -107,50 +108,52 @@ test("it updates any Categories affected by the insertion", async done => {
     done();
 });
 
-test("it returns the inserted Category and an object containing updated Resources", async done => {
+test("it returns an object containing all the updated Resources", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const newCategory = new Category(seeded.user.id);
+    const targetCategory = seeded.categories[0];
     const targetRecording = seeded.recordings[0];
     const targetNote = seeded.notes[0];
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
-    newCategory.relationships.notes.ids.push(targetNote.id);
+    targetCategory.relationships.recordings.ids.push(targetRecording.id);
+    targetCategory.relationships.notes.ids.push(targetNote.id);
 
-    const updated = await CategoryController.insertCategory(newCategory);
+    const updated = await CategoryController.updateCategory(targetCategory);
 
     expect(updated).toEqual(
         expect.objectContaining({
-            category: expect.objectContaining({id: newCategory.id}),
             updatedRecordings: expect.arrayContaining([
                 expect.objectContaining({id: targetRecording.id})
             ]),
             updatedNotes: expect.arrayContaining([
                 expect.objectContaining({id: targetNote.id})
             ]),
-            updatedCategories: expect.arrayContaining([])
+            updatedCategories: expect.arrayContaining([
+                expect.objectContaining({id: targetCategory.id})
+            ])
         })
     );
 
     done();
 });
 
-test("it throws an error if the new Category's id is already in the database", async done => {
+test("it throws an error if the Category does not exist", async done => {
     const seeded = await handler.seedTestDatabase();
     const newCategory = new Category(seeded.user.id);
-    newCategory.id = seeded.categories[0].id;
 
     await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
-    }).rejects.toThrow(Dexie.ConstraintError);
+        await CategoryController.updateCategory(newCategory);
+    }).rejects.toThrow("Category does not exist.");
 
     done();
 });
 
 test("it throws an error if the Category links a non-existent User id", async done => {
-    const newCategory = new Category("bad-id");
+    const seeded = await handler.seedTestDatabase();
+    const targetCategory = seeded.categories[0];
+    targetCategory.relationships.user.id = "bad-id";
 
     await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
+        await CategoryController.insertCategory(targetCategory);
     }).rejects.toThrow("User does not exist.");
 
     done();
@@ -158,11 +161,11 @@ test("it throws an error if the Category links a non-existent User id", async do
 
 test("it throws an error if the Category links a non-existent Media id", async done => {
     const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push("bad-id");
+    const targetCategory = seeded.categories[0];
+    targetCategory.relationships.recordings.ids.push("bad-id");
 
     await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
+        await CategoryController.updateCategory(targetCategory);
     }).rejects.toThrow("Recording does not exist.");
 
     done();
