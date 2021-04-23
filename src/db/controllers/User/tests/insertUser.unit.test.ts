@@ -17,8 +17,11 @@ test("it inserts a new User model into the database", async done => {
     await UserController.insertUser(newUser);
     const retrieved = await UserController.selectUser(newUser.id);
 
-    expect(retrieved).toBeInstanceOf(User);
-    expect(newUser.id).toBe(retrieved.id);
+    expect(retrieved).toEqual(
+        expect.objectContaining({
+            id: newUser.id
+        })
+    );
 
     done();
 });
@@ -28,8 +31,11 @@ test("it returns the inserted User model", async done => {
 
     const inserted = await UserController.insertUser(newUser);
 
-    expect(inserted).toBeInstanceOf(User);
-    expect(newUser.id).toBe(inserted.id);
+    expect(inserted).toEqual(
+        expect.objectContaining({
+            id: newUser.id
+        })
+    );
 
     done();
 })

@@ -1,23 +1,18 @@
 import { db } from '../../db';
 
-import Category from '../../models/Category';
-import { CategoryController } from '../Category';
+import { CommonController } from '../Common';
 
 import Note from '../../models/Note';
+import Category from '../../models/Category';
 
 // SELECT
 
 export const selectNote = async (id: string): Promise<Note> => {
-    const note = await db.notes.get(id);
-    if (!note) throw new Error('Note does not exist.');
-    return note;
+    return CommonController.selectModelById("notes", id);
 }
 
 export const selectUserNotes = (userId: string): Promise<Note[]> => {
-    return db.transaction("r", db.users, db.notes, async () => {
-        if (!(await db.users.get(userId))) throw new Error('User does not exist.');
-        return db.notes.where({"relationships.user.id": userId}).toArray();
-    });
+    return CommonController.selectModelsByUserId("notes", userId);
 }
 
 // INSERT
@@ -31,15 +26,10 @@ export const insertNote = (note: Note): Promise<{
 
         if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
 
-        const insertedModel = await (async () => {
-            await db.notes.add(note);
-            const model = await db.notes.get(id);
-            if (!model) throw new Error('Note could not be inserted.');
-            return model;
-        })();
+        const insertedModel = await CommonController.insertModel("notes", note);
 
         const updatedCategories = category.id ? ([
-            await CategoryController.updateCategoryRelationships(
+            await CommonController.updateCategoryMedia(
                 'add', category.id, [], [id]
             )
         ]) : [];
@@ -57,20 +47,7 @@ export const updateNoteCategory = (
     id: string, 
     categoryId: string | undefined
 ): Promise<Note> => {
-    return db.transaction('rw', db.notes, db.categories, async () => {
-        if (categoryId && !(await db.categories.get(categoryId))) {
-            throw new Error('Category does not exist.');
-        }
-
-        await db.notes.where('id').equals(id).modify(note => {
-            note.relationships.category.id = categoryId;
-        });
-
-        const updated = await db.notes.get(id);
-        if (!updated) throw new Error('Note does not exist.');
-        
-        return updated;
-    });
+    return CommonController.updateMediaCategory("notes", id, categoryId);
 }
 
 export const updateNote = (note: Note): Promise<{
@@ -78,34 +55,26 @@ export const updateNote = (note: Note): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.users, db.notes, db.categories, async () => {
-        const { id, relationships: { user } } = note;
-
-        const existing = await db.notes.get(id);
-        if (!existing) throw new Error('Note does not exist.');
+        const { relationships: { user } } = note;
 
         if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
 
-        const updatedModel = await (async () => {
-            await db.notes.update(id, note);
-            const model = await db.notes.get(id);
-            if (!model) throw new Error("Note does not exist.");
-            return model;
-        })();
+        const { previous, current } = await CommonController.updateModel("notes", note);
 
         const updatedCategories = await (async () => {
-            const { id: prevId } = existing.relationships.category;
-            const { id: newId } = note.relationships.category;
+            const { id: prevId } = previous.relationships.category;
+            const { id: newId } = current.relationships.category;
 
             const unEqual = prevId !== newId;
 
             const removed = unEqual && prevId ? ([
-                await CategoryController.updateCategoryRelationships(
+                await CommonController.updateCategoryMedia(
                     'remove', prevId, [], [note.id]
                 )
             ]) : [];
 
             const added = unEqual && newId ? ([
-                await CategoryController.updateCategoryRelationships(
+                await CommonController.updateCategoryMedia(
                     'add', newId, [], [note.id]
                 )
             ]) : [];
@@ -114,7 +83,7 @@ export const updateNote = (note: Note): Promise<{
         })();
 
         return {
-            note: updatedModel,
+            note: current,
             updatedCategories
         }
     });
@@ -126,18 +95,15 @@ export const deleteNote = (id: string): Promise<{
     updatedCategories: Category[]
 }> => {
     return db.transaction('rw', db.notes, db.categories, async () => {
-        const existing = await db.notes.get(id);
-        if (!existing) throw new Error('Note does not exist.');
+        const deleted = await CommonController.deleteModel("notes", id);
 
-        const categoryId = existing.relationships.category.id;
+        const categoryId = deleted.relationships.category.id;
 
         const updatedCategories = categoryId ? (
-            [await CategoryController.updateCategoryRelationships(
+            [await CommonController.updateCategoryMedia(
                 'remove', categoryId, [], [id]
             )]
         ) : [];
-
-        await db.notes.delete(id);
 
         return {
             updatedCategories

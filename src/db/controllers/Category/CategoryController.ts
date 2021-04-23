@@ -2,28 +2,20 @@ import { db } from '../../db';
 
 import getArrayModifications from '../../../lib/utils/getArrayModifications';
 
+import { CommonController } from '../Common';
+
 import Category from '../../models/Category';
-
 import Recording from '../../models/Recording';
-import { RecordingController } from '../Recording';
-
 import Note from '../../models/Note';
-import { NoteController } from '../Note';
 
 // SELECT
 
 export const selectCategory = async (id: string): Promise<Category> => {
-    const category = await db.categories.get(id);
-    if (!category) throw new Error('Category does not exist.');
-    return category;
+    return CommonController.selectModelById("categories", id);
 }
 
 export const selectUserCategories = (userId: string): Promise<Category[]> => {
-    return db.transaction("r", db.users, db.categories, async () => {
-        const user = await db.users.get(userId);
-        if (!user) throw new Error("User does not exist.");
-        return db.categories.where({"relationships.user.id": userId}).toArray();
-    });
+    return CommonController.selectModelsByUserId("categories", userId);
 }
 
 // INSERT
@@ -37,19 +29,14 @@ export const insertCategory = (category: Category): Promise<{
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
         const { id, relationships: { recordings, notes } } = category;
 
-        const insertedModel = await (async () => {
-            await db.categories.add(category);
-            const model = await db.categories.get(category.id);
-            if (!model) throw new Error('Category does not exist.');
-            return model;
-        })();
+        const insertedModel = await CommonController.insertModel("categories", category);
 
         const updatedRecordings = await Promise.all(recordings.ids.map(recId => {
-            return RecordingController.updateRecordingCategory(recId, id);
-        }))
+            return CommonController.updateMediaCategory("recordings", recId, id);
+        }));
 
         const updatedNotes = await Promise.all(notes.ids.map(noteId => {
-            return NoteController.updateNoteCategory(noteId, id);
+            return CommonController.updateMediaCategory("notes", noteId, id);
         }));
 
         const updatedCategories = await (async () => {
@@ -61,7 +48,7 @@ export const insertCategory = (category: Category): Promise<{
             );
 
             return Promise.all(targettedCategories.map(category => {
-                return updateCategoryRelationships(
+                return CommonController.updateCategoryMedia(
                     'remove', category.id, recordings.ids, notes.ids
                 );
             }));
@@ -78,70 +65,27 @@ export const insertCategory = (category: Category): Promise<{
 
 // UPDATE
 
-export const updateCategoryRelationships = (
-    method: 'add' | 'remove',
-    id: string,
-    recordingIds: string[],
-    noteIds: string[]
-): Promise<Category> => {
-    return db.transaction('rw', db.categories, async () => {
-        const category = db.categories.where('id').equals(id);
-
-        const modifier = {
-            add: (target: {ids: string[]}, source: string[]) => {
-                target.ids = [...target.ids, ...source];
-            },
-            remove: (target: {ids: string[]}, source: string[]) => {
-                target.ids = target.ids.filter(id => !source.includes(id));
-            }
-        }[method];
-
-        if (recordingIds.length > 0) await category.modify(record => modifier(
-            record.relationships.recordings,
-            recordingIds
-        ));
-
-        if (noteIds.length > 0) await category.modify(record => modifier(
-            record.relationships.notes,
-            noteIds
-        ));
-
-        const updated = await db.categories.get(id);
-        if (!updated) throw new Error('Category does not exist.');
-
-        return updated;
-    })
-}
-
 export const updateCategory = (category: Category): Promise<{
     updatedRecordings: Recording[];
     updatedNotes: Note[];
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
-        const existing = await db.categories.get(category.id);
-        if (!existing) throw new Error('Category does not exist.');
+        const { previous, current } = await CommonController.updateModel("categories", category);
 
-        const { recordings: prevRecordings, notes: prevNotes } = existing.relationships;
-        const { recordings: newRecordings, notes: newNotes } = category.relationships;
+        const { recordings: prevRecordings, notes: prevNotes } = previous.relationships;
+        const { recordings: newRecordings, notes: newNotes } = current.relationships;
 
         const recMods = getArrayModifications(prevRecordings.ids, newRecordings.ids);
         const noteMods = getArrayModifications(prevNotes.ids, newNotes.ids);
 
-        const updatedModel = await (async () => {
-            await db.categories.update(category.id, category);
-            const model = await db.categories.get(category.id);
-            if (!model) throw new Error('Category does not exist.');
-            return model;
-        })();
-
         const updatedRecordings = await (async () => {
             const added = await Promise.all(recMods.added.map(recId => {
-                return RecordingController.updateRecordingCategory(recId, category.id);
+                return CommonController.updateMediaCategory("recordings", recId, current.id);
             }));
 
             const removed = await Promise.all(recMods.removed.map(recId => {
-                return RecordingController.updateRecordingCategory(recId, undefined);
+                return CommonController.updateMediaCategory("recordings", recId, undefined);
             }));
 
             return [...added, ...removed];
@@ -149,11 +93,11 @@ export const updateCategory = (category: Category): Promise<{
 
         const updatedNotes = await (async () => {
             const added = await Promise.all(noteMods.added.map(noteId => {
-                return NoteController.updateNoteCategory(noteId, category.id);
+                return CommonController.updateMediaCategory("notes", noteId, current.id);
             }));
             
             const removed = await Promise.all(noteMods.removed.map(noteId => {
-                return NoteController.updateNoteCategory(noteId, undefined);
+                return CommonController.updateMediaCategory("notes", noteId, undefined);
             }))
 
             return [...added, ...removed];
@@ -168,7 +112,7 @@ export const updateCategory = (category: Category): Promise<{
             );
 
             return Promise.all(targettedCategories.map(category => {
-                return updateCategoryRelationships(
+                return CommonController.updateCategoryMedia(
                     'remove', category.id, recMods.added, noteMods.added
                 );
             }));
@@ -177,7 +121,7 @@ export const updateCategory = (category: Category): Promise<{
         return {
             updatedRecordings,
             updatedNotes,
-            updatedCategories: [updatedModel, ...updatedCategories]
+            updatedCategories: [current, ...updatedCategories]
         }
     });
 }
@@ -189,20 +133,17 @@ export const deleteCategory = (id: string): Promise<{
     updatedNotes: Note[];
 }> => {
     return db.transaction('rw', db.categories, db.recordings, db.notes, async () => {
-        const existing = await db.categories.get(id);
-        if (!existing) throw new Error('Category could not be retrieved');
+        const deleted = await CommonController.deleteModel("categories", id);
 
-        const {relationships: { recordings, notes }} = existing;
+        const {relationships: { recordings, notes }} = deleted;
 
         const updatedRecordings = await Promise.all(recordings.ids.map(recId => (
-            RecordingController.updateRecordingCategory(recId, undefined)
+            CommonController.updateMediaCategory("recordings", recId, undefined)
         )));
 
         const updatedNotes = await Promise.all(notes.ids.map(noteId => (
-            NoteController.updateNoteCategory(noteId, undefined)
+            CommonController.updateMediaCategory("notes", noteId, undefined)
         )));
-
-        await db.categories.delete(id);
 
         return {
             updatedRecordings,

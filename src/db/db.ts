@@ -33,4 +33,26 @@ class DictmDatabase extends Dexie {
     }
 }
 
+export type AllTables = {
+    users: {
+        table: Dexie.Table<User, string>;
+        returns: User;
+    }
+    recordings: {
+        table: Dexie.Table<Recording, string>;
+        returns: Recording;
+    }
+    notes: {
+        table: Dexie.Table<Note, string>;
+        returns: Note;
+    }
+    categories: {
+        table: Dexie.Table<Category, string>;
+        returns: Category;
+    }
+}
+
+export type ResourceTables = Omit<AllTables, "users">;
+export type MediaTables = Omit<ResourceTables, "categories">;
+
 export const db = new DictmDatabase();

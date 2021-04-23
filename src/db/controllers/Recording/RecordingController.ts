@@ -1,23 +1,18 @@
 import { db } from '../../db';
 
-import Category from '../../models/Category';
-import { CategoryController } from '../Category';
+import { CommonController } from '../Common';
 
 import Recording from '../../models/Recording';
+import Category from '../../models/Category';
 
 // SELECT
 
-export const selectRecording = async (id: string): Promise<Recording> => {
-    const recording = await db.recordings.get(id);
-    if (!recording) throw new Error('Recording does not exist.');
-    return recording;
+export const selectRecording = (id: string): Promise<Recording> => {
+    return CommonController.selectModelById("recordings", id);
 }
 
 export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
-    return db.transaction("r", db.users, db.recordings, async () => {
-        if (!(await db.users.get(userId))) throw new Error('User does not exist.');
-        return db.recordings.where({"relationships.user.id": userId}).toArray();
-    });
+    return CommonController.selectModelsByUserId("recordings", userId);
 }
 
 // INSERT
@@ -31,15 +26,10 @@ export const insertRecording = (recording: Recording): Promise<{
 
         if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
 
-        const insertedModel = await (async () => {
-            await db.recordings.add(recording);
-            const model =  await db.recordings.get(id);
-            if (!model) throw new Error('Recording could not be inserted.');
-            return model;
-        })();
+        const insertedModel = await CommonController.insertModel("recordings", recording);
 
         const updatedCategories = category.id ? ([
-            await CategoryController.updateCategoryRelationships(
+            await CommonController.updateCategoryMedia(
                 'add', category.id, [id], []
             )
         ]) : [];
@@ -57,20 +47,7 @@ export const updateRecordingCategory = (
     id: string, 
     categoryId: string | undefined
 ): Promise<Recording> => {
-    return db.transaction('rw', db.recordings, db.categories, async () => {
-        if (categoryId && !(await db.categories.get(categoryId))) {
-            throw new Error('Category does not exist.');
-        }
-
-        await db.recordings.where('id').equals(id).modify(recording => {
-            recording.relationships.category.id = categoryId;
-        });
-
-        const updated = await db.recordings.get(id);
-        if (!updated) throw new Error('Recording does not exist.');
-
-        return updated;
-    });
+    return CommonController.updateMediaCategory("recordings", id, categoryId);
 }
 
 export const updateRecording = (recording: Recording): Promise<{
@@ -78,34 +55,26 @@ export const updateRecording = (recording: Recording): Promise<{
     updatedCategories: Category[];
 }> => {
     return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
-        const { id, relationships: { user } } = recording;
-
-        const existing = await db.recordings.get(id);
-        if (!existing) throw new Error('Recording does not exist.');
+        const { relationships: { user } } = recording;
 
         if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
 
-        const updatedModel = await (async () => {
-            await db.recordings.update(id, recording);
-            const model = await db.recordings.get(id);
-            if (!model) throw new Error('Recording does not exist.');
-            return model;
-        })();
+        const { previous, current } = await CommonController.updateModel("recordings", recording);
 
         const updatedCategories = await (async () => {
-            const { id: prevId } = existing.relationships.category;
-            const { id: newId } = recording.relationships.category;
+            const { id: prevId } = previous.relationships.category;
+            const { id: newId } = current.relationships.category;
 
             const unEqual = prevId !== newId;
 
             const removed = unEqual && prevId ? ([
-                await CategoryController.updateCategoryRelationships(
+                await CommonController.updateCategoryMedia(
                     'remove', prevId, [recording.id], []
                 )
             ]) : [];
 
             const added = unEqual && newId ? ([
-                await CategoryController.updateCategoryRelationships(
+                await CommonController.updateCategoryMedia(
                     'add', newId, [recording.id], []
                 )
             ]) : [];
@@ -114,7 +83,7 @@ export const updateRecording = (recording: Recording): Promise<{
         })();
 
         return {
-            recording: updatedModel,
+            recording: current,
             updatedCategories
         }
     });
@@ -126,18 +95,15 @@ export const deleteRecording = (id: string): Promise<{
     updatedCategories: Category[]
 }> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
-        const existing = await db.recordings.get(id);
-        if (!existing) throw new Error('Recording does not exist.');
+        const deleted = await CommonController.deleteModel("recordings", id);
 
-        const categoryId = existing.relationships.category.id;
+        const categoryId = deleted.relationships.category.id;
 
         const updatedCategories = categoryId ? (
-            [await CategoryController.updateCategoryRelationships(
+            [await CommonController.updateCategoryMedia(
                 'remove', categoryId, [id], []
             )]
         ) : [];
-
-        await db.recordings.delete(id);
 
         return {
             updatedCategories
