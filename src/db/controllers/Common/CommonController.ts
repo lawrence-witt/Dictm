@@ -1,3 +1,5 @@
+import Dexie from 'dexie';
+
 import { db, AllTables, ResourceTables, MediaTables } from '../../db';
 
 const getSingluarFromPlural = (target: keyof AllTables, cap?: boolean) => {
@@ -9,22 +11,30 @@ const getSingluarFromPlural = (target: keyof AllTables, cap?: boolean) => {
     }
 }
 
-const tableMatchesModel = <T extends keyof AllTables>(
-    table: T, 
-    model: AllTables[T]["returns"]
-) => {
-    return getSingluarFromPlural(table) === model.type;
-}
-
 const isResource = <T extends keyof AllTables>(
     model: AllTables[T]["returns"]
 ): model is ResourceTables[keyof ResourceTables]["returns"] => {
     return model.type !== "user";
 }
 
+const validateTableModel = <T extends keyof AllTables>(
+    table: T, 
+    model: AllTables[T]["returns"]
+) => {
+    if(getSingluarFromPlural(table) !== model.type) {
+        throw new Error(`Table ${table} does not match model ${model.type}.`);
+    }
+}
+
+const validiateUser = async (
+    userId: string
+) => {
+    if (!(await db.users.get(userId))) throw new Error('User does not exist.');
+}
+
 // SELECT
 
-export const selectTable = <T extends keyof AllTables>(
+export const selectAllModels = <T extends keyof AllTables>(
     table: T
 ): Promise<AllTables[T]["returns"][]> => {
     return db[table].toArray();
@@ -34,19 +44,24 @@ export const selectModelById = async <T extends keyof AllTables>(
     table: T,
     id: string
 ): Promise<AllTables[T]["returns"]> => {
-    const content = await db[table].get(id);
-    if (!content) throw new Error(`${getSingluarFromPlural(table, true)} does not exist.`);
-    return content;
+    const model = await db[table].get(id);
+    if (!model) throw new Error(`${getSingluarFromPlural(table, true)} does not exist.`);
+    return model;
 }
 
-export const selectModelsByUserId = <T extends keyof ResourceTables>(
+export const selectModelsById = <T extends keyof AllTables>(
+    table: T,
+    ids: string[]
+): Promise<AllTables[T]["returns"][]> => {
+    return db[table].where("id").anyOf(ids).toArray();
+}
+
+export const selectModelsByUserId = async <T extends keyof ResourceTables>(
     table: T,
     userId: string
 ): Promise<ResourceTables[T]["returns"][]> => {
-    return db.transaction('r', db.users, db[table], async () => {
-        if (!(await db.users.get(userId))) throw new Error('User does not exist.');
-        return db[table].where({"relationships.user.id": userId}).toArray();
-    });
+    await validiateUser(userId);
+    return db[table].where({"relationships.user.id": userId}).toArray();
 }
 
 // INSERT
@@ -55,24 +70,16 @@ export const insertModel = <T extends keyof AllTables>(
     table: T,
     model: AllTables[T]["returns"],
 ): Promise<AllTables[T]["returns"]> => {
-    return db.transaction('rw', db.users, db[table], async () => {
-        if (!tableMatchesModel(table, model)) {
-            throw new Error(`Table ${table} does not match model ${model.type}.`);
-        }
+    const includedTables = [db.users, db[table]];
 
-        if (isResource(model)) {
-            const { relationships: { user } } = model;
-            if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
-        }
+    return db.transaction('rw', includedTables, async () => {
+        validateTableModel(table, model);
+        
+        if (isResource(model)) await validiateUser(model.relationships.user.id);
 
         await db[table].add(model as any);
-        const added = await db[table].get(model.id);
 
-        if (!added) {
-            throw new Error(`${getSingluarFromPlural(table, true)} could not be added.`);
-        }
-
-        return added;
+        return selectModelById(table, model.id);
     })
 }
 
@@ -85,28 +92,18 @@ export const updateModel = <T extends keyof AllTables>(
     previous: AllTables[T]["returns"];
     current: AllTables[T]["returns"];
 }> => {
-    return db.transaction('rw', db.users, db[table], async () => {
-        if (!tableMatchesModel(table, model)) {
-            throw new Error(`Table ${table} does not match model ${model.type}.`);
-        }
+    const includedTables = [db.users, db[table]];
 
-        if (isResource(model)) {
-            const { relationships: { user } } = model;
-            if (!(await db.users.get(user.id))) throw new Error('User does not exist.');
-        }
+    return db.transaction('rw', includedTables, async () => {
+        validateTableModel(table, model);
 
-        const previous = await db[table].get(model.id);
+        if (isResource(model)) await validiateUser(model.relationships.user.id);
+
+        const previous = await selectModelById(table, model.id);
         await db[table].update(model.id, model);
-        const current = await db[table].get(model.id);
+        const current = await selectModelById(table, model.id);
 
-        if (!previous || !current) {
-            throw new Error(`${getSingluarFromPlural(table, true)} does not exist.`)
-        }
-
-        return {
-            previous,
-            current
-        };
+        return { previous, current };
     })
 }
 
@@ -115,19 +112,16 @@ export const updateMediaCategory = <T extends keyof MediaTables>(
     id: string,
     categoryId: string | undefined
 ): Promise<MediaTables[T]["returns"]> => {
-    return db.transaction('rw', db.categories, db[table], async () => {
-        if (categoryId && !(await db.categories.get(categoryId))) {
-            throw new Error('Category does not exist.');
-        }
+    const includedTables = [db.categories, db[table]];
+
+    return db.transaction('rw', includedTables, async () => {
+        if (categoryId) await selectModelById("categories", categoryId);
 
         await db[table].where('id').equals(id).modify(media => {
             media.relationships.category.id = categoryId;
         });
 
-        const updated = await db[table].get(id);
-        if (!updated) throw new Error(`${getSingluarFromPlural(table, true)} does not exist.`);
-        
-        return updated;
+        return selectModelById(table, id);
     });
 }
 
@@ -137,7 +131,11 @@ export const updateCategoryMedia = (
     recordingIds: string[],
     noteIds: string[]
 ): Promise<ResourceTables["categories"]["returns"]> => {
-    return db.transaction('rw', db.categories, async () => {
+    const includedTables: Dexie.Table[] = [db.categories];
+    if (recordingIds.length > 0) includedTables.push(db.recordings);
+    if (noteIds.length > 0) includedTables.push(db.notes);
+
+    return db.transaction('rw', includedTables, async () => {
         const category = db.categories.where('id').equals(id);
 
         const modifier = {
@@ -148,6 +146,11 @@ export const updateCategoryMedia = (
                 target.ids = target.ids.filter(id => !source.includes(id));
             }
         }[method];
+
+        if (method === "add") {
+            await Promise.all(recordingIds.map(id => selectModelById("recordings", id)));
+            await Promise.all(noteIds.map(id => selectModelById("notes", id)));
+        }
 
         if (recordingIds.length > 0) await category.modify(record => modifier(
             record.relationships.recordings,
@@ -170,8 +173,7 @@ export const deleteModel = <T extends keyof AllTables>(
     id: string
 ): Promise<AllTables[T]["returns"]> => {
     return db.transaction('rw', db[table], async () => {
-        const existing = await db[table].get(id);
-        if (!existing) throw new Error(`${getSingluarFromPlural(table, true)} does not exist.`);
+        const existing = await selectModelById(table, id);
 
         await db[table].delete(id);
 

@@ -11,7 +11,7 @@ import Recording from '../../models/Recording';
 // SELECT
 
 export const selectLocalUsers = (): Promise<User[]> => {
-    return CommonController.selectTable("users");
+    return CommonController.selectAllModels("users");
 }
 
 export const selectUser = async (id: string): Promise<User> => {

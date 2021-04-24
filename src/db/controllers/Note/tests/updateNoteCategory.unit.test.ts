@@ -29,7 +29,7 @@ test("it updates the Category id for a Note model", async done => {
     );
 
     done();
-})
+});
 
 test("it returns the updated Note", async done => {
     const seeded = await handler.seedTestDatabase();

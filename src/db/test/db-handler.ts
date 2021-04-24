@@ -7,17 +7,20 @@ import Category from '../models/Category';
 
 const recordingTitles = [
     "User 1: Recording 1",
-    "User 1: Recording 2"
+    "User 1: Recording 2",
+    "User 1: Recording 3"
 ];
 
 const noteTitles = [
     "User 1: Note 1",
-    "User 1: Note 2"
+    "User 1: Note 2",
+    "User 1: Note 3"
 ];
 
 const categoryTitles = [
     "User 1: Category 1",
-    "User 2: Category 2"
+    "User 1: Category 2",
+    "User 1: Category 3"
 ];
 
 export const seedTestDatabase = (): Promise<{

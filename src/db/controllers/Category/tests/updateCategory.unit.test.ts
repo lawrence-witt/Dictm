@@ -65,7 +65,7 @@ test("it updates any Media affected by the Category update", async done => {
     done();
 });
 
-test("it updates any Categories affect by the Category update", async done => {
+test("it updates any Categories affected by the Category update", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link

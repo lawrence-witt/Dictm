@@ -11,6 +11,10 @@ export const selectRecording = (id: string): Promise<Recording> => {
     return CommonController.selectModelById("recordings", id);
 }
 
+export const selectRecordingsById = (ids: string[]): Promise<Recording[]> => {
+    return CommonController.selectModelsById("recordings", ids);
+}
+
 export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
     return CommonController.selectModelsByUserId("recordings", userId);
 }
