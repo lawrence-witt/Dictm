@@ -11,7 +11,7 @@ export const selectNote = async (id: string): Promise<Note> => {
     return CommonController.selectModelById("notes", id);
 }
 
-export const selectUserNotes = (userId: string): Promise<Note[]> => {
+export const selectNotesByUserId = (userId: string): Promise<Note[]> => {
     return CommonController.selectModelsByUserId("notes", userId);
 }
 
@@ -40,13 +40,6 @@ export const insertNote = (note: Note): Promise<{
 }
 
 // UPDATE
-
-export const updateNoteCategory = (
-    id: string, 
-    categoryId: string | undefined
-): Promise<Note> => {
-    return CommonController.updateMediaCategory("notes", id, categoryId);
-}
 
 export const updateNote = (note: Note): Promise<{
     note: Note,

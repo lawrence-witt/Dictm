@@ -14,7 +14,7 @@ export const selectCategory = async (id: string): Promise<Category> => {
     return CommonController.selectModelById("categories", id);
 }
 
-export const selectUserCategories = (userId: string): Promise<Category[]> => {
+export const selectCategoriesByUserId = (userId: string): Promise<Category[]> => {
     return CommonController.selectModelsByUserId("categories", userId);
 }
 

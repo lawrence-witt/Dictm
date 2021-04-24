@@ -5,6 +5,18 @@ import { CommonController } from '../Common';
 import Recording from '../../models/Recording';
 import Category from '../../models/Category';
 
+interface RecordingControllerReturn {
+    recording: Recording;
+    updatedCategories: Category[];
+}
+
+interface RecordingAndCategoriesReturn {
+    recording: Recording;
+    updatedCategories: Category[];
+}
+
+type CategoriesReturn = Omit<RecordingAndCategoriesReturn, "recording">;
+
 // SELECT
 
 export const selectRecording = (id: string): Promise<Recording> => {
@@ -15,16 +27,41 @@ export const selectRecordingsById = (ids: string[]): Promise<Recording[]> => {
     return CommonController.selectModelsById("recordings", ids);
 }
 
-export const selectUserRecordings = (userId: string): Promise<Recording[]> => {
+export const selectRecordingsByUserId = (userId: string): Promise<Recording[]> => {
     return CommonController.selectModelsByUserId("recordings", userId);
 }
 
 // INSERT
 
-export const insertRecording = (recording: Recording): Promise<{
-    recording: Recording;
-    updatedCategories: Category[];
-}> => {
+export const _insertRecording = (
+    insertFn: typeof CommonController["insertModel"],
+    updateCategoryFn: typeof CommonController["updateCategoryMedia"]
+) => (
+    (recording: Recording): Promise<RecordingAndCategoriesReturn> => (
+        db.transaction('rw', db.users, db.recordings, db.categories, async () => {
+            const { id, relationships: { category } } = recording;
+    
+            const insertedModel = await insertFn("recordings", recording);
+    
+            const updatedCategories = category.id ? ([
+                await updateCategoryFn('add', category.id, [id], [])
+            ]) : [];
+    
+            return {
+                recording: insertedModel,
+                updatedCategories
+            }
+        })
+    )
+);
+
+export const insertRecording = (
+    recording: Recording
+): Promise<RecordingAndCategoriesReturn> => (
+    _insertRecording(CommonController.insertModel, CommonController.updateCategoryMedia)(recording)
+)
+
+/* export const insertRecording = (recording: Recording): Promise<RecordingControllerReturn> => {
     return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
         const { id, relationships: { category } } = recording;
 
@@ -41,21 +78,11 @@ export const insertRecording = (recording: Recording): Promise<{
             updatedCategories
         }
     });
-}
+} */
 
 // UPDATE
 
-export const updateRecordingCategory = (
-    id: string, 
-    categoryId: string | undefined
-): Promise<Recording> => {
-    return CommonController.updateMediaCategory("recordings", id, categoryId);
-}
-
-export const updateRecording = (recording: Recording): Promise<{
-    recording: Recording;
-    updatedCategories: Category[];
-}> => {
+export const updateRecording = (recording: Recording): Promise<RecordingControllerReturn> => {
     return db.transaction('rw', db.users, db.recordings, db.categories, async () => {
         const { previous, current } = await CommonController.updateModel("recordings", recording);
 
@@ -89,9 +116,7 @@ export const updateRecording = (recording: Recording): Promise<{
 
 // DELETE
 
-export const deleteRecording = (id: string): Promise<{
-    updatedCategories: Category[]
-}> => {
+export const deleteRecording = (id: string): Promise<Omit<RecordingControllerReturn, "recording">> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
         const deleted = await CommonController.deleteModel("recordings", id);
 
@@ -109,9 +134,7 @@ export const deleteRecording = (id: string): Promise<{
     });
 }
 
-export const deleteRecordings = (ids: string[]): Promise<{
-    updatedCategories: Category[]
-}> => {
+export const deleteRecordings = (ids: string[]): Promise<Omit<RecordingControllerReturn, "recording">> => {
     return db.transaction('rw', db.recordings, db.categories, async () => {
         const updatedCategoryIds: Set<string> = new Set();
 
