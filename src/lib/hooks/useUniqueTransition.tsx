@@ -1,4 +1,5 @@
-/* this hook is a workaround for the deprecation of the `unique` prop in react-spring v9 */
+// this hook is a workaround for the deprecation of the `unique` prop in react-spring v9
+// https://github.com/pmndrs/react-spring/discussions/1027
 
 import React from 'react';
 
