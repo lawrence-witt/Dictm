@@ -1,6 +1,6 @@
 import { db } from '../../../db';
 
-import { RecordingController } from '..';
+import RecordingController, { _RecordingController } from '..';
 import Recording from '../../../models/Recording';
 import Category from '../../../models/Category';
 
@@ -37,10 +37,55 @@ test("it returns an object containing an array of updated Categories", async don
     expect(actualResult).toEqual(expectedResult);
 
     done();
-})
+});
 
-// it calls deleteModel once
+test("it calls the deleteModel function once", async done => {
+    const deletedRecording = new Recording("");
 
-// it does not call upateCategoryMedia by default
+    const deleteFn = jest.fn((table: string, id: string): any => {
+        return deletedRecording;
+    });
+    const updateCategoryFn = jest.fn();
 
-// it calls updateCategoryMedia once when the deleted Recording linked a category
+    await _RecordingController._deleteRecording(deleteFn, updateCategoryFn)(deletedRecording.id);
+
+    expect(deleteFn.mock.calls).toEqual([
+        ["recordings", deletedRecording.id]
+    ]);
+
+    done();
+});
+
+
+test("it does not call the updateCategoryMedia function by default", async done => {
+    const deletedRecording = new Recording("");
+
+    const deleteFn = jest.fn((table: string, id: string): any => {
+        return deletedRecording;
+    });
+    const updateCategoryFn = jest.fn();
+
+    await _RecordingController._deleteRecording(deleteFn, updateCategoryFn)(deletedRecording.id);
+
+    expect(updateCategoryFn).not.toBeCalled();
+
+    done();
+});
+
+test("it calls the updatedCategoryMedia function once when a Category was linked", async done => {
+    const deletedRecording = new Recording("");
+    deletedRecording.relationships.category.id = "test-id";
+
+    const deleteFn = jest.fn((table: string, id: string): any => {
+        return deletedRecording;
+    });
+    const updateCategoryFn = jest.fn();
+
+    await _RecordingController._deleteRecording(deleteFn, updateCategoryFn)(deletedRecording.id);
+
+    expect(updateCategoryFn.mock.calls).toEqual([
+        ["remove", "test-id", [deletedRecording.id], []]
+    ]);
+
+    done();
+});

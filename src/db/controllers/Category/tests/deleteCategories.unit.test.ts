@@ -1,7 +1,8 @@
 import { db } from '../../../db';
 
-import Category from '../../../models/Category';
-import { CategoryController } from '..';
+import CategoryController, { _CategoryController } from '..';
+import Recording from '../../../models/Recording';
+import Note from '../../../models/Note';
 
 import * as handler from '../../../test/db-handler';
 
@@ -11,117 +12,129 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it deletes a list of Categories from the database", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const categoryIds = seeded.categories.map(category => category.id);
-
-    await CategoryController.deleteCategories(categoryIds);
-    const retrieved = await db.categories.where("id").anyOf(categoryIds).toArray();
-
-    expect(retrieved).toHaveLength(0);
-
-    done();
-});
-
-test("it updates any Media which linked the deleted Categories", async done => {
-    const seeded = await handler.seedTestDatabase();
-
-    // Set up link
-    const targetCategory = seeded.categories[0];
-    const targetRecording = seeded.recordings[0];
-    targetCategory.relationships.recordings.ids.push(targetRecording.id);
-    targetRecording.relationships.category.id = targetCategory.id;
-
-    await db.categories.update(targetCategory.id, targetCategory);
-    await db.recordings.update(targetRecording.id, targetRecording);
-    const linkedRecording = await db.recordings.get(targetRecording.id);
-
-    expect(linkedRecording).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: targetCategory.id
-                })
-            })
-        })
-    );
-
-    // Remove link
-    await CategoryController.deleteCategories([targetCategory.id]);
-    const unlinkedRecording = await db.recordings.get(targetRecording.id);
-
-    expect(unlinkedRecording).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: undefined
-                })
-            })
-        })
-    );
-
-    done();
-});
-
 test("it returns an object containing all updated Media models", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link
-    const targetCategoryOne = seeded.categories[0];
-    const targetCategoryTwo = seeded.categories[1];
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
+    const linkedCategoryOne = seeded.categories[0];
+    const linkedCategoryTwo = seeded.categories[1];
+    const linkedRecording = seeded.recordings[0];
+    const linkedNote = seeded.notes[0];
 
-    targetCategoryOne.relationships.notes.ids.push(targetNote.id);
-    targetCategoryTwo.relationships.recordings.ids.push(targetRecording.id);
-    targetNote.relationships.category.id = targetCategoryOne.id;
-    targetRecording.relationships.category.id = targetCategoryTwo.id;
+    linkedCategoryOne.relationships.notes.ids = [linkedNote.id];
+    linkedCategoryTwo.relationships.recordings.ids = [linkedRecording.id];
+    linkedNote.relationships.category.id = linkedCategoryOne.id;
+    linkedRecording.relationships.category.id = linkedCategoryTwo.id;
 
-    await db.categories.bulkPut([targetCategoryOne, targetCategoryTwo]);
-    await db.recordings.put(targetRecording)
-    await db.notes.put(targetNote);
+    await db.categories.bulkPut([linkedCategoryOne, linkedCategoryTwo]);
+    await db.recordings.put(linkedRecording)
+    await db.notes.put(linkedNote);
 
     // Remove link
-    const deleted = await CategoryController.deleteCategories([targetCategoryOne.id, targetCategoryTwo.id]);
+    const expectedRecording = linkedRecording;
+    const expectedNote = linkedNote;
+    expectedRecording.relationships.category.id = undefined;
+    expectedNote.relationships.category.id = undefined;
 
-    expect(deleted).toEqual(
-        expect.objectContaining({
-            updatedRecordings: expect.arrayContaining([
-                expect.objectContaining({
-                    id: targetRecording.id
-                })
-            ]),
-            updatedNotes: expect.arrayContaining([
-                expect.objectContaining({
-                    id: targetNote.id
-                })
-            ])
-        })
-    );
+    const expectedResult = {
+        updatedRecordings: [ expectedRecording ],
+        updatedNotes: [ expectedNote ]
+    }
+
+    const actualResult = await CategoryController.deleteCategories([linkedCategoryOne.id, linkedCategoryTwo.id]);
+
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
 
-test("it throws an error if any of the Categories do not exist", async done => {
-    const seeded = await handler.seedTestDatabase();
+test("it calls deleteCategory as many times as the length of the id array", async done => {
+    const categoryIds = ["test-id-1", "test-id-2", "test-id-3"];
 
-    await expect(async () => {
-        await CategoryController.deleteCategories([seeded.categories[0].id, "bad-id"]);
-    }).rejects.toThrow("Category does not exist.");
+    const deleteFn = jest.fn(async () => {
+        return {
+            updatedRecordings: [],
+            updatedNotes: []
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _CategoryController._deleteCategories(deleteFn, selectFn)(categoryIds);
+
+    expect(deleteFn.mock.calls).toEqual([
+        ["test-id-1"], ["test-id-2"], ["test-id-3"]
+    ]);
+
+    done();
+});
+
+test("it does not call selectModelsById by default", async done => {
+    const categoryIds = ["test-id-1", "test-id-2", "test-id-3"];
+
+    const deleteFn = jest.fn(async () => {
+        return {
+            updatedRecordings: [],
+            updatedNotes: []
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _CategoryController._deleteCategories(deleteFn, selectFn)(categoryIds);
+
+    expect(selectFn).not.toBeCalled();
 
     done();
 });
 
-test("it throws an error if any of the Categories link non-existent Media", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push("bad-id");
+test("it calls selectModelsById once if deleted Categories linked Media of one type", async done => {
+    const categoryIds = ["test-id-1", "test-id-2", "test-id-3"];
 
-    await db.categories.add(newCategory);
+    let count = 1;
+    const deleteFn = jest.fn(async () => {
+        const updatedRecording = new Recording("");
+        updatedRecording.id = `test-rec-id-${count}`;
+        count++;
 
-    await expect(async () => {
-        await CategoryController.deleteCategories([seeded.categories[0].id, newCategory.id]);
-    }).rejects.toThrow("Recording does not exist.");
+        return {
+            updatedRecordings: [ updatedRecording ],
+            updatedNotes: []
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _CategoryController._deleteCategories(deleteFn, selectFn)(categoryIds);
+
+    expect(selectFn.mock.calls).toEqual([
+        ["recordings", ["test-rec-id-1", "test-rec-id-2", "test-rec-id-3"]]
+    ]);
 
     done();
 });
+
+test("it calls selectModelsById twice if deleted Categories linked Media of two types", async done => {
+    const categoryIds = ["test-id-1", "test-id-2", "test-id-3"];
+
+    let count = 1;
+    const deleteFn = jest.fn(async () => {
+        const updatedRecording = new Recording("");
+        updatedRecording.id = `test-rec-id-${count}`;
+        const updatedNote = new Note("");
+        updatedNote.id = `test-note-id-${count}`;
+        count++;
+
+        return {
+            updatedRecordings: [ updatedRecording ],
+            updatedNotes: [ updatedNote ]
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _CategoryController._deleteCategories(deleteFn, selectFn)(categoryIds);
+
+    expect(selectFn.mock.calls).toEqual([
+        ["recordings", ["test-rec-id-1", "test-rec-id-2", "test-rec-id-3"]],
+        ["notes", ["test-note-id-1", "test-note-id-2", "test-note-id-3"]]
+    ]);
+
+    done();
+})

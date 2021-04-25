@@ -1,6 +1,6 @@
 import { db } from '../../../db';
 
-import { NoteController } from '..';
+import NoteController, { _NoteController } from '..';
 import Note from '../../../models/Note';
 import Category from '../../../models/Category';
 
@@ -12,115 +12,91 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it deletes a list of Notes from the database", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const noteIds = seeded.notes.map(note => note.id);
-
-    await NoteController.deleteNotes(noteIds);
-    const retrieved = await db.notes.where("id").anyOf(noteIds).toArray();
-
-    expect(retrieved).toHaveLength(0);
-
-    done();
-});
-
-test("it updates any Categories which linked the deleted Notes", async done => {
-    const seeded = await handler.seedTestDatabase();
-
-    // Set up link
-    const newNote = new Note(seeded.user.id);
-    const newCategory = new Category(seeded.user.id);
-    newNote.relationships.category.id = newCategory.id;
-    newCategory.relationships.notes.ids.push(newNote.id);
-
-    await db.notes.add(newNote);
-    await db.categories.add(newCategory);
-    const insertedCategory = await db.categories.get(newCategory.id);
-
-    expect(insertedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                notes: expect.objectContaining({
-                    ids: expect.arrayContaining([newNote.id])
-                })
-            })
-        })
-    );
-
-    // Remove link
-    await NoteController.deleteNotes([newNote.id]);
-    const updatedCategory = await db.categories.get(newCategory.id);
-
-    expect(updatedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                notes: expect.objectContaining({
-                    ids: expect.arrayContaining([])
-                })
-            })
-        })
-    );
-
-    done();
-});
-
 test("it returns an array of unique updated Categories", async done => {
     const seeded = await handler.seedTestDatabase();
 
     // Set up link
-    const newNoteOne = new Note(seeded.user.id);
-    const newNoteTwo = new Note(seeded.user.id);
-    const newCategory = new Category(seeded.user.id);
+    const linkedNoteOne = new Note(seeded.user.id);
+    const linkedNoteTwo = new Note(seeded.user.id);
+    const linkedCategory = new Category(seeded.user.id);
 
-    newNoteOne.relationships.category.id = newCategory.id;
-    newNoteTwo.relationships.category.id = newCategory.id;
-    newCategory.relationships.notes.ids.push(newNoteOne.id, newNoteTwo.id);
+    linkedNoteOne.relationships.category.id = linkedCategory.id;
+    linkedNoteTwo.relationships.category.id = linkedCategory.id;
+    linkedCategory.relationships.notes.ids.push(linkedNoteOne.id, linkedNoteTwo.id);
 
-    await db.notes.bulkAdd([newNoteOne, newNoteTwo]);
-    await db.categories.add(newCategory);
+    await db.notes.bulkAdd([linkedNoteOne, linkedNoteTwo]);
+    await db.categories.add(linkedCategory);
 
     // Remove link
-    const deleted = await NoteController.deleteNotes([newNoteOne.id, newNoteTwo.id]);
+    const expectedCategory = linkedCategory;
+    expectedCategory.relationships.notes.ids = [];
 
-    expect(deleted).toEqual(
-        expect.objectContaining({
-            updatedCategories: expect.arrayContaining([
-                expect.objectContaining({
-                    id: newCategory.id,
-                    relationships: expect.objectContaining({
-                        notes: expect.objectContaining({
-                            ids: expect.arrayContaining([])
-                        })
-                    })
-                })
-            ])
-        })
-    );
-    expect(deleted.updatedCategories).toHaveLength(1);
+    const expectedResult = {
+        updatedCategories: [ expectedCategory ]
+    };
 
-    done();
-})
+    const actualResult = await NoteController.deleteNotes([linkedNoteOne.id, linkedNoteTwo.id]);
 
-test("it throws an error if any of the Notes do not exist", async done => {
-    const seeded = await handler.seedTestDatabase();
-
-    await expect(async () => {
-        await NoteController.deleteNotes([seeded.notes[0].id, "bad-id"]);
-    }).rejects.toThrow("Note does not exist.");
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
 
-test("it throws an error if any of the Notes link non-existent Category ids", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newNote = new Note(seeded.user.id);
-    newNote.relationships.category.id = "bad-id";
+test("it calls deleteNote as many times as the length of the id array", async done => {
+    const noteIds = ["test-id-1", "test-id-2", "test-id-3"];
 
-    await db.notes.add(newNote);
+    const deleteFn = jest.fn(async () => {
+        return {
+            updatedCategories: []
+        }
+    });
+    const selectFn = jest.fn();
 
-    await expect(async () => {
-        await NoteController.deleteNotes([newNote.id]);
-    }).rejects.toThrow("Category does not exist.");
+    await _NoteController._deleteNotes(deleteFn, selectFn)(noteIds);
+
+    expect(deleteFn.mock.calls).toEqual([
+        ["test-id-1"], ["test-id-2"], ["test-id-3"]
+    ]);
+
+    done();
+});
+
+test("it does not call the select function by default", async done => {
+    const noteIds = ["test-id-1", "test-id-2", "test-id-3"];
+
+    const deleteFn = jest.fn(async () => {
+        return {
+            updatedCategories: []
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _NoteController._deleteNotes(deleteFn, selectFn)(noteIds);
+
+    expect(selectFn).not.toBeCalled();
+
+    done();
+});
+
+test("it calls the select function once with the ids of any updated Categories", async done => {
+    const noteIds = ["", "", ""];
+
+    let count = 1;
+    const deleteFn = jest.fn(async () => {
+        const updatedCategory = new Category("");
+        updatedCategory.id = `test-id-${count++}`;
+
+        return {
+            updatedCategories: [ updatedCategory ]
+        }
+    });
+    const selectFn = jest.fn();
+
+    await _NoteController._deleteNotes(deleteFn, selectFn)(noteIds);
+
+    expect(selectFn.mock.calls).toEqual([
+        ["categories", ["test-id-1", "test-id-2", "test-id-3"]]
+    ]);
 
     done();
 });

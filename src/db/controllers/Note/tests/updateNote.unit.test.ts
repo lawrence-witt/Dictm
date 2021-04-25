@@ -1,8 +1,5 @@
-import { db } from '../../../db';
-
-import { NoteController } from '..';
+import NoteController, { _NoteController } from '..';
 import Note from '../../../models/Note';
-import Category from '../../../models/Category';
 
 import * as handler from '../../../test/db-handler';
 
@@ -12,143 +9,129 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it updates the Note model in the database", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const targetNote = seeded.notes[0];
-    targetNote.attributes.title = "Updated Title";
-
-    await NoteController.updateNote(targetNote);
-    const retrieved = await db.notes.get(targetNote.id);
-
-    expect(retrieved).toEqual(
-        expect.objectContaining({
-            attributes: expect.objectContaining({
-                title: "Updated Title"
-            })
-        })
-    );
-
-    done();
-});
-
-test("it updates a Category the Note has been added to", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const targetNote = seeded.notes[0];
-    const targetCategory = seeded.categories[0];
-    targetNote.relationships.category.id = targetCategory.id;
-
-    await NoteController.updateNote(targetNote);
-    const updatedCategory = await db.categories.get(targetCategory.id);
-
-    expect(updatedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                notes: expect.objectContaining({
-                    ids: expect.arrayContaining([targetNote.id])
-                })
-            })
-        })
-    );
-
-    done();
-});
-
-test("it updates a Category the Note has been removed from", async done => {
-    const seeded = await handler.seedTestDatabase();
-
-    // Set up link
-    const newNote = new Note(seeded.user.id);
-    const newCategory = new Category(seeded.user.id);
-    newNote.relationships.category.id = newCategory.id;
-    newCategory.relationships.notes.ids.push(newNote.id);
-
-    await db.notes.add(newNote);
-    await db.categories.add(newCategory);
-    const insertedCategory = await db.categories.get(newCategory.id);
-
-    expect(insertedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                notes: expect.objectContaining({
-                    ids: expect.arrayContaining([newNote.id])
-                })
-            })
-        })
-    );
-
-    // Remove link
-    newNote.relationships.category.id = undefined;
-    await NoteController.updateNote(newNote);
-    const updatedCategory = await db.categories.get(newCategory.id);
-
-    expect(updatedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                notes: expect.objectContaining({
-                    ids: expect.arrayContaining([])
-                })
-            })
-        })
-    );
-
-    done();
-});
-
 test("it returns the updated Note and an array of updated Categories", async done => {
     const seeded = await handler.seedTestDatabase();
-    const targetNote = seeded.notes[0];
-    const targetCategory = seeded.categories[0];
-    targetNote.relationships.category.id = targetCategory.id;
+    
+    const expectedNote = seeded.notes[0];
+    const expectedCategory = seeded.categories[0];
+    expectedNote.relationships.category.id = expectedCategory.id;
+    expectedCategory.relationships.notes.ids.push(expectedNote.id);
 
-    const updated = await NoteController.updateNote(targetNote);
+    const expectedResult = {
+        note: expectedNote,
+        updatedCategories: [ expectedCategory ]
+    };
 
-    expect(updated).toEqual(
-        expect.objectContaining({
-            note: expect.objectContaining({
-                id: targetNote.id
-            }),
-            updatedCategories: expect.arrayContaining(
-                [expect.objectContaining({
-                    id: targetCategory.id
-                })]
-            )
-        })
-    );
+    const actualResult = await NoteController.updateNote(expectedNote);
+
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
 
-test("it throws an error if the Note does not exist", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newRecording = new Note(seeded.user.id);
+test("it calls the updateModel function once", async done => {
+    const note = new Note("");
 
-    await expect(async () => {
-        await NoteController.updateNote(newRecording);
-    }).rejects.toThrow("Note does not exist.");
+    const updateFn = jest.fn(async (table: string, model: any) => {
+        return {
+            previous: model,
+            current: model
+        }
+    });
+    const updateCategoryFn = jest.fn();
 
-    done();
-});
+    await _NoteController._updateNote(updateFn, updateCategoryFn)(note);
 
-test("it throws an error if the Note links a non-existent User id", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const targetNote = seeded.notes[0];
-    targetNote.relationships.user.id = "bad-id";
-
-    await expect(async () => {
-        await NoteController.updateNote(targetNote);
-    }).rejects.toThrow("User does not exist.");
+    expect(updateFn.mock.calls).toEqual([
+        ["notes", note]
+    ]);
 
     done();
 });
 
-test("it throws an error if the Note links a non-existent Category id", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const targetNote = seeded.notes[0];
-    targetNote.relationships.category.id = "bad-id";
+test("it does not call the upateCategoryMedia function by default", async done => {
+    const note = new Note("");
 
-    await expect(async () => {
-        await NoteController.updateNote(targetNote);
-    }).rejects.toThrow("Category does not exist.");
+    const updateFn = jest.fn(async (table: string, model: any) => {
+        return {
+            previous: model,
+            current: model
+        }
+    });
+    const updateCategoryFn = jest.fn();
 
+    await _NoteController._updateNote(updateFn, updateCategoryFn)(note);
+
+    expect(updateCategoryFn).not.toBeCalled();
+
+    done();
+});
+
+test("it calls the updateCategoryMedia function once when a Category is added", async done => {
+    const updatedNote = new Note("");
+    updatedNote.relationships.category.id = "test-id";
+
+    const updateFn = jest.fn(async (table: string, model: any) => {
+        return {
+            previous: new Note(""),
+            current: model
+        }
+    });
+    const updateCategoryFn = jest.fn();
+
+    await _NoteController._updateNote(updateFn, updateCategoryFn)(updatedNote);
+
+    expect(updateCategoryFn.mock.calls).toEqual([
+        ["add", "test-id", [], [updatedNote.id]]
+    ]);
+    
+    done();
+});
+
+test("it calls the updateCategoryMedia function once when a Category is removed", async done => {
+    const updatedNote = new Note("");
+
+    const updateFn = jest.fn(async (table: string, model: any) => {
+        const previousModel = new Note("");
+        previousModel.relationships.category.id = "test-id";
+
+        return {
+            previous: previousModel,
+            current: model
+        }
+    });
+    const updateCategoryFn = jest.fn();
+
+    await _NoteController._updateNote(updateFn, updateCategoryFn)(updatedNote);
+
+    expect(updateCategoryFn.mock.calls).toEqual([
+        ["remove", "test-id", [], [updatedNote.id]]
+    ]);
+    
+    done();
+});
+
+test("it calls the updateCategoryMedia function twice when a Category is removed and added", async done => {
+    const updatedNote = new Note("");
+    updatedNote.relationships.category.id = "test-id-2";
+
+    const updateFn = jest.fn(async (table: string, model: any) => {
+        const previousModel = new Note("");
+        previousModel.relationships.category.id = "test-id-1";
+
+        return {
+            previous: previousModel,
+            current: model
+        }
+    });
+    const updateCategoryFn = jest.fn();
+
+    await _NoteController._updateNote(updateFn, updateCategoryFn)(updatedNote);
+
+    expect(updateCategoryFn.mock.calls).toEqual([
+        ["remove", "test-id-1", [], [updatedNote.id]],
+        ["add", "test-id-2", [], [updatedNote.id]]
+    ]);
+    
     done();
 });

@@ -1,9 +1,5 @@
-import Dexie from 'dexie';
-
-import { db } from '../../../db';
-
+import CategoryController, { _CategoryController } from '..';
 import Category from '../../../models/Category';
-import { CategoryController } from '..';
 
 import * as handler from '../../../test/db-handler';
 
@@ -13,171 +9,153 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it inserts a new Category model into the database", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-
-    await CategoryController.insertCategory(newCategory);
-    const retrieved = await db.categories.get(newCategory.id);
-
-    expect(retrieved).toEqual(
-        expect.objectContaining({
-            id: newCategory.id
-        })
-    );
-
-    done();
-});
-
-test("it updates any Media affected by the insertion", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
-    newCategory.relationships.notes.ids.push(targetNote.id);
-
-    await CategoryController.insertCategory(newCategory);
-    const updatedRecording = await db.recordings.get(targetRecording.id);
-    const updatedNote = await db.notes.get(targetNote.id);
-
-    expect(updatedRecording).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: newCategory.id
-                })
-            })
-        })
-    );
-
-    expect(updatedNote).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: newCategory.id
-                })
-            })
-        })
-    );
-
-    done();
-});
-
-test("it updates any Categories affected by the insertion", async done => {
-    const seeded = await handler.seedTestDatabase();
-
-    // Set up link
-    const targetCategory = seeded.categories[0];
-    const targetRecording = seeded.recordings[0];
-    targetCategory.relationships.recordings.ids.push(targetRecording.id);
-    targetRecording.relationships.category.id = targetCategory.id;
-
-    await db.categories.update(targetCategory.id, targetCategory);
-    await db.recordings.update(targetRecording.id, targetRecording);
-    const linkedCategory = await db.categories.get(targetCategory.id);
-
-    expect(linkedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                recordings: expect.objectContaining({
-                    ids: expect.arrayContaining([targetRecording.id])
-                })
-            })
-        })
-    );
-
-    // Remove link
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
-
-    await CategoryController.insertCategory(newCategory);
-    const unlinkedCategory = await db.categories.get(targetCategory.id);
-
-    expect(unlinkedCategory).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                recordings: expect.objectContaining({
-                    ids: expect.arrayContaining([])
-                })
-            })
-        })
-    );
-
-    done();
-});
-
 test("it returns an object containing inserted Category and updated Resources", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const newCategory = new Category(seeded.user.id);
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
-    newCategory.relationships.recordings.ids.push(targetRecording.id);
-    newCategory.relationships.notes.ids.push(targetNote.id);
+    const expectedCategory = new Category(seeded.user.id);
+    const expectedRecording = seeded.recordings[0];
+    const expectedNote = seeded.notes[0];
 
-    const updated = await CategoryController.insertCategory(newCategory);
+    expectedCategory.relationships.recordings.ids.push(expectedRecording.id);
+    expectedCategory.relationships.notes.ids.push(expectedNote.id);
+    expectedRecording.relationships.category.id = expectedCategory.id;
+    expectedNote.relationships.category.id = expectedCategory.id;
 
-    expect(updated).toEqual(
-        expect.objectContaining({
-            category: expect.objectContaining({
-                id: newCategory.id,
-                relationships: expect.objectContaining({
-                    recordings: expect.objectContaining({
-                        ids: expect.arrayContaining([targetRecording.id])
-                    }),
-                    notes: expect.objectContaining({
-                        ids: expect.arrayContaining([targetNote.id])
-                    })
-                })
-            }),
-            updatedRecordings: expect.arrayContaining([
-                expect.objectContaining({id: targetRecording.id})
-            ]),
-            updatedNotes: expect.arrayContaining([
-                expect.objectContaining({id: targetNote.id})
-            ]),
-            updatedCategories: []
-        })
-    );
+    const expectedResult = {
+        category: expectedCategory,
+        updatedRecordings: [ expectedRecording ],
+        updatedNotes: [ expectedNote ],
+        updatedCategories: []
+    }
 
-    expect(updated.updatedRecordings).toHaveLength(1);
-    expect(updated.updatedNotes).toHaveLength(1);
-    expect(updated.updatedCategories).toHaveLength(0);
+    const actualResult = await CategoryController.insertCategory(expectedCategory);
+
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
 
-test("it throws an error if the new Category's id is already in the database", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    newCategory.id = seeded.categories[0].id;
+test("it calls the insertModel function once", async done => {
+    const category = new Category("");
 
-    await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
-    }).rejects.toThrow(Dexie.ConstraintError);
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
 
-    done();
-});
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
 
-test("it throws an error if the Category links a non-existent User id", async done => {
-    const newCategory = new Category("bad-id");
-
-    await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
-    }).rejects.toThrow("User does not exist.");
+    expect(insertFn.mock.calls).toEqual([
+        ["categories", category]
+    ]);
 
     done();
 });
 
-test("it throws an error if the Category links a non-existent Media id", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push("bad-id");
+test("it does not call the updateMediaCategory function by default", async done => {
+    const category = new Category("");
 
-    await expect(async () => {
-        await CategoryController.insertCategory(newCategory);
-    }).rejects.toThrow("Recording does not exist.");
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
+
+    expect(updateMediaFn).not.toBeCalled();
 
     done();
-})
+});
+
+test("it calls the updateMediaCategory function as many times as the Category has Media ids", async done => {
+    const category = new Category("");
+    category.relationships.recordings.ids.push("test-rec-id-1", "test-rec-id-2");
+    category.relationships.notes.ids.push("test-note-id-1");
+
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
+
+    expect(updateMediaFn.mock.calls).toEqual([
+        ["recordings", "test-rec-id-1", category.id],
+        ["recordings", "test-rec-id-2", category.id],
+        ["notes", "test-note-id-1", category.id]
+    ]);
+
+    done();
+});
+
+test("it does not call the selectCategoriesByResourceIds function by default", async done => {
+    const category = new Category("");
+
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
+
+    expect(selectFn).not.toBeCalled();
+
+    done();
+});
+
+test("it calls the selectCategoriesByResourceIds function once if the Category has any Media ids", async done => {
+    const category = new Category("");
+    category.relationships.recordings.ids.push("test-rec-id-1", "test-rec-id-2");
+    category.relationships.notes.ids.push("test-note-id-1");
+
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
+
+    expect(selectFn.mock.calls).toEqual([
+        [["test-rec-id-1", "test-rec-id-2"], ["test-note-id-1"], [category.id]]
+    ]);
+
+    done();
+});
+
+test("it does not call the updateCategoryMedia function by default", async done => {
+    const category = new Category("");
+
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => []);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(category);
+
+    expect(updateCategoryFn).not.toBeCalled();
+
+    done();
+});
+
+test("it calls the updateCategoryMedia function once for every Category the select function returns", async done => {
+    const insertedCategory = new Category("");
+    insertedCategory.relationships.recordings.ids.push("test-rec-id-1");
+    insertedCategory.relationships.notes.ids.push("test-note-id-1");
+
+    const expectedCategoryOne = new Category("");
+    const expectedCategoryTwo = new Category("");
+
+    const insertFn = jest.fn();
+    const updateMediaFn = jest.fn();
+    const updateCategoryFn = jest.fn();
+    const selectFn = jest.fn(async () => [expectedCategoryOne, expectedCategoryTwo]);
+
+    await _CategoryController._insertCategory(insertFn, updateMediaFn, updateCategoryFn, selectFn)(insertedCategory);
+
+    expect(updateCategoryFn.mock.calls).toEqual([
+        ["remove", expectedCategoryOne.id, ["test-rec-id-1"], ["test-note-id-1"]],
+        ["remove", expectedCategoryTwo.id, ["test-rec-id-1"], ["test-note-id-1"]]
+    ]);
+
+    done();
+});

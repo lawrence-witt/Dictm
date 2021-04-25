@@ -1,6 +1,6 @@
 import { db } from '../../../db';
 
-import { CategoryController } from '..';
+import CategoryController, { _CategoryController } from '..';
 import Category from '../../../models/Category';
 
 import * as handler from '../../../test/db-handler';
@@ -11,109 +11,84 @@ afterEach(async () => {
     await handler.clearTestDatabase();
 });
 
-test("it deletes the Category from the database", async done => {
+test("it returns an object containing any updated Media", async done => {
     const seeded = await handler.seedTestDatabase();
-    const targetCategory = seeded.categories[0];
 
-    const original = await db.categories.get(targetCategory.id);
-    await CategoryController.deleteCategory(targetCategory.id);
-    const retrieved = await db.categories.get(targetCategory.id);
+    // Set up links
+    const linkedCategory = seeded.categories[0];
+    const linkedRecording = seeded.recordings[0];
+    const linkedNote = seeded.notes[0];
 
-    expect(original).toBeInstanceOf(Category);
-    expect(retrieved).toBeUndefined();
+    linkedCategory.relationships.notes.ids = [linkedNote.id];
+    linkedCategory.relationships.recordings.ids = [linkedRecording.id];
+    linkedRecording.relationships.category.id = linkedCategory.id;
+    linkedNote.relationships.category.id = linkedCategory.id;
+
+    await db.categories.update(linkedCategory.id, linkedCategory);
+    await db.recordings.update(linkedRecording.id, linkedRecording);
+    await db.notes.update(linkedNote.id, linkedNote);
+
+    // Remove links
+    const expectedRecording = linkedRecording;
+    const expectedNote = linkedNote;
+    expectedRecording.relationships.category.id = undefined;
+    expectedNote.relationships.category.id = undefined;
+
+    const expectedResult = {
+        updatedRecordings: [ expectedRecording ],
+        updatedNotes: [ expectedNote ]
+    };
+
+    const actualResult = await CategoryController.deleteCategory(linkedCategory.id);
+
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
 
-test("it updates any Media which linked the deleted Category", async done => {
-    const seeded = await handler.seedTestDatabase();
+test("it calls the deleteModel function once", async done => {
+    const deletedCategory = new Category("");
 
-    // Set up link
-    const targetCategory = seeded.categories[0];
-    const targetRecording = seeded.recordings[0];
-    targetCategory.relationships.recordings.ids.push(targetRecording.id);
-    targetRecording.relationships.category.id = targetCategory.id;
+    const deleteFn = jest.fn(async () => deletedCategory);
+    const updateMediaFn = jest.fn();
 
-    await db.categories.update(targetCategory.id, targetCategory);
-    await db.recordings.update(targetRecording.id, targetRecording);
-    const linkedRecording = await db.recordings.get(targetRecording.id);
+    await _CategoryController._deleteCategory(deleteFn, updateMediaFn)(deletedCategory.id);
 
-    expect(linkedRecording).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: targetCategory.id
-                })
-            })
-        })
-    );
-
-    // Remove link
-    await CategoryController.deleteCategory(targetCategory.id);
-    const unlinkedRecording = await db.recordings.get(targetRecording.id);
-
-    expect(unlinkedRecording).toEqual(
-        expect.objectContaining({
-            relationships: expect.objectContaining({
-                category: expect.objectContaining({
-                    id: undefined
-                })
-            })
-        })
-    );
+    expect(deleteFn.mock.calls).toEqual([
+        ["categories", deletedCategory.id]
+    ]);
 
     done();
 });
 
-test("returns an object containing all the updated Media models", async done => {
-    const seeded = await handler.seedTestDatabase();
+test("it does not call the updateMediaCategory function by default", async done => {
+    const deletedCategory = new Category("");
 
-    const targetCategory = seeded.categories[0];
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
-    targetCategory.relationships.notes.ids.push(targetNote.id);
-    targetCategory.relationships.recordings.ids.push(targetRecording.id);
-    targetRecording.relationships.category.id = targetCategory.id;
-    targetNote.relationships.category.id = targetCategory.id;
+    const deleteFn = jest.fn(async () => deletedCategory);
+    const updateMediaFn = jest.fn();
 
-    await db.categories.update(targetCategory.id, targetCategory);
-    await db.recordings.update(targetRecording.id, targetRecording);
-    await db.notes.update(targetNote.id, targetNote);
+    await _CategoryController._deleteCategory(deleteFn, updateMediaFn)(deletedCategory.id);
 
-    const deleted = await CategoryController.deleteCategory(targetCategory.id);
-
-    expect(deleted).toEqual(
-        expect.objectContaining({
-            updatedRecordings: expect.arrayContaining([
-                expect.objectContaining({id: targetRecording.id})
-            ]),
-            updatedNotes: expect.arrayContaining([
-                expect.objectContaining({id: targetNote.id})
-            ])
-        })
-    );
+    expect(updateMediaFn).not.toBeCalled();
 
     done();
 });
 
-test("it throws an error if the Category does not exist", async done => {
-    await expect(async () => {
-        await CategoryController.deleteCategory("bad-id");
-    }).rejects.toThrow("Category does not exist.");
+test("it calls the updateMediaCategory function once for every Media id on the deleted Category", async done => {
+    const deletedCategory = new Category("");
+    deletedCategory.relationships.recordings.ids = ["test-rec-id-1", "test-rec-id-2"];
+    deletedCategory.relationships.notes.ids = ["test-note-id-2"];
 
-    done();
-});
+    const deleteFn = jest.fn(async () => deletedCategory);
+    const updateMediaFn = jest.fn();
 
-test("it throws an error if the Category links a non-existent Media id", async done => {
-    const seeded = await handler.seedTestDatabase();
-    const newCategory = new Category(seeded.user.id);
-    newCategory.relationships.recordings.ids.push("bad-id");
+    await _CategoryController._deleteCategory(deleteFn, updateMediaFn)(deletedCategory.id);
 
-    await db.categories.add(newCategory);
-
-    await expect(async () => {
-        await CategoryController.deleteCategory(newCategory.id);
-    }).rejects.toThrow("Recording does not exist.");
+    expect(updateMediaFn.mock.calls).toEqual([
+        ["recordings", "test-rec-id-1", undefined],
+        ["recordings", "test-rec-id-2", undefined],
+        ["notes", "test-note-id-2", undefined]
+    ]);
 
     done();
 });

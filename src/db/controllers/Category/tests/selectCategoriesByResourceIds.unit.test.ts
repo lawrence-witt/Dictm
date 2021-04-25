@@ -1,5 +1,7 @@
-import { CategoryController } from '..';
 import { db } from '../../../db';
+
+import CategoryController from '..';
+
 import * as handler from '../../../test/db-handler';
 
 jest.mock("../../../models/Recording/Recording.ts");
@@ -7,32 +9,26 @@ jest.mock("../../../models/Recording/Recording.ts");
 test("it selects the correct Category resources", async done => {
     const seeded = await handler.seedTestDatabase();
 
-    const targetCategoryOne = seeded.categories[0];
-    const targetCategoryTwo = seeded.categories[1];
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
+    // Set up link
+    const expectedCategoryOne = seeded.categories[0];
+    const expectedCategoryTwo = seeded.categories[1];
+    const linkedRecording = seeded.recordings[0];
+    const linkedNote = seeded.notes[0];
     
-    targetCategoryOne.relationships.recordings.ids.push(targetRecording.id);
-    targetCategoryTwo.relationships.notes.ids.push(targetNote.id);
+    expectedCategoryOne.relationships.recordings.ids.push(linkedRecording.id);
+    expectedCategoryTwo.relationships.notes.ids.push(linkedNote.id);
 
-    await db.categories.bulkPut([targetCategoryOne, targetCategoryTwo]);
-    const selected = await CategoryController.selectCategoriesByResourceIds(
-        [targetRecording.id],
-        [targetNote.id]
+    await db.categories.bulkPut([expectedCategoryOne, expectedCategoryTwo]);
+
+    // Test link
+    const expectedResult = [ expectedCategoryOne, expectedCategoryTwo ];
+
+    const actualResult = await CategoryController.selectCategoriesByResourceIds(
+        [linkedRecording.id],
+        [linkedNote.id]
     );
 
-    expect(selected).toEqual(
-        expect.arrayContaining([
-            expect.objectContaining({
-                id: targetCategoryOne.id
-            }),
-            expect.objectContaining({
-                id: targetCategoryTwo.id
-            })
-        ])
-    );
-
-    expect(selected).toHaveLength(2);
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 });
@@ -40,30 +36,27 @@ test("it selects the correct Category resources", async done => {
 test("it excludes Categories from exclude array", async done => {
     const seeded = await handler.seedTestDatabase();
     
-    const targetCategoryOne = seeded.categories[0];
-    const targetCategoryTwo = seeded.categories[1];
-    const targetRecording = seeded.recordings[0];
-    const targetNote = seeded.notes[0];
+    // Set up link
+    const expectedCategoryOne = seeded.categories[0];
+    const expectedCategoryTwo = seeded.categories[1];
+    const linkedRecording = seeded.recordings[0];
+    const linkedNote = seeded.notes[0];
     
-    targetCategoryOne.relationships.recordings.ids.push(targetRecording.id);
-    targetCategoryTwo.relationships.notes.ids.push(targetNote.id);
+    expectedCategoryOne.relationships.recordings.ids.push(linkedRecording.id);
+    expectedCategoryTwo.relationships.notes.ids.push(linkedNote.id);
 
-    await db.categories.bulkPut([targetCategoryOne, targetCategoryTwo]);
-    const selected = await CategoryController.selectCategoriesByResourceIds(
-        [targetRecording.id],
-        [targetNote.id],
-        [targetCategoryOne.id]
+    await db.categories.bulkPut([expectedCategoryOne, expectedCategoryTwo]);
+
+    // Test link
+    const expectedResult = [ expectedCategoryTwo ];
+
+    const actualResult = await CategoryController.selectCategoriesByResourceIds(
+        [linkedRecording.id],
+        [linkedNote.id],
+        [expectedCategoryOne.id]
     );
 
-    expect(selected).toEqual(
-        expect.arrayContaining([
-            expect.objectContaining({
-                id: targetCategoryTwo.id
-            })
-        ])
-    );
-
-    expect(selected).toHaveLength(1);
+    expect(actualResult).toEqual(expectedResult);
 
     done();
 })
