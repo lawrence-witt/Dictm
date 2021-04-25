@@ -3,7 +3,7 @@ import { ThunkResult } from '../../../store';
 import * as actions from './actions';
 
 import Recording from '../../../../db/models/Recording';
-import { RecordingController } from '../../../../db/controllers/Recording';
+import RecordingController from '../../../../db/controllers/Recording';
 
 import { categoryOperations } from '../categories';
 

@@ -5,7 +5,7 @@ import * as actions from './actions';
 import { categoryOperations } from '../categories';
 
 import Note from '../../../../db/models/Note';
-import { NoteController } from '../../../../db/controllers/Note';
+import NoteController from '../../../../db/controllers/Note';
 
 /** 
 *  Summary:
@@ -26,10 +26,6 @@ export const loadNotes = (
 *
 *  @param {object} note The new Note Model.
 */
-
-/* const createNote = (): ThunkAction<any, any, any, Action> => async (dispatch) => {
-    dispatch(() => Promise.resolve()).then(() => 'thing');
-} */
 
 export const createNote = (
     note: Note

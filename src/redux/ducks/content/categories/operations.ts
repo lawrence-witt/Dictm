@@ -1,7 +1,9 @@
 import * as actions from './actions';
 
 import Category from '../../../../db/models/Category';
-import { CategoryController } from '../../../../db/controllers/Category';
+import CategoryController from '../../../../db/controllers/Category';
+
+
 import { recordingOperations } from '../recordings';
 import { noteOperations } from '../notes';
 import { ThunkResult } from '../../../store';

@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
+import { CassetteProgressCallback } from 'cassette-js';
+import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe';
+
 import { RootState } from '../../../../../redux/store';
 import { editorSelectors, editorOperations } from '../../../../../redux/ducks/editor';
 import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
@@ -13,9 +16,7 @@ import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
 import Controls from './Controls/Controls';
 
-import { CassetteProgressCallback } from 'cassette-js';
-import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe';
-
+import useRecordingData from '../../../../../db/hooks/useRecordingData';
 import useCassette from '../../../../../lib/hooks/useCassette';
 
 /* 
@@ -175,7 +176,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle inserting audio and frequencies data
     */
 
-    const insertFailed = React.useRef(false);
+    const recordingData = useRecordingData(model.id);
 
     const handleInsert = React.useCallback(async (
         audio: RecordingPanelProps["model"]["data"]["audio"]
@@ -189,11 +190,11 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     }, [cassette.controls]);
 
     React.useEffect(() => {
-        if (mode !== "play" || !cassette.flags.canInsert || insertFailed.current) return;
-        handleInsert(model.data.audio);
-        waveHandle.current.init(model.data.frequencies);
-        waveHandle.current.increment(0, model.data.audio.attributes.duration);
-    }, [mode, model, cassette.flags, handleInsert]);
+        if (mode !== "play" || !cassette.flags.canInsert || !recordingData) return;
+        handleInsert(recordingData.audio);
+        waveHandle.current.init(recordingData.frequencies);
+        waveHandle.current.increment(0, recordingData.audio.attributes.duration);
+    }, [mode, recordingData, cassette.flags, handleInsert]);
 
     /* 
     *   Handle getting and releasing microphone stream
