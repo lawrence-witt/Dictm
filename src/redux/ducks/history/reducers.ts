@@ -6,7 +6,8 @@ const initialState: types.HistoryState = {
         pathname: window.location.pathname,
         search: "",
         hash: "",
-        state: undefined
+        state: undefined,
+        key: ""
     }
 }
 

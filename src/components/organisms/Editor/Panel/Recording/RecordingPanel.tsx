@@ -16,7 +16,6 @@ import WaveForm from './WaveForm/WaveForm';
 import Form from './Form/Form';
 import Controls from './Controls/Controls';
 
-import useRecordingData from '../../../../../db/hooks/useRecordingData';
 import useCassette from '../../../../../lib/hooks/useCassette';
 
 /* 
@@ -176,7 +175,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle inserting audio and frequencies data
     */
 
-    const recordingData = useRecordingData(model.id);
+    /* const recordingData = useRecordingData(model.id); */
 
     const handleInsert = React.useCallback(async (
         audio: RecordingPanelProps["model"]["data"]["audio"]
@@ -190,11 +189,11 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     }, [cassette.controls]);
 
     React.useEffect(() => {
-        if (mode !== "play" || !cassette.flags.canInsert || !recordingData) return;
-        handleInsert(recordingData.audio);
-        waveHandle.current.init(recordingData.frequencies);
-        waveHandle.current.increment(0, recordingData.audio.attributes.duration);
-    }, [mode, recordingData, cassette.flags, handleInsert]);
+        if (mode !== "play" || !cassette.flags.canInsert) return;
+        handleInsert(model.data.audio);
+        waveHandle.current.init(model.data.frequencies);
+        waveHandle.current.increment(0, model.data.audio.attributes.duration);
+    }, [mode, model.data, cassette.flags, handleInsert]);
 
     /* 
     *   Handle getting and releasing microphone stream
