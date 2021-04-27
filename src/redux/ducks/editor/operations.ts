@@ -1,10 +1,8 @@
-import { Action } from 'redux';
-
 import * as types from './types';
 import * as actions from './actions';
 import * as helpers from './helpers';
 
-import { RootState, ThunkResult } from '../../store';
+import { ThunkResult } from '../../store';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -45,10 +43,7 @@ export const openEditor = (
         model = helpers.findContentModel(content, editorType, contentId);
     }
 
-    if (!model) {
-        // TODO: dispatch notification error
-        return;
-    }
+    if (!model) return;
     
     const { title, context } = helpers.generateEditorContext(model, isNew);
 

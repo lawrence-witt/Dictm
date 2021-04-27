@@ -7,6 +7,9 @@ import * as types from './types';
 import * as actions from './actions';
 
 import { userOperations, userHelpers } from '../user';
+import { notificationsOperations } from '../notifications';
+
+const { notifyDatabaseError } = notificationsOperations;
 
 /* 
 *   Init App Operations
@@ -43,8 +46,7 @@ export const loadLocalUsers = (): ThunkResult<Promise<void>> => async (
         try {
             return await UserController.selectLocalUsers();
         } catch (err) {
-            // handle bad db connection
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -154,9 +156,7 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
         try {
             return await UserController.insertUser(newUser);
         } catch (err) {
-            // handle no creation
-            console.log(err);
-            return;
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 

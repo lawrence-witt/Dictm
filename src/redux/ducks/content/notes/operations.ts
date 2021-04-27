@@ -6,6 +6,9 @@ import { categoryOperations } from '../categories';
 
 import Note from '../../../../db/models/Note';
 import NoteController from '../../../../db/controllers/Note';
+import { notificationsOperations } from '../../notifications';
+
+const { notifyDatabaseError } = notificationsOperations;
 
 /** 
 *  Summary:
@@ -36,8 +39,7 @@ export const createNote = (
         try {
             return await NoteController.insertNote(note);
         } catch (err) {
-            // handle no note creation
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -66,8 +68,7 @@ export const updateNote = (
         try {
             return await NoteController.updateNote(note);
         } catch (err) {
-            // handle no note update
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -113,8 +114,7 @@ export const deleteNotes = (
         try {
             return await NoteController.deleteNotes(ids);
         } catch (err) {
-            // handle cannot delete
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 

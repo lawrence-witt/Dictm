@@ -6,6 +6,9 @@ import Recording from '../../../../db/models/Recording';
 import RecordingController from '../../../../db/controllers/Recording';
 
 import { categoryOperations } from '../categories';
+import { notificationsOperations } from '../../notifications';
+
+const { notifyDatabaseError } = notificationsOperations;
 
 /** 
 *  Summary:
@@ -34,8 +37,7 @@ export const createRecording = (
         try {
             return await RecordingController.insertRecording(recording);
         } catch (err) {
-            // handle cannot create
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -64,8 +66,7 @@ export const updateRecording = (
         try {
             return await RecordingController.updateRecording(recording);
         } catch (err) {
-            // handle cannot update
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -110,8 +111,7 @@ export const deleteRecordings = (
         try {
             return await RecordingController.deleteRecordings(ids);
         } catch (err) {
-            // handle cannot delete
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 

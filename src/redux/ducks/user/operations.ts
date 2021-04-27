@@ -9,6 +9,9 @@ import * as helpers from './helpers';
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
 import { categoryOperations } from '../content/categories';
+import { notificationsOperations } from '../notifications';
+
+const { notifyDatabaseError } = notificationsOperations;
 
 /** 
 *  Summary:
@@ -24,9 +27,7 @@ export const loadUser = (
         try {
             return await UserController.selectUserData(profile.id);
         } catch (err) {
-            // handle cannot get data
-            console.log(err);
-            return;
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 

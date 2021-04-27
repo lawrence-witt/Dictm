@@ -1,12 +1,14 @@
+import { ThunkResult } from '../../../store';
 import * as actions from './actions';
 
 import Category from '../../../../db/models/Category';
 import CategoryController from '../../../../db/controllers/Category';
 
-
 import { recordingOperations } from '../recordings';
 import { noteOperations } from '../notes';
-import { ThunkResult } from '../../../store';
+import { notificationsOperations } from '../../notifications';
+
+const { notifyDatabaseError } = notificationsOperations;
 
 /** 
 *  Summary:
@@ -35,8 +37,7 @@ export const createCategory = (
         try {
             return await CategoryController.insertCategory(category);
         } catch (err) {
-            // handle no category create
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -78,8 +79,7 @@ export const updateCategory = (
         try {
             return await CategoryController.updateCategory(category);
         } catch (err) {
-            // handle no category update
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 
@@ -131,8 +131,7 @@ export const deleteCategories = (
         try {
             return await CategoryController.deleteCategories(ids);
         } catch (err) {
-            // handle no categories delete
-            console.log(err);
+            dispatch(notifyDatabaseError(err.message));
         }
     })();
 

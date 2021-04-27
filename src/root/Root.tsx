@@ -10,6 +10,8 @@ import { authOperations } from '../redux/ducks/auth';
 import PublicRouter from './routers/PublicRouter';
 import PrivateRouter from './routers/PrivateRouter';
 
+import Notifier from '../components/organisms/Notifier/Notifier';
+
 /* 
 *   Redux
 */
@@ -64,11 +66,12 @@ const Root: React.FC<ReduxProps> = (props) => {
 
     // Choose which routes to activate
 
-    if (userLoaded) {
-        return <PrivateRouter />;
-    } else {
-        return <PublicRouter />;
-    }
+    return (
+        <>
+            <Notifier/>
+            {userLoaded ? <PrivateRouter/> : <PublicRouter />}
+        </>
+    );
 }
 
 export default hot(module)(connector(Root));

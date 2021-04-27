@@ -38,15 +38,13 @@ const recordingsReducer = (
         case types.RECORDINGS_DELETED: {
             const { ids } = action.payload;
 
-            const clonedState = {
-                byId: {...state.byId}, 
-                allIds: [...state.allIds]
-            };
-
-            ids.forEach(id => delete clonedState.byId[id]);
-            clonedState.allIds = clonedState.allIds.filter(id => !ids.includes(id));
-
-            return clonedState;
+            return {
+                byId: (bi => {
+                    ids.forEach(id => delete bi[id]); 
+                    return bi;
+                })({...state.byId}),
+                allIds: state.allIds.filter(id => !ids.includes(id))
+            }
         }
         case types.RECORDINGS_CLEARED:
             return initialState;

@@ -1,7 +1,6 @@
 import { ThunkResult } from '../../../store';
 
 import * as actions from './actions';
-import * as types from './types';
 
 /** 
 *  Summary
