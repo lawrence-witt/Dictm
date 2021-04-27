@@ -185,14 +185,18 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     const flush = React.useCallback(() => {
         waveClass.current.flush(progressRef.current);
+    }, []);
+
+    const frequencies = React.useCallback(() => {
         return waveClass.current.frequencyData;
     }, []);
 
     React.useImperativeHandle(waveHandle, () => ({
         init,
         increment,
-        flush
-    }), [init, increment, flush]);
+        flush,
+        frequencies
+    }), [init, increment, flush, frequencies]);
 
     React.useEffect(() => {
         if (isListening) waveClass.current.flush(progressRef.current);

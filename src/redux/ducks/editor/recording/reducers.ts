@@ -37,7 +37,6 @@ const recordingEditorReducer = (
                 }
             }
         case types.RECORDING_EDITOR_CATEGORY_UPDATED:
-            const id = action.payload.id;
             return {
                 ...state,
                 data: {
@@ -46,7 +45,24 @@ const recordingEditorReducer = (
                         ...state.data.editing,
                         relationships: {
                             ...state.data.editing.relationships,
-                            category: { id }
+                            category: { id: action.payload.id }
+                        }
+                    }
+                }
+            }
+        case types.RECORDING_EDITOR_ATTRIBUTES_UPDATED:
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    editing: {
+                        ...state.data.editing,
+                        data: {
+                            ...state.data.editing.data,
+                            audio: {
+                                ...state.data.editing.data.audio,
+                                attributes: action.payload.attributes
+                            }
                         }
                     }
                 }

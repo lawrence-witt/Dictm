@@ -33,6 +33,7 @@ class Recording implements RecordingModel {
                 attributes: {
                     duration: 0,
                     sampleRate: 0,
+                    size: '0 Bytes',
                     timestamps: {
                         created: 0,
                         modified: 0

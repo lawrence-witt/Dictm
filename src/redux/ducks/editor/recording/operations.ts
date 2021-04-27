@@ -6,8 +6,6 @@ import * as actions from './actions';
 /** 
 *  Summary
 *  Changes the editor mode between 'play' and 'edit'.
-*
-*  @param {"edit" | "play"} mode The new editor mode.
 */
 
 export const updateRecordingEditorMode = (
@@ -21,8 +19,6 @@ export const updateRecordingEditorMode = (
 /** 
 *  Summary
 *  Updates the title string for a Recording Model.
-*
-*  @param {string} title The new title for the model.
 */
 
 export const updateRecordingEditorTitle = (
@@ -36,8 +32,6 @@ export const updateRecordingEditorTitle = (
 /** 
 *  Summary
 *  Updates the category for a Recording Model.
-*
-*  @param {string | undefined} id The new category (or no category) the model should be assigned to.
 */
 
 export const updateRecordingEditorCategory = (
@@ -48,11 +42,22 @@ export const updateRecordingEditorCategory = (
     dispatch(actions.updateRecordingEditorCategory(id));
 }
 
+/* 
+*   Summary:
+*   Updates the audio attributes of a Recording following a successful capture.
+*/
+
+export const updateRecordingEditorAttributes = (
+    attributes: Recording["data"]["audio"]["attributes"]
+): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(actions.updateRecordingEditorAttributes(attributes));
+}
+
 /** 
 *  Summary:
 *  Updates the recording data for a Recording Model.
-*
-*  @param {object} data A data object containing the most recent audio/frequency capture.
 */
 
 export const updateRecordingEditorData = (

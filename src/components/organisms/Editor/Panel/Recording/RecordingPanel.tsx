@@ -28,6 +28,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
+    updateAttributes: recordingEditorOperations.updateRecordingEditorAttributes,
     updateData: recordingEditorOperations.updateRecordingEditorData,
     saveEditor: editorOperations.saveEditor,
     notifyError: notificationsOperations.notifyRecordingError
@@ -46,6 +47,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         mode, 
         model,
         canSave,
+        updateAttributes,
         updateData,
         saveEditor,
         notifyError
@@ -123,14 +125,14 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (analyser.current) {
             analyser.current = null;
 
-            const audioData = cassette.get.track()?.copy;
-            const frequencyData = waveHandle.current.flush();
+            const audioAttributes = cassette.get.track()?.attributes;
+            waveHandle.current.flush();
 
-            if (!audioData) throw new Error('Could not retrieve audio data.');
+            if (!audioAttributes) return;
 
-            updateData({audio: audioData, frequencies: frequencyData});
+            updateAttributes(audioAttributes);
         }
-    }, [cassette.controls, cassette.get, updateData]);
+    }, [cassette.controls, cassette.get, updateAttributes]);
 
     // Scan the available tape and force animation
 
@@ -141,18 +143,24 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (nextFrame.current) demandAnimationFrame(nextFrame.current, true);
     }, [cassette.controls]);
 
-    // Commit the recording model
+    // Commit the Recording model
 
     const handleSave = React.useCallback(async () => {
+        const audio = cassette.get.track()?.copy;
+        const frequencies = waveHandle.current.frequencies();
+
+        if (!audio) return;
+        
+        updateData({ audio, frequencies });
         saveEditor();
         handleScan("to", 0);
-    }, [saveEditor, handleScan]);
+    }, [cassette.get, updateData, saveEditor, handleScan]);
 
     /* 
     *   Handle play resume after scan control
     */
 
-    const resumeTimeout = React.useRef() as React.MutableRefObject<ReturnType<typeof setTimeout> | undefined>;
+    const resumeTimeout = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     React.useEffect(() => {
         if(!cassette.flags.canPlay && resumeTimeout.current) {
@@ -178,7 +186,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle inserting audio and frequencies data
     */
 
-    // This flag is currently necessary to prevent an infinite loop, 
+    // This flag is currently necessary to prevent an infinite loop on error, 
     // since insert triggers two flag updates
     const insertFailed = React.useRef(false);
 

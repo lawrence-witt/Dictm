@@ -7,7 +7,7 @@ import Recording from '../../../db/models/Recording';
 import Note from '../../../db/models/Note';
 
 import { formatLongTimestamp, formatDuration } from '../../../lib/utils/formatTime';
-import { formatByteLength, formatStringBytes } from '../../../lib/utils/formatFileSize';
+import { formatStringBytes } from '../../../lib/utils/formatFileSize';
 
 const stringArraysEqual = (arr1: string[], arr2: string[]) => {
     const asSet = new Set([...arr1, ...arr2]);
@@ -78,7 +78,7 @@ export const getSaveAvailability = createSelector((editorState: RootState["edito
 *   Format the details of the editing model
 */
 
-// Factory
+// Base
 
 const createDetail = (
     name: string,
@@ -131,7 +131,7 @@ const createSizeDetail = (
 ) => createDetail(
     "Size",
     model.type === "recording" ?
-    formatByteLength(model.data.audio.data.bytes.length) :
+    model.data.audio.attributes.size :
     formatStringBytes(model.data.content)
 );
 

@@ -29,6 +29,15 @@ export const updateRecordingEditorCategory = (
     }
 });
 
+export const updateRecordingEditorAttributes = (
+    attributes: Recording["data"]["audio"]["attributes"]
+): types.RecordingEditorAttributesUpdatedAction => ({
+    type: types.RECORDING_EDITOR_ATTRIBUTES_UPDATED,
+    payload: {
+        attributes
+    }
+})
+
 export const updateRecordingEditorData = (
     data: Recording["data"]
 ): types.RecordingEditorDataUpdatedAction => ({

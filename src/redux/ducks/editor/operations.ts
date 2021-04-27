@@ -79,9 +79,7 @@ export const saveEditor = (): ThunkResult<void> => (
         throw new Error('An editable context has not been initialised.');
     }
 
-    const stamped = helpers.stampContentModel(
-        context.data.editing
-    );
+    const stamped = helpers.stampContentModel(context.data.editing);
 
     const persist = () => {
         switch(stamped.type) {
