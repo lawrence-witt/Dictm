@@ -7,6 +7,7 @@ import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe
 import { RootState } from '../../../../../redux/store';
 import { editorSelectors, editorOperations } from '../../../../../redux/ducks/editor';
 import { recordingEditorOperations } from '../../../../../redux/ducks/editor/recording';
+import { notificationsOperations } from '../../../../../redux/ducks/notifications';
 
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 
@@ -28,7 +29,8 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     updateData: recordingEditorOperations.updateRecordingEditorData,
-    saveEditor: editorOperations.saveEditor
+    saveEditor: editorOperations.saveEditor,
+    notifyError: notificationsOperations.notifyRecordingError
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -45,7 +47,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         model,
         canSave,
         updateData,
-        saveEditor
+        saveEditor,
+        notifyError
     } = props;
 
     /* 
@@ -85,8 +88,8 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         undefined,  // status callback
     );
 
-    const stream = React.useRef(null) as React.MutableRefObject<MediaStream | null>;
-    const analyser = React.useRef(null) as React.MutableRefObject<AnalyserNode | null>;
+    const stream = React.useRef<MediaStream | null>(null);
+    const analyser = React.useRef<AnalyserNode | null>(null);
 
     /* 
     *   Handle user initiated controls with side effects
@@ -175,7 +178,9 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle inserting audio and frequencies data
     */
 
-    /* const recordingData = useRecordingData(model.id); */
+    // This flag is currently necessary to prevent an infinite loop, 
+    // since insert triggers two flag updates
+    const insertFailed = React.useRef(false);
 
     const handleInsert = React.useCallback(async (
         audio: RecordingPanelProps["model"]["data"]["audio"]
@@ -183,13 +188,13 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         try {
             await cassette.controls.insert(audio);
         } catch(err) {
-            console.log(err);
-            // TODO: dispatch notification error
+            notifyError("insert", err.message);
+            insertFailed.current = true;
         }
-    }, [cassette.controls]);
+    }, [cassette.controls, notifyError]);
 
     React.useEffect(() => {
-        if (mode !== "play" || !cassette.flags.canInsert) return;
+        if (mode !== "play" || !cassette.flags.canInsert || insertFailed.current) return;
         handleInsert(model.data.audio);
         waveHandle.current.init(model.data.frequencies);
         waveHandle.current.increment(0, model.data.audio.attributes.duration);
@@ -199,29 +204,37 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Handle getting and releasing microphone stream
     */
 
-    const handleConnect = React.useCallback(async () => {
-        if (cassette.flags.hasStream) return;
+    const handleConnect = React.useCallback(() => {
+        let attemptValid = true;
 
-        try {
-            const mic = await navigator.mediaDevices.getUserMedia({audio: true});
-            stream.current = mic;
-            await cassette.controls.connect(stream.current);
-        } catch(err) {
-            console.log(err);
-            // TODO: dispatch notificaion error
+        (async () => {
+            try {
+                const mic = await navigator.mediaDevices.getUserMedia({audio: true});
+    
+                if (!attemptValid) return;
+    
+                stream.current = mic;
+                await cassette.controls.connect(stream.current);
+            } catch(err) {
+                notifyError("connect", err.message);
+            }
+        })();
+
+        return {
+            cancel: () => { attemptValid = false; }
         }
-    }, [cassette.flags, cassette.controls]);
+    }, [cassette.controls, notifyError]);
 
     React.useEffect(() => {
-        if (mode !== "edit" || stream.current) return;
-        handleConnect();
+        if (mode !== "edit" || !cassette.flags.canConnect) return;
+        const attempt = handleConnect();
         if (!cassette.flags.hasData) waveHandle.current.init([]);
+
+        return () => attempt.cancel();
     }, [mode, cassette.flags, handleConnect]);
 
     React.useEffect(() => {
-        return () => {
-            if (stream.current) stream.current.getAudioTracks()[0].stop();
-        }
+        return () => { stream.current && stream.current.getAudioTracks()[0].stop(); };
     }, []);
 
     return (

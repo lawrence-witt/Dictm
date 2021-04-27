@@ -53,13 +53,13 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     // Internal flags
 
-    const isEditable = mode === 'edit';
+    const isEditMode = mode === 'edit';
     const isPlaying = status === "playing";
     const isRecording = status === "recording";
 
     // Styles
 
-    const classes = useStyles({addPseudo: !isEditable || !flags.hasData});
+    const classes = useStyles({addPseudo: !isEditMode || !flags.hasData});
 
     // Handle scanning with buttons
 
@@ -68,10 +68,14 @@ const Controls: React.FC<ControlsProps> = (props) => {
         if (isPlaying) handleTimeout("set");
     }, [isPlaying, handleScan, handleTimeout]);
 
-    // Deduce primary icon type
+    // Primary button settings
+
+    const primaryDisabled = 
+        isEditMode && isPlaying ||
+        isEditMode && !flags.hasStream;
 
     const primaryIcon = (
-        isEditable ? (
+        isEditMode ? (
             isRecording ? 'pause' : 'record'
         ) : (
             isPlaying ? 'pause' : 'play'
@@ -80,13 +84,14 @@ const Controls: React.FC<ControlsProps> = (props) => {
 
     return (
         <div className={classes.controlsContainer}>
-            {flags.hasData && 
+            {flags.hasData && (
                 <Replay5Button 
                     color="inherit" 
                     onClick={() => handleScanButton(-5)} 
                     disabled={!flags.canScan} 
-                />}
-            {flags.hasData && isEditable && (
+                />
+            )}
+            {flags.hasData && isEditMode && (
                 isPlaying ? 
                 <PauseButton 
                     color="inherit" 
@@ -101,21 +106,23 @@ const Controls: React.FC<ControlsProps> = (props) => {
             )}
             <PrimaryAudioButton 
                 icon={primaryIcon}
-                onClick={() => flags.canPause ? handleStop() : handleStart(isEditable ? 'record' : 'play')}
-                disabled={isEditable && isPlaying}
+                onClick={() => flags.canPause ? handleStop() : handleStart(isEditMode ? 'record' : 'play')}
+                disabled={primaryDisabled}
             />
-            {flags.hasData && isEditable && 
+            {flags.hasData && isEditMode && (
                 <SaveButton 
                     color="inherit" 
                     onClick={handleSave} 
                     disabled={!flags.canEject || !canSave}
-                />}
-            {flags.hasData && 
+                />
+            )}
+            {flags.hasData && (
                 <Forward5Button 
                     color="inherit" 
                     onClick={() => handleScanButton(5)} 
                     disabled={!flags.canScan}
-                />}
+                />
+            )}
         </div>
     )
 }

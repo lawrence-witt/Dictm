@@ -25,6 +25,17 @@ export const notifyDatabaseError = (message: string): ThunkResult<void> => (
     dispatch(addNotification(true, "error", [header, sub], "RELOAD"));
 }
 
+export const notifyRecordingError = (type: 'insert' | 'connect', message: string): ThunkResult<void> => (
+    dispatch
+) => {
+    if (type === "insert") {
+        dispatch(addNotification(false, "error", ["Recording could not be inserted:", message]));
+    } else {
+        const connectMessage = "Could not connect to a microphone. Please check your microphone permissions and try again.";
+        dispatch(addNotification(false, "error", [connectMessage]));
+    }
+}
+
 export const dismissNotification = (
     key: string
 ): ThunkResult<void> => (

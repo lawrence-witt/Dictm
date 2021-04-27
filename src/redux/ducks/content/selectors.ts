@@ -86,53 +86,6 @@ export const getContentList = createSelector((
     return { byId, allIds };
 }, contentList => contentList);
 
-/* export const getMediaList = createSelector((
-    media: RootState["content"],
-    categories: RootState["categories"],
-    filter: RootState["tools"]["search"]["term"], 
-    props: MediaTemplateProps
-) => {
-    // Return default media list if no category specified
-
-    if (props.context !== "category") {
-        const mediaState = media[props.context];
-
-        if (filter.length === 0) return mediaState;
-
-        return getMediaSlice(mediaState, mediaState.allIds, filter);
-    }
-
-    if (!props.categoryId) throw new Error('selector: getMediaList missing a categoryId');
-
-    //Sort category resources into new media list by timestamps.created
-
-    const { recordings, notes } = media;
-
-    const category = categories.byId[props.categoryId];
-
-    const recordingsSlice = getMediaSlice(
-        recordings, 
-        category.relationships.recordings.ids, 
-        filter
-    );
-
-    const notesSlice = getMediaSlice(
-        notes, 
-        category.relationships.notes.ids,
-        filter
-    );
-    
-    const byId = Object.assign({}, recordingsSlice.byId, notesSlice.byId);
-    const allIds = [...recordingsSlice.allIds, ...notesSlice.allIds].sort((a, b) => {
-        const aModel = recordingsSlice.byId[a] || notesSlice.byId[a];
-        const bModel = recordingsSlice.byId[b] || notesSlice.byId[b];
-
-        return aModel.attributes.timestamps.created - bModel.attributes.timestamps.created;
-    });
-
-    return { byId, allIds };
-}, mediaList => mediaList); */
-
 /* 
 *   Get media by category and title for select inputs
 */
