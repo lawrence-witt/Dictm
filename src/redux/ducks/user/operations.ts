@@ -3,8 +3,9 @@ import { ThunkResult } from '../../store';
 import User from '../../../db/models/User';
 import UserController from '../../../db/controllers/User';
 
+import StorageService from '../../services/StorageService';
+
 import * as actions from './actions';
-import * as helpers from './helpers';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -38,7 +39,7 @@ export const loadUser = (
     dispatch(categoryOperations.loadCategories(userData.categories));
     dispatch(actions.loadUser(profile));
 
-    helpers.persistSession(profile.id);
+    StorageService.persistSession(profile.id);
 }
 
 /** 
@@ -54,5 +55,5 @@ export const clearUser = (): ThunkResult<void> => (
     dispatch(categoryOperations.clearCategories());
     dispatch(actions.clearUser());
 
-    helpers.clearSession();
+    StorageService.clearSession();
 }

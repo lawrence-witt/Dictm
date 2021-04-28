@@ -3,13 +3,15 @@ import { ThunkResult } from '../../store';
 import User from '../../../db/models/User';
 import UserController from '../../../db/controllers/User';
 
+import StorageService from '../../services/StorageService';
+
 import * as types from './types';
 import * as actions from './actions';
 
-import { userOperations, userHelpers } from '../user';
+import { userOperations } from '../user';
 import { notificationsOperations } from '../notifications';
 
-const { notifyDatabaseError } = notificationsOperations;
+const { notifyDatabaseError, notifyGenericError } = notificationsOperations;
 
 /* 
 *   Init App Operations
@@ -18,13 +20,32 @@ const { notifyDatabaseError } = notificationsOperations;
 export const initialiseApp = (): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
-    const user = await userHelpers.retrieveSession();
+    const session = StorageService.retrieveSession();
 
     const lastly = () => dispatch(actions.initialiseApp());
 
-    if (user) {
-        dispatch(userOperations.loadUser(user)).then(lastly);
-        return;
+    if (session) {
+        const { user: { id: userId }, flags } = session;
+
+        if (flags.hasError) {
+            try {
+                await UserController.repairUserData(userId);
+                StorageService.setSessionFlag("hasError", false);
+            } catch (err) {
+                StorageService.clearSession();
+                dispatch(notifyGenericError([`User data could not be repaired: ${err.message}.`]));
+                lastly();
+                return;
+            }
+        }
+
+        try {
+            const user = await UserController.selectUser(userId);
+            dispatch(userOperations.loadUser(user)).then(lastly);
+            return;
+        } catch {
+            StorageService.clearSession();
+        }
     }
 
     lastly();

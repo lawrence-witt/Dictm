@@ -1,5 +1,7 @@
 import { ThunkResult } from '../../store';
 
+import StorageService from '../../services/StorageService';
+
 import * as actions from './actions';
 import * as types from './types';
 import * as helpers from './helpers';
@@ -22,6 +24,8 @@ export const notifyDatabaseError = (message: string): ThunkResult<void> => (
     const header = `A critical error has occured: ${message}`;
     const sub = "Reload the application to repair the database.";
 
+    StorageService.setSessionFlag("hasError", true);
+
     dispatch(addNotification(true, "error", [header, sub], "RELOAD"));
 }
 
@@ -34,6 +38,12 @@ export const notifyRecordingError = (type: 'insert' | 'connect', message: string
         const connectMessage = "Could not connect to a microphone. Please check your microphone permissions and try again.";
         dispatch(addNotification(false, "error", [connectMessage]));
     }
+}
+
+export const notifyGenericError = (message: string[], action?: types.NotificationActions): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(addNotification(false, "error", message, action));
 }
 
 export const dismissNotification = (
