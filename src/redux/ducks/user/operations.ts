@@ -1,7 +1,7 @@
 import { ThunkResult } from '../../store';
 
 import User from '../../../db/models/User';
-import { UserController } from '../../../db/controllers/User';
+import UserController from '../../../db/controllers/User';
 
 import * as actions from './actions';
 import * as helpers from './helpers';

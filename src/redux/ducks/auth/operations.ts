@@ -1,7 +1,7 @@
 import { ThunkResult } from '../../store';
 
 import User from '../../../db/models/User';
-import { UserController } from '../../../db/controllers/User';
+import UserController from '../../../db/controllers/User';
 
 import * as types from './types';
 import * as actions from './actions';
@@ -44,7 +44,7 @@ export const loadLocalUsers = (): ThunkResult<Promise<void>> => async (
 ) => {
     const users = await (async () => {
         try {
-            return await UserController.selectLocalUsers();
+            return await UserController.selectUsers();
         } catch (err) {
             dispatch(notifyDatabaseError(err.message));
         }
