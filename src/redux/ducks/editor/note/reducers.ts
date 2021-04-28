@@ -20,28 +20,23 @@ const noteEditorReducer = (
         case types.NOTE_EDITOR_TITLE_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
+                model: {
+                    ...state.model,
+                    attributes: {
+                        ...state.model.attributes,
+                        title: action.payload.title
                     }
                 }
             }
         case types.NOTE_EDITOR_CATEGORY_UPDATED:
-            const id = action.payload.id;
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            category: { id }
+                model: {
+                    ...state.model,
+                    relationships: {
+                        ...state.model.relationships,
+                        category: {
+                            id: action.payload.id
                         }
                     }
                 }
@@ -49,12 +44,9 @@ const noteEditorReducer = (
         case types.NOTE_EDITOR_DATA_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        data: action.payload.data
-                    }
+                model: {
+                    ...state.model,
+                    data: action.payload.data
                 }
             }
         default:

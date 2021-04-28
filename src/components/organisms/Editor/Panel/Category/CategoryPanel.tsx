@@ -58,7 +58,8 @@ const CategoryPanel: React.FC<CategoryPanelProps & ReduxProps> = (props) => {
         <>
             <TextField 
                 label="Title"
-                value={model.attributes.title} 
+                value={model.attributes.title}
+                required
                 fullWidth
                 onChange={onTitleChange}
             />

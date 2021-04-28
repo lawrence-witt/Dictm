@@ -15,7 +15,7 @@ import { MenuItem } from '@material-ui/core';
 */
 
 const mapState = (state: RootState) => ({
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -33,7 +33,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const NotePanelButtons: React.FC<ReduxProps> = (props) => {
     const {
-        canSave,
+        saveAvailability,
         saveEditor,
         openDetailsDialog
     } = props;
@@ -49,7 +49,7 @@ const NotePanelButtons: React.FC<ReduxProps> = (props) => {
         <>
             <SaveButton
                 color="inherit"
-                disabled={!canSave}
+                disabled={!saveAvailability.hasRequiredProperties}
                 onClick={saveEditor}
             />
             <DropdownMenu>

@@ -72,19 +72,19 @@ const EditorPanelSwitch = React.memo(function EditorPanelSwitch(
             return (
                 <RecordingPanel 
                     mode={context.mode}
-                    model={context.data.editing} 
+                    model={context.model} 
                 />
             );
         case "note":
             return (
                 <NotePanel
-                    model={context.data.editing}
+                    model={context.model}
                 />
             );
         case "category":
             return (
                 <CateogryPanel
-                    model={context.data.editing}
+                    model={context.model}
                 />
             );
         default:

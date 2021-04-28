@@ -24,7 +24,7 @@ import useCassette from '../../../../../lib/hooks/useCassette';
 */
 
 const mapState = (state: RootState) => ({
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -46,7 +46,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     const {
         mode, 
         model,
-        canSave,
+        saveAvailability,
         updateAttributes,
         updateData,
         saveEditor,
@@ -271,7 +271,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
                 mode={mode} 
                 status={cassette.status}
                 flags={cassette.flags}
-                canSave={canSave}
+                canSave={saveAvailability.hasRequiredProperties}
                 handleStart={handleStart}
                 handleStop={handleStop}
                 handleScan={handleScan}

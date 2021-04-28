@@ -8,7 +8,7 @@ export interface RecordingPanelButtonsProps {
 
 export interface RecordingPanelProps {
     mode: "edit" | "play";
-    model: EditorContexts["recording"]["data"]["editing"];
+    model: EditorContexts["recording"]["model"];
 }
 
 export interface TimerHandle {

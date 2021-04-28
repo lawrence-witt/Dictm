@@ -15,7 +15,7 @@ import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 */
 
 const mapState = (state: RootState) => ({
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -33,7 +33,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const CategoryPanelButtons: React.FC<ReduxProps> = (props) => {
     const {
-        canSave,
+        saveAvailability,
         openDetailsDialog,
         saveEditor
     } = props;
@@ -49,7 +49,7 @@ const CategoryPanelButtons: React.FC<ReduxProps> = (props) => {
         <>
             <SaveButton
                 color="inherit"
-                disabled={!canSave}
+                disabled={!saveAvailability.hasRequiredProperties}
                 onClick={saveEditor}
             />
             <DropdownMenu>

@@ -18,7 +18,7 @@ import Dialog from './Dialog/Dialog';
 const mapState = (state: RootState) => ({
     isOpen: state.editor.attributes.isOpen,
     context: state.editor.context,
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -47,7 +47,7 @@ const Editor: React.FC<ReduxProps> = (props) => {
     const {
         isOpen,
         context,
-        canSave,
+        saveAvailability,
         openSaveDialog,
         closeEditor,
         clearEditor
@@ -56,9 +56,9 @@ const Editor: React.FC<ReduxProps> = (props) => {
     const classes = useStyles();
 
     const onClose = React.useCallback(() => {
-        if (canSave) return openSaveDialog();
+        if (saveAvailability.hasNewProperties) return openSaveDialog();
         closeEditor();
-    }, [canSave, openSaveDialog, closeEditor]);
+    }, [saveAvailability, openSaveDialog, closeEditor]);
 
     return (
         <Drawer

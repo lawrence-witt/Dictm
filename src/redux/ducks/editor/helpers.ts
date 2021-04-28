@@ -75,30 +75,21 @@ const generateRecordingContext = (
 ): EditorContexts["recording"] => ({
     type: "recording",
     mode: isNew ? "edit" : "play",
-    data: {
-        original: model,
-        editing: model
-    }
+    model
 });
 
 const generateNoteContext = (
     model: Note
 ): EditorContexts["note"] => ({
     type: "note",
-    data: {
-        original: model,
-        editing: model
-    }
+    model
 });
 
 const generateCategoryContext = (
     model: Category
 ): EditorContexts["category"] => ({
     type: "category",
-    data: {
-        original: model,
-        editing: model
-    }
+    model
 });
 
 

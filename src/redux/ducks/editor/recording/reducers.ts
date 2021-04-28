@@ -25,27 +25,23 @@ const recordingEditorReducer = (
         case types.RECORDING_EDITOR_TITLE_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
+                model: {
+                    ...state.model,
+                    attributes: {
+                        ...state.model.attributes,
+                        title: action.payload.title
                     }
                 }
             }
         case types.RECORDING_EDITOR_CATEGORY_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            category: { id: action.payload.id }
+                model: {
+                    ...state.model,
+                    relationships: {
+                        ...state.model.relationships,
+                        category: {
+                            id: action.payload.id
                         }
                     }
                 }
@@ -53,16 +49,13 @@ const recordingEditorReducer = (
         case types.RECORDING_EDITOR_ATTRIBUTES_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        data: {
-                            ...state.data.editing.data,
-                            audio: {
-                                ...state.data.editing.data.audio,
-                                attributes: action.payload.attributes
-                            }
+                model: {
+                    ...state.model,
+                    data: {
+                        ...state.model.data,
+                        audio: {
+                            ...state.model.data.audio,
+                            attributes: action.payload.attributes
                         }
                     }
                 }
@@ -70,12 +63,9 @@ const recordingEditorReducer = (
         case types.RECORDING_EDITOR_DATA_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        data: action.payload.data
-                    }
+                model: {
+                    ...state.model,
+                    data: action.payload.data
                 }
             }
         default:

@@ -12,10 +12,7 @@ import { categoryTypes } from './category';
 
 export interface EditorContext<Model extends ContentModels> {
     type: Model["type"];
-    data: {
-        original: Model;
-        editing: Model;
-    }
+    model: Model
 }
 
 export interface ChooseEditorContext {

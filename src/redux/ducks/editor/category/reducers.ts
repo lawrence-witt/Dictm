@@ -20,29 +20,23 @@ const categoryEditorReducer = (
         case types.CATEGORY_EDITOR_TITLE_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        attributes: {
-                            ...state.data.editing.attributes,
-                            title: action.payload.title
-                        }
+                model: {
+                    ...state.model,
+                    attributes: {
+                        ...state.model.attributes,
+                        title: action.payload.title
                     }
                 }
             }
         case types.CATEGORY_EDITOR_IDS_UPDATED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    editing: {
-                        ...state.data.editing,
-                        relationships: {
-                            ...state.data.editing.relationships,
-                            [action.payload.type]: {
-                                ids: action.payload.ids
-                            }
+                model: {
+                    ...state.model,
+                    relationships: {
+                        ...state.model.relationships,
+                        [action.payload.type]: {
+                            ids: action.payload.ids
                         }
                     }
                 }

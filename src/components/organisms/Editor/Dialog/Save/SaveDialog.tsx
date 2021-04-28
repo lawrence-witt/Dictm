@@ -9,8 +9,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 
-import { SaveDialogProps } from './SaveDialog.types';
-
 /* 
 *   Redux
 */
@@ -18,7 +16,7 @@ import { SaveDialogProps } from './SaveDialog.types';
 const mapState = (state: RootState) => ({
     type: state.editor.context?.type,
     isNew: state.editor.attributes.isNew,
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -39,15 +37,20 @@ const SaveDialog: React.FC<ReduxProps> = (props) => {
     const {
         type,
         isNew,
-        canSave,
+        saveAvailability,
         saveEditor,
         closeDialog,
         closeEditor
     } = props;
 
-    const text = isNew ? 
-    `Save your ${type} or discard it?` : 
-    'Save your changes or discard them?';
+    const lineOne = isNew ? 
+        `Save your ${type} or discard it?` : 
+        'Save your changes or discard them?';
+
+    const lineTwo = saveAvailability.hasRequiredProperties ?
+        "" : " (A required field is currently missing.)"
+
+    const text = lineOne + lineTwo;
 
     return (
         <>
@@ -65,7 +68,7 @@ const SaveDialog: React.FC<ReduxProps> = (props) => {
                 </Button>
                 <Button 
                     color="primary"
-                    disabled={!canSave}
+                    disabled={!saveAvailability.hasRequiredProperties}
                     onClick={saveEditor}
                 >
                     Save

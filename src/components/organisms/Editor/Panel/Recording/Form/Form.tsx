@@ -68,6 +68,7 @@ const Form: React.FC<FormProps & ReduxProps> = (props) => {
                 label="Title"
                 value={title}
                 fullWidth
+                required
                 className={classes.textField}
                 onChange={onTitleChange}
             />

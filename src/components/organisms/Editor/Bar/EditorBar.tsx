@@ -22,7 +22,7 @@ import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 const mapState = (state: RootState) => ({
     title: state.editor.attributes.title,
     context: state.editor.context,
-    canSave: editorSelectors.getSaveAvailability(state.editor)
+    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
 });
 
 const mapDispatch = {
@@ -60,7 +60,7 @@ const EditorBar: React.FC<ReduxProps> = (props) => {
     const {
         title,
         context,
-        canSave,
+        saveAvailability,
         openSaveDialog,
         closeEditor
     } = props;
@@ -83,12 +83,9 @@ const EditorBar: React.FC<ReduxProps> = (props) => {
     }, [context]);
 
     const onClose = React.useCallback(() => {
-        if (canSave) {
-            return openSaveDialog();
-        }
-
+        if (saveAvailability.hasNewProperties) return openSaveDialog();
         closeEditor();
-    }, [canSave, openSaveDialog, closeEditor]);
+    }, [saveAvailability, openSaveDialog, closeEditor]);
 
     return (
         <Toolbar className={classes.container}>

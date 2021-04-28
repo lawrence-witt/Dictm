@@ -5,6 +5,7 @@ import { ContentModels } from './types';
 
 import Recording from '../../../db/models/Recording';
 import Note from '../../../db/models/Note';
+import Category from "../../../db/models/Category";
 
 import { formatLongTimestamp, formatDuration } from '../../../lib/utils/formatTime';
 import { formatStringBytes } from '../../../lib/utils/formatFileSize';
@@ -14,65 +15,125 @@ const stringArraysEqual = (arr1: string[], arr2: string[]) => {
     return asSet.size === arr1.length && asSet.size === arr2.length;
 }
 
+const blankRecording = new Recording("");
+const blankNote = new Note("");
+const blankCategory = new Category("");
+
 /* 
 *   Decide whether the editing model can be saved.
 */
 
-export const getSaveAvailability = createSelector((editorState: RootState["editor"]) => {
-    const { attributes, context } = editorState;
+const isTitleValid = (editing: ContentModels) => {
+    return editing.attributes.title.length > 0;
+}
 
-    if (attributes.isSaving || !context || context.type === "choose") return false;
+const isTitleDifferent = (original: ContentModels, editing: ContentModels) => {
+    return original.attributes.title !== editing.attributes.title;
+}
 
-    const checkTitleDifferent = () => {
-        const originalTitle = context.data.original.attributes.title;
-        const editingTitle = context.data.editing.attributes.title;
-        return originalTitle !== editingTitle;
-    };
+const isCategoryDifferent = (original: Recording | Note, editing: Recording | Note) => {
+    return original.relationships.category.id !== editing.relationships.category.id;
+}
 
-    if (context.type === "category") {
-        const idsDifferent = (() => {
-            const originalRecordingIds = context.data.original.relationships.recordings.ids;
-            const editingRecordingIds = context.data.editing.relationships.recordings.ids;
-            const originalNoteIds = context.data.original.relationships.notes.ids;
-            const editingNoteIds = context.data.editing.relationships.notes.ids;
-
-            return (
-                !stringArraysEqual(originalRecordingIds, editingRecordingIds) || 
-                !stringArraysEqual(originalNoteIds, editingNoteIds)
-            );
-        })();
-
-        return checkTitleDifferent() || idsDifferent;
+const getRecordingSaveAvailability = ( 
+    original: Recording | undefined, 
+    editing: Recording
+) => {
+    if (!original) original = blankRecording;
+    
+    const isDataDifferent = (original: Recording, editing: Recording) => {
+        const originalModified = original.data.audio.attributes.timestamps.modified;
+        const editingModified = editing.data.audio.attributes.timestamps.modified;
+        return originalModified !== editingModified;
     }
 
-    const checkCategoryDifferent = () => {
-        const originalCategory = context.data.original.relationships.category?.id;
-        const editingCategory = context.data.editing.relationships.category?.id;
-        return originalCategory !== editingCategory;
+    const hasNewProperties = (
+        isTitleDifferent(original, editing) ||
+        isCategoryDifferent(original, editing) ||
+        isDataDifferent(original, editing)
+    );
+
+    const hasRequiredProperties = isTitleValid(editing) && hasNewProperties;
+
+    return { hasRequiredProperties, hasNewProperties };
+}
+
+const getNoteSaveAvailability = (
+    original: Note | undefined, 
+    editing: Note
+) => {
+    if (!original) original = blankNote;
+
+    const isDataDifferent = (original: Note, editing: Note) => {
+        return original.data.content !== editing.data.content;
     }
 
-    if (context.type === "recording") {
-        const audioDifferent = (() => {
-            const originalMod = context.data.original.data.audio.attributes.timestamps.modified;
-            const editingMod = context.data.editing.data.audio.attributes.timestamps.modified;
-            return originalMod !== editingMod;
-        })();
+    const hasNewProperties = (
+        isTitleDifferent(original, editing) ||
+        isCategoryDifferent(original, editing) ||
+        isDataDifferent(original, editing)
+    );
 
-        return checkTitleDifferent() || checkCategoryDifferent() || audioDifferent;
+    const hasRequiredProperties = isTitleValid(editing) && hasNewProperties;
+
+    return { hasRequiredProperties, hasNewProperties };
+}
+
+const getCategorySaveAvailability = (
+    original: Category | undefined, 
+    editing: Category
+) => {
+    if (!original) original = blankCategory;
+
+    const isDataDifferent = (original: Category, editing: Category) => {
+        const originalRecordingIds = original.relationships.recordings.ids;
+        const editingRecordingIds = editing.relationships.recordings.ids;
+        const originalNoteIds = original.relationships.notes.ids;
+        const editingNoteIds = editing.relationships.notes.ids;
+
+        return (
+            !stringArraysEqual(originalRecordingIds, editingRecordingIds) ||
+            !stringArraysEqual(originalNoteIds, editingNoteIds)
+        )
     }
 
-    if (context.type === "note") {
-        const textDifferent = (() => {
-            const originalText = context.data.original.data.content;
-            const editingText = context.data.editing.data.content;
-            return originalText !== editingText;
-        })();
+    const hasNewProperties = (
+        isTitleDifferent(original, editing) ||
+        isDataDifferent(original, editing)
+    )
 
-        return checkTitleDifferent() || checkCategoryDifferent() || textDifferent;
+    const hasRequiredProperties = isTitleValid(editing) && hasNewProperties;
+
+    return { hasRequiredProperties, hasNewProperties };
+}
+
+export const getSaveAvailability = createSelector((
+    contentState: RootState["content"], 
+    editorState: RootState["editor"]
+) => {
+    const { recordings, notes, categories } = contentState;
+    const { attributes: { isSaving }, context } = editorState;
+
+    const defaultAvailability = {
+        hasRequiredProperties: false,
+        hasNewProperties: false
     }
 
-    return false;
-}, canSave => canSave);
+    if (isSaving || !context || context.type === "choose") return defaultAvailability;
+
+    const contentId = context.model.id;
+
+    switch (context.type) {
+        case "recording":
+            return getRecordingSaveAvailability(recordings.byId[contentId], context.model);
+        case "note":
+            return getNoteSaveAvailability(notes.byId[contentId], context.model);
+        case "category":
+            return getCategorySaveAvailability(categories.byId[contentId], context.model);
+        default:
+            return defaultAvailability;
+    }
+}, saveAvailability => saveAvailability);
 
 /* 
 *   Format the details of the editing model
@@ -174,11 +235,11 @@ export const getModelDetails = createSelector((
 
     switch(context.type) {
         case "recording": 
-            return createRecodingDetails(context.data.editing);
+            return createRecodingDetails(context.model);
         case "note":
-            return createNoteDetails(context.data.editing);
+            return createNoteDetails(context.model);
         case "category":
-            return createWrappedDetails(context.data.editing);
+            return createWrappedDetails(context.model);
         default:
             return []
     }

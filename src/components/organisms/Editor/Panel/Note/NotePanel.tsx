@@ -74,7 +74,8 @@ const NotePanel: React.FC<NotePanelProps & ReduxProps> = (props) => {
         <>
             <TextField
                 label="Title"
-                value={model.attributes.title} 
+                value={model.attributes.title}
+                required
                 fullWidth
                 onChange={onTitleChange}
             />
