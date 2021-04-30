@@ -10,6 +10,7 @@ interface CustomSelectProps {
     label: string;
     selected: string | undefined;
     options: {id: number | string, title: string}[];
+    disabled?: boolean;
     fullWidth?: boolean;
     required?: boolean;
     onChange: (id: string | undefined) => void;
@@ -28,6 +29,7 @@ const CustomSelect: React.FC<CustomSelectProps> = (props) => {
         label,
         selected,
         options,
+        disabled,
         fullWidth,
         required,
         onChange
@@ -40,7 +42,7 @@ const CustomSelect: React.FC<CustomSelectProps> = (props) => {
     }, [onChange]);
 
     return (
-        <FormControl fullWidth={fullWidth} required={required}>
+        <FormControl disabled={disabled} fullWidth={fullWidth} required={required}>
             <InputLabel id="custom-select">
                 {label}
             </InputLabel>

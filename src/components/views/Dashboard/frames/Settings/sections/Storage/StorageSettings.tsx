@@ -7,8 +7,10 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Section from '../../../../../../molecules/Section/Section';
 import { SectionClasses } from '../../../../../../molecules/Section/Section.types';
-
+import FlexSpace from '../../../../../../atoms/FlexSpace/FlexSpace';
 import CustomSelect from '../../../../../../atoms/Inputs/CustomSelect';
+
+import { formatFileSize } from '../../../../../../../lib/utils/formatFileSize';
 
 interface StorageSettingsProps {
     baseClasses: SectionClasses;
@@ -34,6 +36,25 @@ const useStyles = makeStyles(theme => ({
             marginLeft: theme.spacing(2),
             marginBottom: theme.spacing(1)
         }
+    },
+    warnContainer: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        flexWrap: 'wrap',
+        marginBottom: -theme.spacing(1),
+        "& > p": {
+            marginRight: theme.spacing(2),
+            marginBottom: theme.spacing(1)
+        }
+    },
+    warnInputContainer: {
+        display: 'flex',
+        marginLeft: -theme.spacing(1),
+        "& > *": {
+            marginBottom: theme.spacing(1),
+            marginLeft: theme.spacing(1),
+        }
     }
 }))
 
@@ -45,6 +66,34 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
     } = props;
 
     const classes = useStyles();
+
+    const [manager, setManager] = React.useState({
+        supported: false,
+        persisted: false,
+        persistText: "Request Persistent Storage",
+        spaceText: "Calculating..."
+    });
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const { usage, quota } = await navigator.storage.estimate();
+                const persisted = await navigator.storage.persisted();
+                if (!usage || !quota) throw new Error();
+                setManager(m => ({
+                    supported: true,
+                    persisted,
+                    persistText: persisted ? "Persistent Storage Granted" : m.persistText,
+                    spaceText: formatFileSize(quota - usage) + " (approx.)"
+                }));
+            } catch {
+                setManager(m => ({
+                    ...m,
+                    spaceText: "Sorry, StorageManager in not supported in this browser!"
+                }));
+            }
+        })();
+    }, []);
 
     return (
         <Section
@@ -63,7 +112,12 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                     Selecting this option is permanent in current browsers, and will affect all other Dictm accounts on this browser.
                 </Typography>
                 <div className={classes.buttonContainer}>
-                    <Button variant="outlined">Request Persistent Storage</Button>
+                    <Button 
+                        disabled={!manager.supported || manager.persisted}
+                        variant="outlined"
+                    >
+                        {manager.persistText}
+                    </Button>
                 </div>
             </Section>
             <Section
@@ -72,28 +126,32 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                 classes={thresholdClasses}
             >
                 <Typography>
-                    Get a notification when the browser&apos;s remaining storage space drops below a certain threshold.
+                    Get a notification when the browser&apos;s remaining storage space for this site drops below a certain threshold.
                 </Typography>
                 <Typography>
-                    Available storage space: 1.2GB (approx)
+                    Available storage space: <b>{manager.spaceText}</b>
                 </Typography>
-                {/* Cant have inputs inside p */}
-                <Typography>
-                    Warn me at:
-                    <TextField 
-                        required
-                        label="Value"
-                        type="number"
-                        value={500}
-                    />
-                    <CustomSelect
-                        required
-                        label="Unit"
-                        selected="Bytes"
-                        options={byteOptions}
-                        onChange={() => ({})}
-                    />
-                </Typography>
+                <div className={classes.warnContainer}>
+                    <Typography>Warn me at:</Typography>
+                    <FlexSpace/>
+                    <div className={classes.warnInputContainer}>
+                        <TextField 
+                            disabled={!manager.supported}
+                            required
+                            label="Value"
+                            type="number"
+                            value={500}
+                        />
+                        <CustomSelect
+                            disabled={!manager.supported}
+                            required
+                            label="Unit"
+                            selected="Bytes"
+                            options={byteOptions}
+                            onChange={() => ({})}
+                        />
+                    </div>
+                </div>
             </Section>
         </Section>
     )

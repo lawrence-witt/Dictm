@@ -1,4 +1,4 @@
-export const formatByteLength = (bytes: number, decimals = 2): string => {
+export const formatFileSize = (bytes: number, decimals = 2): string => {
     if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
@@ -11,5 +11,5 @@ export const formatByteLength = (bytes: number, decimals = 2): string => {
 }
 
 export const formatStringBytes = (data: string): string => {
-    return formatByteLength(new TextEncoder().encode(data).length);
+    return formatFileSize(new TextEncoder().encode(data).length);
 }
