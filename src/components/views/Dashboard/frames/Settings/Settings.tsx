@@ -1,7 +1,5 @@
 import React from 'react';
 
-import clsx from 'clsx';
-
 import Link from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core';
@@ -10,20 +8,6 @@ import UserSettings from './sections/User/UserSettings';
 import DisplaySettings from './sections/Display/DisplaySettings';
 import StorageSettings from './sections/Storage/StorageSettings';
 import DataSettings from './sections/Data/DataSettings';
-
-/* scrollMenu: {
-    position: 'sticky',
-    float: 'right',
-    top: theme.spacing(2),
-    right: theme.spacing(2),
-    display: 'flex',
-    flexDirection: 'column',
-
-    "& > a": {
-        cursor: "pointer",
-        marginBottom: theme.spacing(1)
-    }
-}, */
 
 const useStyles = makeStyles(theme => ({
     scrollContainer: {
@@ -66,13 +50,6 @@ const useStyles = makeStyles(theme => ({
     doublePadding: {
         paddingBottom: theme.spacing(2)
     },
-    persistenceColumn: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    persistenceButton: {
-        marginTop: theme.spacing(1)
-    },
     sectionContent: {
         "& > *:not(:last-child)": {
             paddingBottom: theme.spacing(1)
@@ -101,13 +78,7 @@ const SettingsTemplate: React.FC = () => {
 
     // Classes for nested Section components
 
-    const persistenceSectionClasses = React.useMemo(() => ({
-        root: classes.doublePadding,
-        header: classes.singlePadding,
-        content: clsx(classes.sectionContent, classes.persistenceColumn)
-    }), [classes]);
-
-    const deleteResourcesSectionClasses = React.useMemo(() => ({
+    const defaultSectionClasses = React.useMemo(() => ({
         root: classes.doublePadding,
         header: classes.singlePadding,
         content: classes.sectionContent
@@ -129,38 +100,42 @@ const SettingsTemplate: React.FC = () => {
         ref.current.scrollIntoView({behavior: "smooth"})
     }, []);
 
+    const scrollMenu = (
+        <div className={classes.scrollMenu}>
+            <Link
+                onClick={() => scrollHandler(userRef)}
+                color="inherit"
+                variant="body1"
+            >
+                User
+            </Link>
+            <Link
+                color="inherit"
+                variant="body1"
+                onClick={() => scrollHandler(displayRef)}
+            >
+                Display
+            </Link>
+            <Link
+                color="inherit"
+                variant="body1"
+                onClick={() => scrollHandler(storageRef)}
+            >
+                Storage
+            </Link>
+            <Link
+                color="inherit"
+                variant="body1"
+                onClick={() => scrollHandler(dataRef)}
+            >
+                Data
+            </Link>
+        </div>
+    )
+
     return (
         <div className={classes.scrollContainer}>
-            <div className={classes.scrollMenu}>
-                <Link
-                    onClick={() => scrollHandler(userRef)}
-                    color="inherit"
-                    variant="body1"
-                >
-                    User
-                </Link>
-                <Link
-                    color="inherit"
-                    variant="body1"
-                    onClick={() => scrollHandler(displayRef)}
-                >
-                    Display
-                </Link>
-                <Link
-                    color="inherit"
-                    variant="body1"
-                    onClick={() => scrollHandler(storageRef)}
-                >
-                    Storage
-                </Link>
-                <Link
-                    color="inherit"
-                    variant="body1"
-                    onClick={() => scrollHandler(dataRef)}
-                >
-                    Data
-                </Link>
-            </div>
+            {scrollMenu}
             <div className={classes.sectionsContainer}>
                 <span ref={userRef}></span>
                 <UserSettings
@@ -177,14 +152,14 @@ const SettingsTemplate: React.FC = () => {
                 <span ref={storageRef}></span>
                 <StorageSettings
                     baseClasses={midSectionClasses}
-                    persistenceClasses={persistenceSectionClasses}
+                    persistenceClasses={defaultSectionClasses}
                     thresholdClasses={lastOfTypeSectionClasses}
                 />
                 <div className={classes.spacer}></div>
                 <span ref={dataRef}></span>
                 <DataSettings
                     baseClasses={bottomSectionClasses}
-                    deleteResourcesClasses={deleteResourcesSectionClasses}
+                    deleteResourcesClasses={defaultSectionClasses}
                     deleteUserClasses={lastOfTypeSectionClasses}
                 />
             </div>

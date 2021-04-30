@@ -1,9 +1,8 @@
 import React from 'react';
 
-import clsx from 'clsx';
-
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
 
 import Section from '../../../../../../molecules/Section/Section';
 import { SectionClasses } from '../../../../../../molecules/Section/Section.types';
@@ -14,6 +13,21 @@ interface DataSettingsProps {
     deleteUserClasses: SectionClasses;
 }
 
+const useStyles = makeStyles(theme => ({
+    buttonContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        marginLeft: -theme.spacing(2),
+        marginBottom: -theme.spacing(1),
+
+        "& button": {
+            marginLeft: theme.spacing(2),
+            marginBottom: theme.spacing(1)
+        }
+    }
+}))
+
 const DataSettings: React.FC<DataSettingsProps> = (props) => {
     const {
         baseClasses,
@@ -21,7 +35,7 @@ const DataSettings: React.FC<DataSettingsProps> = (props) => {
         deleteUserClasses
     } = props;
 
-    console.log(deleteResourcesClasses);
+    const classes = useStyles();
 
     return (
         <Section
@@ -36,7 +50,7 @@ const DataSettings: React.FC<DataSettingsProps> = (props) => {
                 <Typography>
                     Delete all resources of a particular type from this account.
                 </Typography>
-                <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+                <div className={classes.buttonContainer}>
                     <Button variant="outlined">Delete Recordings</Button>
                     <Button variant="outlined">Delete Notes</Button>
                     <Button variant="outlined">Delete Categories</Button>
@@ -50,7 +64,9 @@ const DataSettings: React.FC<DataSettingsProps> = (props) => {
                 <Typography>
                     Delete this account and all its associated resources.
                 </Typography>
-                <Button variant="outlined">Delete User</Button>
+                <div className={classes.buttonContainer}>
+                    <Button variant="outlined">Delete User</Button>
+                </div>
             </Section>
         </Section>
     )

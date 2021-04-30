@@ -23,9 +23,17 @@ const byteOptions = [
 ];
 
 const useStyles = makeStyles(theme => ({
-    persistenceButton: {
-        alignSelf: 'flex-end',
-        marginTop: theme.spacing(1)
+    buttonContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-end',
+        marginLeft: -theme.spacing(2),
+        marginBottom: -theme.spacing(1),
+
+        "& button": {
+            marginLeft: theme.spacing(2),
+            marginBottom: theme.spacing(1)
+        }
     }
 }))
 
@@ -54,12 +62,9 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                 <Typography>
                     Selecting this option is permanent in current browsers, and will affect all other Dictm accounts on this browser.
                 </Typography>
-                <Button
-                    variant="outlined"
-                    className={classes.persistenceButton}
-                >
-                    Request Persistent Storage
-                </Button>
+                <div className={classes.buttonContainer}>
+                    <Button variant="outlined">Request Persistent Storage</Button>
+                </div>
             </Section>
             <Section
                 title="Threshold"
