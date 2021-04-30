@@ -56,7 +56,14 @@ const useStyles = makeStyles(theme => ({
             marginLeft: theme.spacing(1),
         }
     }
-}))
+}));
+
+const storageManagerSupported = (
+    navigator.storage &&
+    Boolean(navigator.storage.estimate) &&
+    Boolean(navigator.storage.persist) &&
+    Boolean(navigator.storage.persisted)
+);
 
 const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
     const {
@@ -70,29 +77,36 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
     const [manager, setManager] = React.useState({
         supported: false,
         persisted: false,
-        persistText: "Request Persistent Storage",
-        spaceText: "Calculating..."
+        availableSpace: "Calculating..."
     });
 
     React.useEffect(() => {
         (async () => {
-            try {
-                const { usage, quota } = await navigator.storage.estimate();
-                const persisted = await navigator.storage.persisted();
-                if (!usage || !quota) throw new Error();
-                setManager(m => ({
-                    supported: true,
-                    persisted,
-                    persistText: persisted ? "Persistent Storage Granted" : m.persistText,
-                    spaceText: formatFileSize(quota - usage) + " (approx.)"
-                }));
-            } catch {
-                setManager(m => ({
-                    ...m,
-                    spaceText: "Sorry, StorageManager in not supported in this browser!"
-                }));
-            }
+            const notSupported = () => setManager(m => ({
+                ...m,
+                availableSpace: "Sorry, StorageManager in not supported in this browser!"
+            }))
+
+            if (!storageManagerSupported) { notSupported(); return; }
+
+            const { usage, quota } = await navigator.storage.estimate();
+            const persisted = await navigator.storage.persisted();
+
+            if (!usage || !quota) { notSupported(); return; }
+
+            setManager({
+                supported: true,
+                persisted,
+                availableSpace: formatFileSize(quota - usage) + " (approx.)"
+            });
         })();
+    }, []);
+
+    const handlePersistenceRequest = React.useCallback(async () => {
+        if (storageManagerSupported) {
+            const persisted = await navigator.storage.persist();
+            setManager(m => ({ ...m, persisted }));
+        }
     }, []);
 
     return (
@@ -109,14 +123,18 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                     In the unlikely event that your browser runs out of storage space, it may delete locally stored resources at random to make room. If you would like to tell the browser not to delete resources owned by this site, click the button below.
                 </Typography>
                 <Typography>
-                    Selecting this option is permanent in current browsers, and will affect all other Dictm accounts on this browser.
+                    Selecting this option will affect all other Dictm accounts on this browser.
                 </Typography>
                 <div className={classes.buttonContainer}>
                     <Button 
                         disabled={!manager.supported || manager.persisted}
                         variant="outlined"
+                        onClick={handlePersistenceRequest}
                     >
-                        {manager.persistText}
+                        {manager.persisted ? 
+                            "Persistent Storage Granted" : 
+                            "Request Persistent Storage"
+                        }
                     </Button>
                 </div>
             </Section>
@@ -129,7 +147,7 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                     Get a notification when the browser&apos;s remaining storage space for this site drops below a certain threshold.
                 </Typography>
                 <Typography>
-                    Available storage space: <b>{manager.spaceText}</b>
+                    Available storage space: <b>{manager.availableSpace}</b>
                 </Typography>
                 <div className={classes.warnContainer}>
                     <Typography>Warn me at:</Typography>
