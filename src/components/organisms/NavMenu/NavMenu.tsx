@@ -21,7 +21,7 @@ import { NavMenuState } from './NavMenu.types';
 const mapState = (state: RootState, props: RouteComponentProps) => ({
     isMenuOpen: state.tools.menu.isOpen,
     navLists: toolSelectors.getNavLists(
-        state.user, state.content.categories, props.history.push
+        state.user.profile, state.content.categories, props.history.push
     )
 });
 
@@ -59,6 +59,7 @@ const refreshMenu = (
 ): NavMenuState => {
     return {
         ...m,
+        names: m.ids.map(id => lists[id].name),
         list: lists[m.ids[m.ids.length-1]],
         animation: {
             ...m.animation,

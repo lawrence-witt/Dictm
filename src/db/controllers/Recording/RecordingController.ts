@@ -100,7 +100,7 @@ export const updateRecording = (
 // DELETE
 
 export const _deleteRecording = (
-    deleteFn: typeof CommonController["deleteModel"],
+    deleteFn: typeof CommonController["deleteModelById"],
     updateCategoryFn: typeof CommonController["updateCategoryMedia"]
 ) => {
     return (id: string): Promise<CategoriesReturn> => {
@@ -123,7 +123,7 @@ export const _deleteRecording = (
 export const deleteRecording = (
     id: string
 ): Promise<CategoriesReturn> => {
-    return _deleteRecording(CommonController.deleteModel, CommonController.updateCategoryMedia)(id);
+    return _deleteRecording(CommonController.deleteModelById, CommonController.updateCategoryMedia)(id);
 }
 
 export const _deleteRecordings = (

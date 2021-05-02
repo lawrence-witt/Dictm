@@ -21,11 +21,9 @@ const useStyles = makeStyles(() => ({
     }
 }));
 
-function Slider<
-    T extends {[key: string]: any}
->(
+const Slider = <T extends {[key: string]: any}>(
     props: React.PropsWithChildren<types.SliderProps<T>>
-): JSX.Element | null {
+): JSX.Element | null => {
     const {
         disabled = false,
         enter = 'left',

@@ -1,17 +1,24 @@
 import User from '../../../db/models/User';
 
 export const USER_LOADED    = "dictm/user/LOADED";
-export const USER_CLEARED   = "dictm/user/CLEARED"
+export const USER_UPDATED   = "dictm/user/UPDATED";
+export const USER_CLEARED   = "dictm/user/CLEARED";
 
-export interface UserState {
-    isLoaded: boolean;
-    profile: User;
+export type UserState = {
+    profile: User | undefined;
 }
 
 export interface UserLoadedAction {
     type: typeof USER_LOADED;
     payload: {
-        profile: User;
+        user: User;
+    }
+}
+
+export interface UserUpdatedAction {
+    type: typeof USER_UPDATED;
+    payload: {
+        user: User;
     }
 }
 
@@ -21,14 +28,5 @@ export interface UserClearedAction {
 
 export type UserActionTypes = 
 |   UserLoadedAction
+|   UserUpdatedAction
 |   UserClearedAction;
-
-export interface UserSession {
-    user: {
-        id: string;
-    };
-    timestamps: {
-        created: number;
-        modified: number;
-    }
-}

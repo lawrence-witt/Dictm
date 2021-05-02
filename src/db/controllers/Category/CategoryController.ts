@@ -173,7 +173,7 @@ export const updateCategory = (category: Category): Promise<ResourceReturn> => {
 // DELETE
 
 export const _deleteCategory = (
-    deleteFn: typeof CommonController["deleteModel"],
+    deleteFn: typeof CommonController["deleteModelById"],
     updateMediaFn: typeof CommonController["updateMediaCategory"]
 ) => {
     return (id: string): Promise<MediaReturn> => {
@@ -199,7 +199,7 @@ export const _deleteCategory = (
 }
 
 export const deleteCategory = (id: string): Promise<MediaReturn> => {
-    return _deleteCategory(CommonController.deleteModel, CommonController.updateMediaCategory)(id);
+    return _deleteCategory(CommonController.deleteModelById, CommonController.updateMediaCategory)(id);
 }
 
 export const _deleteCategories = (

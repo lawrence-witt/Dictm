@@ -38,7 +38,11 @@ export const insertUser = (user: User): Promise<User> => {
 
 // UPDATE
 
-/* 
+export const updateUser = async (user: User): Promise<User> => {
+    return (await CommonController.updateModel("users", user))["current"];
+}
+
+/**
 *   Summary:
 *   Repairs broken links between a User's resources.
 *

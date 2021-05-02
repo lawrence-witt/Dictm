@@ -1,31 +1,58 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { userOperations } from '../../../../../../../redux/ducks/user';
 
 import Typography from '@material-ui/core/Typography';
 
 import Section from '../../../../../../molecules/Section/Section';
-import { SectionClasses } from '../../../../../../molecules/Section/Section.types';
-
 import CustomSelect from '../../../../../../atoms/Inputs/CustomSelect';
 
-interface DisplaySettingsProps {
-    baseClasses: SectionClasses;
-    sortClasses: SectionClasses;
+import * as types from './DisplaySettings.types';
+
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    updateDisplaySort: userOperations.updateUserDisplaySort
 }
 
-const orderOptions = [
-    {id: "createdDesc", title: "Created date (newest first)"},
-    {id: "createdAsc", title: "Created date (oldest first)"},
-    {id: "modifiedDesc", title: "Last Modified date (newest first)"},
-    {id: "modifiedAsc", title: "Last Modified date (oldest first)"},
-    {id: "alphaDesc", title: "Alphabetically (A > Z)"},
-    {id: "alphaAsc", title: "Alphabetically (Z > A)"}
-];
+const connector = connect(null, mapDispatch);
 
-const DisplaySettings: React.FC<DisplaySettingsProps> = (props) => {
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
+
+const DisplaySettings: React.FC<types.DisplaySettingsProps & ReduxProps> = (props) => {
     const {
         baseClasses,
-        sortClasses
+        sortClasses,
+        sortOrders,
+        updateDisplaySort
     } = props;
+
+    const handleChangeResourceOrder = React.useCallback((type: types.ViewKeys, id: types.SortOrderKeys) => {
+        updateDisplaySort(type, id);
+    }, [updateDisplaySort]);
+
+    const handleChangeRecordingsOrder = React.useCallback((id: types.SortOrderKeys) => {
+        handleChangeResourceOrder("recordings", id);
+    }, [handleChangeResourceOrder]);
+    
+    const handleChangeNotesOrder = React.useCallback((id: types.SortOrderKeys) => {
+        handleChangeResourceOrder("notes", id);
+    }, [handleChangeResourceOrder]);
+
+    const handleChangeCategoriesOrder = React.useCallback((id: types.SortOrderKeys) => {
+        handleChangeResourceOrder("categories", id);
+    }, [handleChangeResourceOrder]);
+
+    const handleChangeMixedOrder = React.useCallback((id: types.SortOrderKeys) => {
+        handleChangeResourceOrder("mixed", id);
+    }, [handleChangeResourceOrder]);
 
     return (
         <Section
@@ -44,37 +71,37 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = (props) => {
                     fullWidth
                     label="Recordings"
                     required
-                    selected={""}
-                    options={orderOptions}
-                    onChange={() => { console.log('d') }}
+                    selected={sortOrders.recordings}
+                    options={types.orderOptions}
+                    onChange={handleChangeRecordingsOrder}
                 />
                 <CustomSelect
                     fullWidth
                     label="Notes"
                     required
-                    selected={""}
-                    options={orderOptions}
-                    onChange={() => { console.log('d') }}
+                    selected={sortOrders.notes}
+                    options={types.orderOptions}
+                    onChange={handleChangeNotesOrder}
                 />
                 <CustomSelect
                     fullWidth
                     label="Categories"
                     required
-                    selected={""}
-                    options={orderOptions}
-                    onChange={() => { console.log('d') }}
+                    selected={sortOrders.categories}
+                    options={types.orderOptions}
+                    onChange={handleChangeCategoriesOrder}
                 />
                 <CustomSelect
                     fullWidth
                     label="Mixed Category"
                     required
-                    selected={""}
-                    options={orderOptions}
-                    onChange={() => { console.log('d') }}
+                    selected={sortOrders.mixed}
+                    options={types.orderOptions}
+                    onChange={handleChangeMixedOrder}
                 />
             </Section>
         </Section>
     )
 }
 
-export default DisplaySettings;
+export default connector(DisplaySettings);

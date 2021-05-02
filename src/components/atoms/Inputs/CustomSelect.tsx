@@ -6,14 +6,19 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import { makeStyles } from '@material-ui/core/styles';
 
-interface CustomSelectProps {
+interface CustomSelectOption {
+    id: number | string;
+    title: string
+}
+
+interface CustomSelectProps<O extends CustomSelectOption[], R extends boolean> {
     label: string;
     selected: string | undefined;
-    options: {id: number | string, title: string}[];
+    options: O;
     disabled?: boolean;
     fullWidth?: boolean;
-    required?: boolean;
-    onChange: (id: string | undefined) => void;
+    required?: R;
+    onChange: (id: O[number]["id"] | (R extends false | undefined ? undefined : never)) => void;
 }
 
 const useSelectStyles = makeStyles(() => ({
@@ -24,7 +29,9 @@ const useSelectStyles = makeStyles(() => ({
     }
 }));
 
-const CustomSelect: React.FC<CustomSelectProps> = (props) => {
+const CustomSelect = <O extends CustomSelectOption[], R extends boolean>(
+    props: React.PropsWithChildren<CustomSelectProps<O, R>>
+): JSX.Element => {
     const {
         label,
         selected,
@@ -38,7 +45,10 @@ const CustomSelect: React.FC<CustomSelectProps> = (props) => {
     const classes = useSelectStyles();
 
     const onOptionChange = React.useCallback((ev: React.ChangeEvent<{value: unknown}>) => {
-        onChange(ev.target.value as string);
+        const { value } = ev.target;
+        if (typeof value === "string" || typeof value === "number" || typeof value === "undefined") {
+            onChange(value as Parameters<typeof onChange>[0]);
+        }
     }, [onChange]);
 
     return (

@@ -14,15 +14,7 @@ const { createCategory, updateCategory } = categoryOperations;
 
 /** 
 *  Summary 
-*  Opens the editor modal.
-*
-*  Description 
-*  Generates a new content model to match editorType if the contentId is "new".
-*  Validates model was created or found, and generates an editor context.
-*  Saves the editorType and contentId to sessionStorage to facilitate page reloading.
-*  
-*  @param {types.EditorTypes} editorType The type of editor panel which should be opened.
-*  @param {string} contentId Either a random string identifying the content or "new".
+*  Opens the editor modal with a new or existing content model.
 */
 
 export const openEditor = (
@@ -33,6 +25,8 @@ export const openEditor = (
     getState
 ) => {
     const { user, content } = getState();
+
+    if (!user.profile) return;
 
     const isNew = contentId === "new";
     let model: types.EditorModels | undefined;

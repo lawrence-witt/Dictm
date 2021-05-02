@@ -6,7 +6,7 @@ class User implements UserModel {
     id: string;
     type = "user" as const;
     attributes: UserModel["attributes"];
-    preferences: UserModel["preferences"];
+    settings: UserModel["settings"];
 
     constructor(name: string, greeting: string) {
         this.id = nanoid(10);
@@ -17,8 +17,24 @@ class User implements UserModel {
                 modified: Date.now()
             }
         }
-        this.preferences = {
-            greeting
+        this.settings = {
+            preferences: {
+                greeting
+            },
+            display: {
+                sort: {
+                    recordings: 'createdAsc',
+                    notes: 'createdAsc',
+                    categories: 'createdAsc',
+                    mixed: 'createdAsc'
+                }
+            },
+            storage: {
+                threshold: {
+                    value: 500,
+                    unit: "MB"
+                }
+            }
         }
     }
 }

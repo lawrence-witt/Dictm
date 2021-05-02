@@ -6,6 +6,7 @@ import UserController from '../../../db/controllers/User';
 import StorageService from '../../services/StorageService';
 
 import * as actions from './actions';
+import * as helpers from './helpers';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -20,13 +21,13 @@ const { notifyDatabaseError } = notificationsOperations;
 */
 
 export const loadUser = (
-    profile: User
+    user: User
 ): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
     const userData = await (async () => {
         try {
-            return await UserController.selectUserData(profile.id);
+            return await UserController.selectUserData(user.id);
         } catch (err) {
             dispatch(notifyDatabaseError(err.message));
         }
@@ -37,9 +38,165 @@ export const loadUser = (
     dispatch(recordingOperations.loadRecordings(userData.recordings));
     dispatch(noteOperations.loadNotes(userData.notes));
     dispatch(categoryOperations.loadCategories(userData.categories));
-    dispatch(actions.loadUser(profile));
+    dispatch(actions.loadUser(user));
 
-    StorageService.persistSession(profile.id);
+    StorageService.persistSession(user.id);
+}
+
+/* 
+*   Summary:
+*   Update a user model in db and redux store.
+*/
+
+export const updateUser = (
+    user: User
+): ThunkResult<Promise<any>> => async (
+    dispatch
+) => {
+    const updatedUser = await (async () => {
+        try {
+            return await UserController.updateUser(user);
+        } catch (err) {
+            dispatch(notifyDatabaseError(err.message));
+        }
+    })();
+
+    if (!updatedUser) return Promise.reject();
+
+    return dispatch(actions.updateUser(updatedUser));
+}
+
+/* 
+*   Summary:
+*   Update a user's name property
+*/
+
+export const updateUserName = (
+    name: string
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile) return;
+
+    const cloned = helpers.cloneUser(profile);
+    cloned.attributes.name = name;
+
+    dispatch(updateUser(cloned));
+}
+
+/* 
+*   Summary:
+*   Update a field from user's perference settings
+*/
+
+export const updateUserPreference = <
+    F extends keyof User["settings"]["preferences"],
+    V extends User["settings"]["preferences"][F]
+>(
+    field: F,
+    value: V
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile) return;
+
+    const cloned = helpers.cloneUser(profile);
+    cloned.settings.preferences[field] = value;
+
+    dispatch(updateUser(cloned));
+}
+
+/* 
+*   Summary:
+*   Update a field from user's display sort settings
+*/
+
+export const updateUserDisplaySort = <
+    F extends keyof User["settings"]["display"]["sort"],
+    V extends User["settings"]["display"]["sort"][F]
+>(
+    field: F,
+    value: V
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile) return;
+
+    const cloned = helpers.cloneUser(profile);
+    cloned.settings.display.sort[field] = value;
+
+    dispatch(updateUser(cloned));
+}
+
+/* 
+*   Summary:
+*   Update a field from user's storage threshold settings
+*/
+
+export const updateUserStorageThreshold = <
+    F extends keyof User["settings"]["storage"]["threshold"],
+    V extends User["settings"]["storage"]["threshold"][F]
+>(
+    field: F,
+    value: V
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile) return;
+
+    const cloned = helpers.cloneUser(profile);
+    cloned.settings.storage.threshold[field] = value;
+
+    dispatch(updateUser(cloned));
+}
+
+/* 
+*   Summary:
+*   Delete a user account and sign out of the application
+*/
+
+export const deleteUser = (
+    userId: string
+): ThunkResult<Promise<void>> => async (
+    dispatch,
+    getState
+) => {
+    //
+}
+
+/* 
+*   Summary:
+*   Delete user or user data of a particular type
+*/
+
+export const deleteUserData = (
+    type: "recordings" | "notes" | "categories" | "user"
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { recordings, notes, categories } = getState().content;
+
+    switch(type) {
+        case "recordings":
+            return dispatch(recordingOperations.deleteRecordings(recordings.allIds));
+        case "notes":
+            return dispatch(noteOperations.deleteNotes(notes.allIds));
+        case "categories":
+            return dispatch(categoryOperations.deleteCategories(categories.allIds));
+    }
 }
 
 /** 

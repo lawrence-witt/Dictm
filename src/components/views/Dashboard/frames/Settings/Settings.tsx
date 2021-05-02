@@ -1,13 +1,32 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
 
 import Link from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core';
 
+import { RootState } from '../../../../../redux/store';
+
 import UserSettings from './sections/User/UserSettings';
 import DisplaySettings from './sections/Display/DisplaySettings';
 import StorageSettings from './sections/Storage/StorageSettings';
 import DataSettings from './sections/Data/DataSettings';
+
+/* 
+*   Redux
+*/
+
+const mapState = (state: RootState) => ({
+    user: state.user.profile
+});
+
+const connector = connect(mapState);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useStyles = makeStyles(theme => ({
     scrollContainer: {
@@ -57,7 +76,11 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const SettingsTemplate: React.FC = () => {
+const SettingsTemplate: React.FC<ReduxProps> = (props) => {
+    const {
+        user
+    } = props;
+
     const classes = useStyles();
 
     // Classes for the top level Section components
@@ -100,38 +123,46 @@ const SettingsTemplate: React.FC = () => {
         ref.current.scrollIntoView({behavior: "smooth"})
     }, []);
 
+    const userScrollHandler = React.useCallback(() => { scrollHandler(userRef); }, [scrollHandler]);
+    const displayScrollHandler = React.useCallback(() => { scrollHandler(displayRef); }, [scrollHandler]);
+    const storageScrollHandler = React.useCallback(() => { scrollHandler(storageRef); }, [scrollHandler]);
+    const dataScrollHandler = React.useCallback(() => { scrollHandler(dataRef); }, [scrollHandler]);
+
+    const linkProps = React.useMemo(() => ({
+        color: 'inherit' as const,
+        variant: 'body1' as const
+    }), []);
+
     const scrollMenu = (
         <div className={classes.scrollMenu}>
             <Link
-                onClick={() => scrollHandler(userRef)}
-                color="inherit"
-                variant="body1"
+                {...linkProps}
+                onClick={userScrollHandler}
             >
                 User
             </Link>
             <Link
-                color="inherit"
-                variant="body1"
-                onClick={() => scrollHandler(displayRef)}
+                {...linkProps}
+                onClick={displayScrollHandler}
             >
                 Display
             </Link>
             <Link
-                color="inherit"
-                variant="body1"
-                onClick={() => scrollHandler(storageRef)}
+                {...linkProps}
+                onClick={storageScrollHandler}
             >
                 Storage
             </Link>
             <Link
-                color="inherit"
-                variant="body1"
-                onClick={() => scrollHandler(dataRef)}
+                {...linkProps}
+                onClick={dataScrollHandler}
             >
                 Data
             </Link>
         </div>
     )
+
+    if (!user) return null;
 
     return (
         <div className={classes.scrollContainer}>
@@ -140,6 +171,8 @@ const SettingsTemplate: React.FC = () => {
                 <span ref={userRef}></span>
                 <UserSettings
                     baseClasses={userSectionClasses}
+                    name={user.attributes.name}
+                    greeting={user.settings.preferences.greeting}
                 />
                 <Divider />
                 <div className={classes.spacer}></div>
@@ -147,6 +180,7 @@ const SettingsTemplate: React.FC = () => {
                 <DisplaySettings
                     baseClasses={midSectionClasses}
                     sortClasses={lastOfTypeSectionClasses}
+                    sortOrders={user.settings.display.sort}
                 />
                 <div className={classes.spacer}></div>
                 <span ref={storageRef}></span>
@@ -154,6 +188,8 @@ const SettingsTemplate: React.FC = () => {
                     baseClasses={midSectionClasses}
                     persistenceClasses={defaultSectionClasses}
                     thresholdClasses={lastOfTypeSectionClasses}
+                    thresholdValue={user.settings.storage.threshold.value}
+                    thresholdUnit={user.settings.storage.threshold.unit}
                 />
                 <div className={classes.spacer}></div>
                 <span ref={dataRef}></span>
@@ -167,4 +203,4 @@ const SettingsTemplate: React.FC = () => {
     )
 }
 
-export default SettingsTemplate;
+export default connector(SettingsTemplate);

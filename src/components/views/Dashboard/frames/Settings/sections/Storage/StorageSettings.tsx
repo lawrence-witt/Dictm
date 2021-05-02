@@ -1,4 +1,7 @@
 import React from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+
+import { userOperations } from '../../../../../../../redux/ducks/user';
 
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -6,23 +9,30 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Section from '../../../../../../molecules/Section/Section';
-import { SectionClasses } from '../../../../../../molecules/Section/Section.types';
 import FlexSpace from '../../../../../../atoms/FlexSpace/FlexSpace';
 import CustomSelect from '../../../../../../atoms/Inputs/CustomSelect';
 
+import useValidatedField from '../../../../../../../lib/hooks/useValidatedField';
+
 import { formatFileSize } from '../../../../../../../lib/utils/formatFileSize';
 
-interface StorageSettingsProps {
-    baseClasses: SectionClasses;
-    persistenceClasses: SectionClasses;
-    thresholdClasses: SectionClasses;
+import * as types from './StorageSettings.types';
+
+/* 
+*   Redux
+*/
+
+const mapDispatch = {
+    updateStorageTheshold: userOperations.updateUserStorageThreshold
 }
 
-const byteOptions = [
-    {id: "Bytes", title: "Bytes"},
-    {id: "MB", title: "MB"},
-    {id: "GB", title: "GB"}
-];
+const connector = connect(null, mapDispatch);
+
+type ReduxProps = ConnectedProps<typeof connector>;
+
+/* 
+*   Local
+*/
 
 const useStyles = makeStyles(theme => ({
     buttonContainer: {
@@ -55,6 +65,10 @@ const useStyles = makeStyles(theme => ({
             marginBottom: theme.spacing(1),
             marginLeft: theme.spacing(1),
         }
+    },
+    helperTextRoot: {
+        position: 'absolute',
+        top: '100%'
     }
 }));
 
@@ -65,11 +79,20 @@ const storageManagerSupported = (
     Boolean(navigator.storage.persisted)
 );
 
-const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
+const isValidInteger = (value: string) => {
+    const wholeNumbers = /^\d+$/;
+    if (!wholeNumbers.test(value)) throw "Threshold must be a whole number";
+    return true;
+}
+
+const StorageSettings: React.FC<types.StorageSettingsProps & ReduxProps> = (props) => {
     const {
         baseClasses,
         persistenceClasses,
-        thresholdClasses
+        thresholdClasses,
+        thresholdValue,
+        thresholdUnit,
+        updateStorageTheshold
     } = props;
 
     const classes = useStyles();
@@ -79,6 +102,8 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
         persisted: false,
         availableSpace: "Calculating..."
     });
+
+    /* Persistence */
 
     React.useEffect(() => {
         (async () => {
@@ -108,6 +133,34 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
             setManager(m => ({ ...m, persisted }));
         }
     }, []);
+
+    /* Threshold */
+
+    const onThresholdValueValidated = React.useCallback((value: string) => {
+        updateStorageTheshold("value", parseInt(value));
+    }, [updateStorageTheshold]);
+
+    const [thresholdValueField, setThresholdValueField, thresholdValueFieldError] = useValidatedField(
+        thresholdValue.toString(), isValidInteger, onThresholdValueValidated, 500
+    );
+
+    const [thresholdUnitField, setThresholdUnitField] = React.useState(thresholdUnit);
+
+    const handleThresholdValueChange = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>) => {
+        setThresholdValueField(ev.target.value);
+    }, [setThresholdValueField]);
+
+    const handleThresholdUnitChange = React.useCallback((id: types.ByteUnitKeys) => {
+        setThresholdUnitField(id);
+        updateStorageTheshold("unit", id);
+    }, [updateStorageTheshold]);
+
+    const formHelperProps = React.useMemo(() => ({
+        error: true,
+        classes: {
+            root: classes.helperTextRoot
+        }
+    }), [classes.helperTextRoot]);
 
     return (
         <Section
@@ -153,20 +206,23 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
                     <Typography>Warn me at:</Typography>
                     <FlexSpace/>
                     <div className={classes.warnInputContainer}>
-                        <TextField 
+                        <TextField
                             disabled={!manager.supported}
                             required
                             label="Value"
-                            type="number"
-                            value={500}
+                            onChange={handleThresholdValueChange}
+                            value={thresholdValueField}
+                            error={Boolean(thresholdValueFieldError)}
+                            helperText={thresholdValueFieldError}
+                            FormHelperTextProps={formHelperProps}
                         />
                         <CustomSelect
                             disabled={!manager.supported}
                             required
                             label="Unit"
-                            selected="Bytes"
-                            options={byteOptions}
-                            onChange={() => ({})}
+                            selected={thresholdUnitField}
+                            options={types.byteOptions}
+                            onChange={handleThresholdUnitChange}
                         />
                     </div>
                 </div>
@@ -175,4 +231,4 @@ const StorageSettings: React.FC<StorageSettingsProps> = (props) => {
     )
 }
 
-export default StorageSettings;
+export default connector(StorageSettings);

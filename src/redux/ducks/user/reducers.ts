@@ -1,22 +1,8 @@
 import * as types from './types';
 
 const initialState: types.UserState = {
-    isLoaded: false,
-    profile: {
-        id: "",
-        type: "user",
-        attributes: {
-            name: "",
-            timestamps: {
-                created: 0,
-                modified: 0
-            }
-        },
-        preferences: {
-            greeting: ""
-        }
-    }
-}
+    profile: undefined
+};
 
 const userReducer = (
     state = initialState, 
@@ -24,9 +10,9 @@ const userReducer = (
 ): types.UserState => {
     switch(action.type) {
         case types.USER_LOADED:
+        case types.USER_UPDATED:
             return {
-                isLoaded: true,
-                profile: action.payload.profile
+                profile: action.payload.user
             }
         case types.USER_CLEARED:
             return initialState;

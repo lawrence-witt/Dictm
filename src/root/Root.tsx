@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { RootState } from '../redux/store';
 import { historyOperations } from '../redux/ducks/history';
 import { authOperations } from '../redux/ducks/auth';
+import { userSelectors } from '../redux/ducks/user';
 
 import PublicRouter from './routers/PublicRouter';
 import PrivateRouter from './routers/PrivateRouter';
@@ -18,7 +19,7 @@ import Notifier from '../components/organisms/Notifier/Notifier';
 
 const mapState = (state: RootState) => ({
     appInitialised: state.auth.init.isInitialised,
-    userLoaded: state.user.isLoaded
+    userLoaded: userSelectors.getUserLoaded(state.user)
 })
 
 const mapDispatch = {

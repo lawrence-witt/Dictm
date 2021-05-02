@@ -3,11 +3,20 @@ import * as types from './types';
 import User from '../../../db/models/User';
 
 export const loadUser = (
-    profile: User
+    user: User
 ): types.UserLoadedAction => ({
     type: types.USER_LOADED,
     payload: {
-        profile
+        user
+    }
+});
+
+export const updateUser = (
+    user: User
+): types.UserUpdatedAction => ({
+    type: types.USER_UPDATED,
+    payload: {
+        user
     }
 });
 

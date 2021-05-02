@@ -168,7 +168,7 @@ export const updateCategoryMedia = (
 
 // DELETE
 
-export const deleteModel = <T extends keyof AllTables>(
+export const deleteModelById = <T extends keyof AllTables>(
     table: T,
     id: string
 ): Promise<AllTables[T]["returns"]> => {
@@ -179,4 +179,34 @@ export const deleteModel = <T extends keyof AllTables>(
 
         return existing;
     })
+}
+
+export const deleteModelsById = <T extends keyof AllTables>(
+    table: T,
+    ids: string[]
+): Promise<AllTables[T]["returns"][]> => {
+    return db.transaction('rw', db[table], async () => {
+        const collection = db[table].where("id").anyOf(ids);
+
+        collection.delete();
+
+        return collection.toArray();
+    });
+}
+
+export const deleteModelsByUserId = <T extends keyof ResourceTables>(
+    table: T,
+    userId: string
+): Promise<ResourceTables[T]["returns"][]> => {
+    const includedTables = [db.users, db[table]];
+
+    return db.transaction('rw', includedTables, async () => {
+        await validiateUser(userId);
+
+        const collection = db[table].where({"relationships.user.id": userId});
+    
+        collection.delete();
+    
+        return collection.toArray();
+    });
 }

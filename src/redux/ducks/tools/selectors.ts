@@ -104,7 +104,7 @@ export const getDashboardAnimation = createSelector((
 */
 
 export const getNavLists = createSelector((
-    user: RootState["user"], 
+    profile: RootState["user"]["profile"], 
     categories: RootState["content"]["categories"],
     push: RouteComponentProps["history"]["push"]
 ): types.NavMenuLists => {
@@ -112,7 +112,7 @@ export const getNavLists = createSelector((
 
     const mainList = {
         id: "main",
-        name: user.profile.attributes.name,
+        name: profile?.attributes.name || "",
         items: [
             createNavItem("recordings", "recordings", "Recordings", false, undefined, () => push('/recordings')),
             createNavItem("notes", "notes", "Notes", false, undefined, () => push('/notes')),

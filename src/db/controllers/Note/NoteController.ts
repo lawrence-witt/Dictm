@@ -96,7 +96,7 @@ export const updateNote = (note: Note): Promise<NoteAndCategoriesReturn> => {
 // DELETE
 
 export const _deleteNote = (
-    deleteFn: typeof CommonController["deleteModel"],
+    deleteFn: typeof CommonController["deleteModelById"],
     updateCategoryFn: typeof CommonController["updateCategoryMedia"]
 ) => {
     return (id: string): Promise<CategoriesReturn> => {
@@ -117,7 +117,7 @@ export const _deleteNote = (
 }
 
 export const deleteNote = (id: string): Promise<CategoriesReturn> => {
-    return _deleteNote(CommonController.deleteModel, CommonController.updateCategoryMedia)(id);
+    return _deleteNote(CommonController.deleteModelById, CommonController.updateCategoryMedia)(id);
 }
 
 export const _deleteNotes = (

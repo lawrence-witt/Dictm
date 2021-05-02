@@ -17,10 +17,10 @@ test("it deletes the model from the database", async done => {
     const expectedNote = seeded.notes[0];
     const expectedCategory = seeded.categories[0];
 
-    await CommonController.deleteModel("users", expectedUser.id);
-    await CommonController.deleteModel("recordings", expectedRecording.id);
-    await CommonController.deleteModel("notes", expectedNote.id);
-    await CommonController.deleteModel("categories", expectedCategory.id);
+    await CommonController.deleteModelById("users", expectedUser.id);
+    await CommonController.deleteModelById("recordings", expectedRecording.id);
+    await CommonController.deleteModelById("notes", expectedNote.id);
+    await CommonController.deleteModelById("categories", expectedCategory.id);
 
     const actualUser = await db.users.get(expectedUser.id);
     const actualRecording = await db.recordings.get(expectedRecording.id);
@@ -43,10 +43,10 @@ test("it returns the deleted model", async done => {
     const expectedNote = seeded.notes[0];
     const expectedCategory = seeded.categories[0];
 
-    const actualUser = await CommonController.deleteModel("users", expectedUser.id);
-    const actualRecording = await CommonController.deleteModel("recordings", expectedRecording.id);
-    const actualNote = await CommonController.deleteModel("notes", expectedNote.id);
-    const actualCategory = await CommonController.deleteModel("categories", expectedCategory.id);
+    const actualUser = await CommonController.deleteModelById("users", expectedUser.id);
+    const actualRecording = await CommonController.deleteModelById("recordings", expectedRecording.id);
+    const actualNote = await CommonController.deleteModelById("notes", expectedNote.id);
+    const actualCategory = await CommonController.deleteModelById("categories", expectedCategory.id);
     
     expect(actualUser).toEqual(expectedUser);
     expect(actualRecording).toEqual(expectedRecording);
@@ -58,7 +58,7 @@ test("it returns the deleted model", async done => {
 
 test("it throws an error if the model's id does not exist in its table", async done => {
     await expect(async () => {
-        await CommonController.deleteModel("recordings", "bad-id");
+        await CommonController.deleteModelById("recordings", "bad-id");
     }).rejects.toThrow("Recording does not exist.");
 
     done();
