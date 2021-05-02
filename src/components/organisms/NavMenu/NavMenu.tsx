@@ -4,6 +4,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
 import { toolSelectors, toolOperations, NavMenuLists } from '../../../redux/ducks/tools';
+import { userOperations } from '../../../redux/ducks/user';
 
 import { useBreakContext } from '../../../lib/hooks/useBreakpoints';
 
@@ -12,20 +13,24 @@ import HybridDrawer from '../../molecules/HybridDrawer/HybridDrawer';
 import NavMenuSwitch from './Switch/NavMenuSwitch';
 import NavMenuHeader from './Header/NavMenuHeader';
 
-import { NavMenuState } from './NavMenu.types';
+import * as types from './NavMenu.types';
 
 /* 
 *   Redux
 */
 
-const mapState = (state: RootState, props: RouteComponentProps) => ({
+const mapState = (state: RootState, props: RouteComponentProps & types.NavMenuProps) => ({
     isMenuOpen: state.tools.menu.isOpen,
     navLists: toolSelectors.getNavLists(
-        state.user.profile, state.content.categories, props.history.push
+        state.user.profile, 
+        state.content.categories,
+        props.history.push,
+        props.signOut
     )
 });
 
 const mapDispatch = {
+    clearUser: userOperations.clearUser,
     onToggleMenu: toolOperations.toggleNavMenu
 }
 
@@ -39,7 +44,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const createMenu = (
     lists: NavMenuLists
-): NavMenuState => {
+): types.NavMenuState => {
     const initial = lists[Object.keys(lists)[0]];
 
     return {
@@ -54,9 +59,9 @@ const createMenu = (
 }
 
 const refreshMenu = (
-    m: NavMenuState,
+    m: types.NavMenuState,
     lists: NavMenuLists
-): NavMenuState => {
+): types.NavMenuState => {
     return {
         ...m,
         names: m.ids.map(id => lists[id].name),
@@ -69,10 +74,10 @@ const refreshMenu = (
 }
 
 const nestMenu = (
-    m: NavMenuState,
+    m: types.NavMenuState,
     lists: NavMenuLists,
     to: string
-): NavMenuState => ({
+): types.NavMenuState => ({
     ids: [...m.ids, lists[to].id],
     names: [...m.names, lists[to].name],
     list: lists[to],
@@ -83,10 +88,10 @@ const nestMenu = (
 });
 
 const unNestMenu = (
-    m: NavMenuState,
+    m: types.NavMenuState,
     lists: NavMenuLists,
     levels: number
-): NavMenuState => {
+): types.NavMenuState => {
     if (m.ids.length - levels < 1) return m;
             
     const ids = m.ids.slice(0, m.ids.length - levels);
@@ -104,9 +109,9 @@ const unNestMenu = (
 }
 
 const resetMenu = (
-    m: NavMenuState,
+    m: types.NavMenuState,
     lists: NavMenuLists,
-): NavMenuState => ({
+): types.NavMenuState => ({
     ids: [m.ids[0]],
     names: [m.names[0]],
     list: lists[m.ids[0]],
@@ -125,7 +130,7 @@ const NavMenu: React.FC<ReduxProps> = (props) => {
 
     const breakpoints = useBreakContext();
 
-    const [menu, setMenu] = React.useState<NavMenuState>(() => createMenu(navLists));
+    const [menu, setMenu] = React.useState<types.NavMenuState>(() => createMenu(navLists));
 
     const onNest = React.useCallback((to: string) => {
         setMenu(m => nestMenu(m, navLists, to))

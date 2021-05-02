@@ -197,6 +197,7 @@ const SettingsTemplate: React.FC<ReduxProps> = (props) => {
                     baseClasses={bottomSectionClasses}
                     deleteResourcesClasses={defaultSectionClasses}
                     deleteUserClasses={lastOfTypeSectionClasses}
+                    userId={user.id}
                 />
             </div>
         </div>

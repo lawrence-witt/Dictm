@@ -5,6 +5,7 @@ import * as helpers from './helpers';
 import * as types from './types';
 
 import { RootState } from '../../store';
+import { userOperations } from '../user';
 
 /* 
 *  Page Selectors
@@ -106,7 +107,8 @@ export const getDashboardAnimation = createSelector((
 export const getNavLists = createSelector((
     profile: RootState["user"]["profile"], 
     categories: RootState["content"]["categories"],
-    push: RouteComponentProps["history"]["push"]
+    push: RouteComponentProps["history"]["push"],
+    signOut: () => void
 ): types.NavMenuLists => {
     const { createNavItem } = helpers;
 
@@ -118,7 +120,7 @@ export const getNavLists = createSelector((
             createNavItem("notes", "notes", "Notes", false, undefined, () => push('/notes')),
             createNavItem("categories", "categories", "Categories", false, "categories", () => push('/categories')),
             createNavItem("settings", "settings", "Settings", true, undefined, () => push('/settings')),
-            createNavItem("signout", "signout", "Sign Out", false, undefined, undefined)
+            createNavItem("signout", "signout", "Sign Out", false, undefined, signOut)
         ]
     }
 

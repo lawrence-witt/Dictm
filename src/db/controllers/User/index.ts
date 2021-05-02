@@ -4,7 +4,8 @@ import {
     selectUserData,
     insertUser,
     updateUser,
-    repairUserData
+    repairUserData,
+    deleteUser
 } from './UserController';
 
 export default {
@@ -13,5 +14,6 @@ export default {
     selectUserData,
     insertUser,
     updateUser,
-    repairUserData
+    repairUserData,
+    deleteUser
 }

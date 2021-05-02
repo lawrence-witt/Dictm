@@ -61,3 +61,9 @@ export const removeNotification = (
 ) => {
     dispatch(actions.removeNotification(key));
 }
+
+export const clearNotificiations = (): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(actions.clearNotifications());
+}

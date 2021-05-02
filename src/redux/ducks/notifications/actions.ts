@@ -26,3 +26,7 @@ export const removeNotification = (
         key
     }
 });
+
+export const clearNotifications = (): types.ClearNotificationsAction => ({
+    type: types.NOTIFICATIONS_CLEARED
+});

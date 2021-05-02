@@ -106,7 +106,7 @@ export const toggleDeleteResource = (
     dispatch(actions.toggleDeleteResource(bucket, id));
 }
 
-/* 
+/**
 *   Summary:
 *   Deletes the resources marked by the delete tool.
 */
@@ -134,4 +134,21 @@ export const commitDeleteTool = (): ThunkResult<Promise<void>> => async (
     .catch(() => {
         dispatch(actions.unsetDeleteToolDeleting());
     });
+}
+
+/* 
+*   Generic Operations
+*/
+
+/**
+*   Summary:
+*   Closes all tools
+*/
+
+export const closeTools = (): ThunkResult<Promise<void>> => async (
+    dispatch
+) => {
+    dispatch(actions.closeNavMenu());
+    dispatch(actions.closeSearchTool());
+    dispatch(actions.closeDeleteTool());
 }

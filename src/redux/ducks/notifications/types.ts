@@ -28,6 +28,7 @@ export { VariantType };
 export const NOTIFICATION_ADDED     = "dictm/notifications/NOTIFICATION_ADDED";
 export const NOTIFICATION_DISMISSED = "dictm/notifications/NOTIFICATION_DISMISSED";
 export const NOTIFICATION_REMOVED   = "dictm/notifications/NOTIFICATION_REMOVED";
+export const NOTIFICATIONS_CLEARED  = "dictm/notifications/NOTIFICATIONS_CLEARED";
 
 export interface NotificationsState {
     byKey: Record<string, Notification<boolean>>;
@@ -55,7 +56,12 @@ export interface RemoveNotificationAction {
     }
 }
 
+export interface ClearNotificationsAction {
+    type: typeof NOTIFICATIONS_CLEARED;
+}
+
 export type NotificationsActions =
 |   AddNotificationAction
 |   DismissNotificationAction
-|   RemoveNotificationAction;
+|   RemoveNotificationAction
+|   ClearNotificationsAction;

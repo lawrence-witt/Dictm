@@ -12,8 +12,10 @@ import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
 import { categoryOperations } from '../content/categories';
 import { notificationsOperations } from '../notifications';
+import { toolOperations } from '../tools';
+import { editorOperations } from '../editor';
 
-const { notifyDatabaseError } = notificationsOperations;
+const { notifyDatabaseError, notifyGenericError } = notificationsOperations;
 
 /** 
 *  Summary:
@@ -170,10 +172,15 @@ export const updateUserStorageThreshold = <
 export const deleteUser = (
     userId: string
 ): ThunkResult<Promise<void>> => async (
-    dispatch,
-    getState
+    dispatch
 ) => {
-    //
+    console.log(userId);
+    try {
+        await UserController.deleteUser(userId);
+        dispatch(clearUser());
+    } catch (err) {
+        dispatch(notifyGenericError([err.message]));
+    }
 }
 
 /* 
@@ -182,7 +189,7 @@ export const deleteUser = (
 */
 
 export const deleteUserData = (
-    type: "recordings" | "notes" | "categories" | "user"
+    type: "recordings" | "notes" | "categories"
 ): ThunkResult<void> => (
     dispatch,
     getState
@@ -201,16 +208,19 @@ export const deleteUserData = (
 
 /** 
 *  Summary:
-*  Clear a user and their data from the store
+*  Clear a user and their application data from the store
 */
 
 export const clearUser = (): ThunkResult<void> => (
     dispatch
 ) => {
+    dispatch(actions.clearUser());
     dispatch(recordingOperations.clearRecordings());
     dispatch(noteOperations.clearNotes());
     dispatch(categoryOperations.clearCategories());
-    dispatch(actions.clearUser());
+    dispatch(toolOperations.closeTools());
+    dispatch(editorOperations.clearEditor());
+    dispatch(notificationsOperations.clearNotificiations());
 
     StorageService.clearSession();
 }

@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { RootState } from '../../../redux/store';
 import { toolSelectors } from '../../../redux/ducks/tools';
+import { userOperations } from '../../../redux/ducks/user';
 
 import AppBar from '../../organisms/AppBar/AppBar';
 import NavBar from '../../organisms/NavBar/NavBar';
@@ -26,7 +27,11 @@ const mapState = (state: RootState) => ({
     transition: toolSelectors.getDashboardAnimation(state.content.categories, state.history)
 });
 
-const connector = connect(mapState);
+const mapDispatch = {
+    signOut: userOperations.clearUser
+}
+
+const connector = connect(mapState, mapDispatch);
 
 type ReduxProps = ConnectedProps<typeof connector>;
 
@@ -53,7 +58,8 @@ const useStyles = makeStyles(() => ({
 const Dashboard: React.FC<ReduxProps> = (props) => {
     const {
         location,
-        transition
+        transition,
+        signOut
     } = props;
 
     const classes = useStyles();
@@ -67,7 +73,7 @@ const Dashboard: React.FC<ReduxProps> = (props) => {
 
     return (
         <div className={classes.fixedBase}>
-            <NavMenu/>
+            <NavMenu signOut={signOut}/>
             <div className={classes.pageBase}>
                 <AppBar/>
                 <Slider 

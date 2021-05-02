@@ -102,3 +102,14 @@ export const repairUserData = (id: string): Promise<void> => {
 }
 
 // DELETE
+
+export const deleteUser = (userId: string): Promise<void> => {
+    const includedTables = [db.users, db.recordings, db.notes, db.categories];
+
+    return db.transaction('rw', includedTables, async () => {
+        await CommonController.deleteModelsByUserId("recordings", userId);
+        await CommonController.deleteModelsByUserId("notes", userId);
+        await CommonController.deleteModelsByUserId("categories", userId);
+        await CommonController.deleteModelById("users", userId);
+    });
+}

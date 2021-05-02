@@ -74,6 +74,7 @@ const Form: React.FC<FormProps & ReduxProps> = (props) => {
             />
             <CustomSelect 
                 label="Category"
+                fullWidth
                 selected={category}
                 options={categoryTitles}
                 onChange={onCategoryChange}

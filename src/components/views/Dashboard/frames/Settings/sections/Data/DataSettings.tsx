@@ -20,6 +20,7 @@ import * as types from './DataSettings.types';
 */
 
 const mapDispatch = {
+    deleteUser: userOperations.deleteUser,
     deleteUserData: userOperations.deleteUserData
 }
 
@@ -46,31 +47,35 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const DataSettingsModal: React.FC<types.DataSettingsModalProps & ReduxProps> = (props) => {
+const DataSettingsDialog: React.FC<types.DataSettingsDialogProps & ReduxProps> = (props) => {
     const {
         open,
         type,
+        userId,
         closeModal,
+        deleteUser,
         deleteUserData
     } = props;
 
     const modalText = React.useMemo(() => {
-        const lineTwo = " This action is irreversible.";
-
         switch(type) {
             case "recordings":
             case "notes":
             case "categories":
-                return `Are you sure you want to delete your ${type}?` + lineTwo;
+                return `Are you sure you want to delete your ${type}?`;
             case "user":
-                return 'Are you sure you want to delete this user?' + lineTwo;
+                return 'Are you sure you want to delete this user?';
         }
     }, [type]);
 
     const handleDeletionConfirmed = React.useCallback(() => {
-        deleteUserData(type);
+        if (type === "user") {
+            deleteUser(userId);
+        } else {
+            deleteUserData(type);
+        }
         closeModal();
-    }, [type, deleteUserData, closeModal]);
+    }, [type, userId, deleteUser, deleteUserData, closeModal]);
 
     return (
         <Dialog
@@ -100,18 +105,19 @@ const DataSettingsModal: React.FC<types.DataSettingsModalProps & ReduxProps> = (
     )
 };
 
-const ConnectedDataSettingsModal = connector(DataSettingsModal);
+const ConnectedDataSettingsDialog = connector(DataSettingsDialog);
 
 const DataSettings: React.FC<types.DataSettingsProps> = (props) => {
     const {
         baseClasses,
         deleteResourcesClasses,
-        deleteUserClasses
+        deleteUserClasses,
+        userId
     } = props;
 
     const classes = useStyles();
 
-    const [dataModal, setDataModal] = React.useState<types.DataSettingsModalState>({
+    const [dataModal, setDataModal] = React.useState<types.DataSettingsDialogState>({
         open: false,
         type: "recordings"
     });
@@ -139,10 +145,11 @@ const DataSettings: React.FC<types.DataSettingsProps> = (props) => {
 
     return (
         <>
-        <ConnectedDataSettingsModal 
+        <ConnectedDataSettingsDialog 
             open={open}
             type={type}
             closeModal={closeModal}
+            userId={userId}
         />
         <Section
             title="Data"

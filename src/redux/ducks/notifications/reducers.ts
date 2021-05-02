@@ -50,6 +50,8 @@ const notificationsReducer = (
                 allKeys: state.allKeys.filter(k => k !== key)
             };
         }
+        case types.NOTIFICATIONS_CLEARED:
+            return initialNotificationsState;
         default:
             return state;
     }

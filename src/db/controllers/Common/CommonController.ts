@@ -181,7 +181,7 @@ export const deleteModelById = <T extends keyof AllTables>(
     })
 }
 
-export const deleteModelsById = <T extends keyof AllTables>(
+/* export const deleteModelsById = <T extends keyof AllTables>(
     table: T,
     ids: string[]
 ): Promise<AllTables[T]["returns"][]> => {
@@ -192,7 +192,7 @@ export const deleteModelsById = <T extends keyof AllTables>(
 
         return collection.toArray();
     });
-}
+} */
 
 export const deleteModelsByUserId = <T extends keyof ResourceTables>(
     table: T,
@@ -203,10 +203,12 @@ export const deleteModelsByUserId = <T extends keyof ResourceTables>(
     return db.transaction('rw', includedTables, async () => {
         await validiateUser(userId);
 
-        const collection = db[table].where({"relationships.user.id": userId});
+        const getCollection = () => db[table].where({"relationships.user.id": userId})
+
+        const existing = await getCollection().toArray();
     
-        collection.delete();
+        await getCollection().delete();
     
-        return collection.toArray();
+        return existing;
     });
 }
