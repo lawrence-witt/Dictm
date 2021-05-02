@@ -11,15 +11,16 @@ import Category from '../../../db/models/Category';
 
 export const generateContentModel = (
     type: EditorModelTypes,
-    userId: string
+    userId: string,
+    newContentCategoryId?: string
 ): EditorModels => {
     switch(type) {
         case "choose":
-            return { type };
+            return { type, categoryId: newContentCategoryId };
         case "recording":
-            return new Recording(userId);
+            return new Recording(userId, newContentCategoryId);
         case "note":
-            return new Note(userId);
+            return new Note(userId, newContentCategoryId);
         case "category":
             return new Category(userId);
         default:
@@ -65,10 +66,6 @@ export const stampContentModel = <M extends ContentModels>(
 *   Create editor contexts
 */
 
-const generateChooseContext = (): EditorContexts["choose"] => ({
-    type: "choose"
-});
-
 const generateRecordingContext = (
     isNew: boolean,
     model: Recording
@@ -112,7 +109,7 @@ export function generateEditorContext(
 
     switch(model.type) {
         case "choose":
-            return {title, context: generateChooseContext()};
+            return {title, context: model};
         case "recording":
             return {title, context: generateRecordingContext(isNew, model)};
         case "note":

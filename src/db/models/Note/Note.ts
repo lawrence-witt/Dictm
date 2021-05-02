@@ -9,7 +9,7 @@ class Note implements NoteModel {
     data: NoteModel["data"];
     relationships: NoteModel["relationships"];
 
-    constructor(userId: string) {
+    constructor(userId: string, categoryId?: string) {
         this.id = nanoid(10);
         this.attributes = {
             title: "",
@@ -25,7 +25,7 @@ class Note implements NoteModel {
         };
         this.relationships = {
             user: { id: userId },
-            category: { id: undefined }
+            category: { id: categoryId }
         }
     }
 }

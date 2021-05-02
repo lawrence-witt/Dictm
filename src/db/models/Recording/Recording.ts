@@ -11,7 +11,7 @@ class Recording implements RecordingModel {
     data: RecordingModel["data"];
     relationships: RecordingModel["relationships"];
 
-    constructor(userId: string) {
+    constructor(userId: string, categoryId?: string) {
         this.id = nanoid(10);
         this.attributes = {
             title: "",
@@ -26,7 +26,7 @@ class Recording implements RecordingModel {
         }
         this.relationships = {
             user: { id: userId },
-            category: { id: undefined }
+            category: { id: categoryId }
         }
     }
 }

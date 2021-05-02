@@ -91,8 +91,6 @@ export const updateCategory = (
         updatedCategories
     } = data;
 
-    dispatch(actions.overwriteCategories(updatedCategories));
-
     if (updatedRecordings.length > 0) {
         dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
     }
@@ -100,6 +98,8 @@ export const updateCategory = (
     if (updatedNotes.length > 0) {
         dispatch(noteOperations.overwriteNotes(updatedNotes));
     }
+
+    return dispatch(actions.overwriteCategories(updatedCategories));
 }
 
 /** 
@@ -122,7 +122,7 @@ export const overwriteCategories = (
 
 export const deleteCategories = (
     ids: string[]
-): ThunkResult<Promise<void>> => async (
+): ThunkResult<Promise<any>> => async (
     dispatch
 ) => {
     if (ids.length === 0) return Promise.resolve();
@@ -139,8 +139,6 @@ export const deleteCategories = (
     
     const { updatedRecordings, updatedNotes } = data;
 
-    dispatch(actions.deleteCategories(ids));
-
     if (updatedRecordings.length > 0) {
         dispatch(recordingOperations.overwriteRecordings(updatedRecordings));
     }
@@ -148,6 +146,8 @@ export const deleteCategories = (
     if (updatedNotes.length > 0) {
         dispatch(noteOperations.overwriteNotes(updatedNotes));
     }
+
+    return dispatch(actions.deleteCategories(ids));
 }
 
 /** 

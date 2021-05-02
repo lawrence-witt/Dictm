@@ -67,7 +67,11 @@ const EditorPanelSwitch = React.memo(function EditorPanelSwitch(
 
     switch(context.type) {
         case "choose":
-            return <ChoosePanel />;
+            return (
+                <ChoosePanel 
+                    categoryId={context.categoryId}
+                />
+            );
         case "recording":
             return (
                 <RecordingPanel 

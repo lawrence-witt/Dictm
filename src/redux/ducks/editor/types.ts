@@ -17,6 +17,7 @@ export interface EditorContext<Model extends ContentModels> {
 
 export interface ChooseEditorContext {
     type: "choose";
+    categoryId?: string;
 }
 
 export type EditorContexts = {
@@ -98,7 +99,7 @@ export type ContentModelTypes = "recording" | "note" | "category";
 export type ContentModels = Recording | Note | Category;
 
 export type EditorModelTypes = "choose" | ContentModelTypes;
-export type EditorModels = { type: "choose" } | ContentModels;
+export type EditorModels = { type: "choose", categoryId?: string } | ContentModels;
 
 // Editor Reducer
 

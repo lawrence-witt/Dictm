@@ -45,11 +45,11 @@ export const createRecording = (
 
     const { recording: newRecording, updatedCategories } = data;
 
-    if (updatedCategories.length > 0) {
-        dispatch(categoryOperations.overwriteCategories(updatedCategories));
-    }
+    dispatch(actions.createRecording(newRecording));
 
-    return dispatch(actions.createRecording(newRecording));
+    if (updatedCategories.length > 0) {
+        return dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
 }
 
 /** 

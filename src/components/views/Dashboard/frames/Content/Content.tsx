@@ -106,7 +106,7 @@ const Content: React.FC<types.ContentTemplateProps & ReduxProps> = (props) => {
                 "category" as const
         }[context];
 
-        openEditor(editorType, "new");
+        openEditor(editorType, "new", categoryId);
     }, [context, categoryId, openEditor]);
 
     if (!contentList) {

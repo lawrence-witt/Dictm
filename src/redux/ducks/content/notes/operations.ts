@@ -47,11 +47,11 @@ export const createNote = (
 
     const { note: insertedNote, updatedCategories } = data;
 
-    if (updatedCategories.length > 0) {
-        dispatch(categoryOperations.overwriteCategories(updatedCategories));
-    }
+    dispatch(actions.createNote(insertedNote));
 
-    return dispatch(actions.createNote(insertedNote));
+    if (updatedCategories.length > 0) {
+        return dispatch(categoryOperations.overwriteCategories(updatedCategories));
+    }
 }
 
 /** 

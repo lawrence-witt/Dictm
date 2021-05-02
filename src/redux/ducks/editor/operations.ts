@@ -19,7 +19,8 @@ const { createCategory, updateCategory } = categoryOperations;
 
 export const openEditor = (
     editorType: types.EditorModelTypes,
-    contentId: string
+    contentId: string,
+    newContentCategoryId?: string
 ): ThunkResult<void> => (
     dispatch,
     getState
@@ -29,13 +30,14 @@ export const openEditor = (
     if (!user.profile) return;
 
     const isNew = contentId === "new";
-    let model: types.EditorModels | undefined;
 
-    if (editorType === "choose" || isNew) {
-        model = helpers.generateContentModel(editorType, user.profile.id);
-    } else {
-        model = helpers.findContentModel(content, editorType, contentId);
-    }
+    const model = (() => {
+        if (editorType === "choose" || isNew) {
+            return helpers.generateContentModel(editorType, user.profile.id, newContentCategoryId);
+        } else {
+            return helpers.findContentModel(content, editorType, contentId);
+        }
+    })();
 
     if (!model) return;
     

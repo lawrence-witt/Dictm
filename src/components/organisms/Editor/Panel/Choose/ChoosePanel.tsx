@@ -26,18 +26,19 @@ type ReduxProps = ConnectedProps<typeof connector>;
 *   Local
 */
 
-const ChoosePanel: React.FC<ReduxProps> = (props) => {
+const ChoosePanel: React.FC<ReduxProps & { categoryId?: string }> = (props) => {
     const {
-        openEditor
+        openEditor,
+        categoryId
     } = props;
 
     const onChooseRecording = React.useCallback(() => {
-        openEditor("recording", "new");
-    }, [openEditor]);
+        openEditor("recording", "new", categoryId);
+    }, [openEditor, categoryId]);
 
     const onChooseNote = React.useCallback(() => {
-        openEditor("note", "new");
-    }, [openEditor]);
+        openEditor("note", "new", categoryId);
+    }, [openEditor, categoryId]);
 
     return (
         <>
