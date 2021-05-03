@@ -71,13 +71,13 @@ const newUserReducer = (
     action: types.NewUserActions
 ): types.NewUserState => {
     switch (action.type) {
-        case types.NEW_USER_STARTED:
-            return initialNewUserState;
         case types.NEW_USER_UPDATED:
             return {
                 ...state,
                 [action.payload.key]: action.payload.value
             }
+        case types.NEW_USER_CLEARED:
+            return initialNewUserState;
         default:
             return state;
     }

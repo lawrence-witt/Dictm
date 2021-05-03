@@ -135,17 +135,6 @@ export const clearLocalUsers = (): ThunkResult<void> => (
 
 /** 
 *  Summary:
-*  Reset the new user state with fresh fields
-*/
-
-export const startNewUser = (): ThunkResult<void> => (
-    dispatch
-) => {
-    dispatch(actions.startNewUser());
-}
-
-/** 
-*  Summary:
 *  Update a field on the new user state
 */
 
@@ -156,6 +145,17 @@ export const updateNewUser = (
     dispatch
 ) => {
     dispatch(actions.updateNewUser(key, value));
+}
+
+/** 
+*   Summary:
+*   Clear the new user information from store
+*/
+
+export const clearNewUser = (): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(actions.clearNewUser());
 }
 
 /** 
@@ -184,4 +184,5 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
     if (!insertedUser) return;
 
     dispatch(userOperations.loadUser(insertedUser));
+    dispatch(clearNewUser());
 }

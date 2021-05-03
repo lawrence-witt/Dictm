@@ -58,16 +58,12 @@ export type LocalUsersActions =
 
 // New User Types
 
-export const NEW_USER_STARTED       = "dictm/auth/users/new/STARTED";
 export const NEW_USER_UPDATED       = "dictm/auth/users/new/UPDATED";
+export const NEW_USER_CLEARED       = "dictm/auth/users/new/CLEARED";
 
 export interface NewUserState {
     name: string;
     greeting: string;
-}
-
-export interface NewUserStartedAction {
-    type: typeof NEW_USER_STARTED;
 }
 
 export interface NewUserUpdatedAction {
@@ -78,6 +74,10 @@ export interface NewUserUpdatedAction {
     }
 }
 
+export interface NewUserClearedAction {
+    type: typeof NEW_USER_CLEARED;
+}
+
 export type NewUserActions =
-|   NewUserStartedAction
-|   NewUserUpdatedAction;
+|   NewUserUpdatedAction
+|   NewUserClearedAction;

@@ -38,10 +38,6 @@ export const clearLocalUsers = (): types.LocalUsersClearedAction => ({
 
 // New User Actions
 
-export const startNewUser = (): types.NewUserStartedAction => ({
-    type: types.NEW_USER_STARTED
-});
-
 export const updateNewUser = (
     key: keyof types.NewUserState,
     value: string
@@ -51,4 +47,8 @@ export const updateNewUser = (
         key,
         value
     }
+});
+
+export const clearNewUser = (): types.NewUserClearedAction => ({
+    type: types.NEW_USER_CLEARED
 });
