@@ -2,6 +2,8 @@ import { createSelector } from 'reselect';
 
 import { RootState } from '../../store';
 
+import { sortFunctions, ContentSlice } from './helpers';
+
 import { formatDuration, formatShortTimestamp } from '../../../lib/utils/formatTime';
 
 /* 
@@ -43,47 +45,52 @@ const getContentSlice = (
 
 export const getContentList = createSelector((
     content: RootState["content"],
+    profile: RootState["user"]["profile"],
     props: ContentTemplateProps,
     filter: string
 ) => {
+    if (!profile) return null;
 
-    // Return single type content list if no category id
+    const { context, categoryId } = props;
+
+    const sortKey = categoryId && context === "categories" ? "mixed" : context;
+    const sortOrder = profile.settings.display.sort[sortKey];
+    const sortFunction = sortFunctions[sortOrder];
+
+    let byId: ContentSlice["byId"];
+    let allIds: ContentSlice["allIds"];
 
     if (!props.categoryId) {
         const contentStore = content[props.context];
 
-        if (filter.length === 0) return contentStore;
+        const unsorted = filter.length === 0 ?
+            contentStore : 
+            getContentSlice(contentStore, contentStore.allIds, filter);
+        
+        byId = unsorted.byId;
+        allIds = unsorted.allIds;
+    } else {
+        const category = content.categories.byId[props.categoryId];
 
-        return getContentSlice(contentStore, contentStore.allIds, filter);
+        if (!category) return null;
+
+        const recordingsSlice = getContentSlice(
+            content.recordings,
+            category.relationships.recordings.ids,
+            filter
+        );
+
+        const notesSlice = getContentSlice(
+            content.notes,
+            category.relationships.notes.ids,
+            filter
+        );
+
+        byId = Object.assign({}, recordingsSlice.byId, notesSlice.byId);
+        allIds = [...recordingsSlice.allIds, ...notesSlice.allIds];
     }
 
-    // Sort category resources into new content list by timestamp
-
-    const category = content.categories.byId[props.categoryId];
-
-    if (!category) return null;
-
-    const recordingsSlice = getContentSlice(
-        content.recordings,
-        category.relationships.recordings.ids,
-        filter
-    );
-
-    const notesSlice = getContentSlice(
-        content.notes,
-        category.relationships.notes.ids,
-        filter
-    );
-
-    const byId = Object.assign({}, recordingsSlice.byId, notesSlice.byId);
-    const allIds = [...recordingsSlice.allIds, ...notesSlice.allIds].sort((a, b) => {
-        const aModel = recordingsSlice.byId[a] || notesSlice.byId[a];
-        const bModel = recordingsSlice.byId[b] || notesSlice.byId[b];
-
-        return aModel.attributes.timestamps.created - bModel.attributes.timestamps.created;
-    });
-
-    return { byId, allIds };
+    return sortFunction(byId, allIds);
 }, contentList => contentList);
 
 /* 

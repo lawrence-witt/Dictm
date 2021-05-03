@@ -26,6 +26,7 @@ import * as types from './Content.types';
 const mapState = (state: RootState, props: types.ContentTemplateProps) => ({
     contentList: contentSelectors.getContentList(
         state.content,
+        state.user.profile,
         props,
         state.tools.search.term
     )
