@@ -20,6 +20,7 @@ export { ByteUnitKeys };
 
 export const byteOptions: ByteOptions = [
     {id: "Bytes", title: "Bytes"},
+    {id: "KB", title: "KB"},
     {id: "MB", title: "MB"},
     {id: "GB", title: "GB"}
 ];

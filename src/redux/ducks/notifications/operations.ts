@@ -18,6 +18,10 @@ export function addNotification(persist: boolean, variant: V, message: string[],
     }
 }
 
+/* 
+*   Named Error Notifications
+*/
+
 export const notifyDatabaseError = (message: string): ThunkResult<void> => (
     dispatch
 ) => {
@@ -40,11 +44,44 @@ export const notifyRecordingError = (type: 'insert' | 'connect', message: string
     }
 }
 
+/* 
+*   Named Warning Notifications
+*/
+
+export const notifyStorageWarning = (available: string, threshold: string): ThunkResult<void> => (
+    dispatch
+) => {
+    const message = `Available storage space for this site (${available}) has dropped below your threshold (${threshold}).`;
+
+    dispatch(addNotification(false, "warning", [message]));
+}
+
+
+/* 
+*   Named Information Notifications
+*/
+
+export const notifyPersistence = (): ThunkResult<void> => (
+    dispatch
+) => {
+    const message = "You have not yet persisted site data on this browser. Go to the Settings page to learn more.";
+
+    dispatch(addNotification(false, "info", [message]));
+}
+
+/* 
+*   Generic Notifications
+*/
+
 export const notifyGenericError = (message: string[], action?: types.NotificationActions): ThunkResult<void> => (
     dispatch
 ) => {
     dispatch(addNotification(false, "error", message, action));
 }
+
+/* 
+*   Notification Removal
+*/
 
 export const dismissNotification = (
     key: string

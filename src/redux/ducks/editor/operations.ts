@@ -4,6 +4,7 @@ import * as helpers from './helpers';
 
 import { ThunkResult } from '../../store';
 
+import { userOperations } from '../user';
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
 import { categoryOperations } from '../content/categories';
@@ -43,7 +44,6 @@ export const openEditor = (
     
     const { title, context } = helpers.generateEditorContext(model, isNew);
 
-    // TODO: save editorType and contentId in sessionStorage
     dispatch(actions.openEditor(title, isNew, context));
 }
 
@@ -63,7 +63,7 @@ export const setEditorSaving = (): ThunkResult<void> => (
 *  Saves the content model currently being edited.
 */
 
-export const saveEditor = (): ThunkResult<void> => (
+export const saveEditor = (): ThunkResult<Promise<void>> => async (
     dispatch,
     getState
 ) => {
@@ -88,17 +88,19 @@ export const saveEditor = (): ThunkResult<void> => (
         }
     }
 
-    dispatch(persist())
-    .then(() => {
+    try {
+        await dispatch(persist());
+
+        dispatch(userOperations.checkUserStorage());
+
         if (dialogs.save.isOpen) {
             dispatch(closeEditor());
         } else {
             dispatch(openEditor(context.type, stamped.id));
         }
-    })
-    .catch(() => {
+    } catch {
         dispatch(actions.unsetEditorSaving());
-    });
+    }
 }
 
 /** 
@@ -171,6 +173,5 @@ export const closeEditor = (): ThunkResult<void> => (
 export const clearEditor = (): ThunkResult<void> => (
     dispatch
 ): void => {
-    // TODO: remove editorType and contentId in sessionStorage
     dispatch(actions.clearEditor());
 }

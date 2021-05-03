@@ -15,7 +15,15 @@ import { notificationsOperations } from '../notifications';
 import { toolOperations } from '../tools';
 import { editorOperations } from '../editor';
 
-const { notifyDatabaseError, notifyGenericError } = notificationsOperations;
+import { formatFileSize, unformatFileSize } from '../../../lib/utils/formatFileSize';
+import storageManagerSupported from '../../../lib/utils/storageManagerSupported';
+
+const { 
+    notifyDatabaseError, 
+    notifyStorageWarning, 
+    notifyPersistence, 
+    notifyGenericError 
+} = notificationsOperations;
 
 /** 
 *  Summary:
@@ -139,7 +147,32 @@ export const updateUserDisplaySort = <
     dispatch(updateUser(cloned));
 }
 
-/* 
+/** 
+*   Summary:
+*   Updates a field from the user's persistence settings
+*/
+
+export const updateUserStoragePersistence = <
+    F extends keyof User["settings"]["storage"]["persistence"],
+    V extends User["settings"]["storage"]["persistence"][F]
+>(
+    field: F,
+    value: V
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile) return;
+
+    const cloned = helpers.cloneUser(profile);
+    cloned.settings.storage.persistence[field] = value;
+
+    dispatch(updateUser(cloned));
+}
+
+/**
 *   Summary:
 *   Update a field from user's storage threshold settings
 */
@@ -164,7 +197,44 @@ export const updateUserStorageThreshold = <
     dispatch(updateUser(cloned));
 }
 
-/* 
+/** 
+*   Summary:
+*   Checks persistence and theshold settings after user saves a resource.
+*/
+
+export const checkUserStorage = (): ThunkResult<Promise<void>> => async (
+    dispatch,
+    getState
+) => {
+    const { profile } = getState().user;
+
+    if (!profile || !storageManagerSupported()) return;
+
+    const { settings: { storage: { persistence, threshold } } } = profile;
+
+    const { prompted } = persistence;
+
+    if (!prompted) {
+        const persisted = await navigator.storage.persisted();
+        if (!persisted) dispatch(notifyPersistence());
+
+        dispatch(updateUserStoragePersistence("prompted", true));
+    }
+
+    const { usage, quota } = await navigator.storage.estimate();
+    if (!usage || !quota) return;
+
+    const { value, unit } = threshold;
+
+    const spaceRemaining = quota - usage;
+    const byteThreshold = unformatFileSize(value, unit);
+
+    if (spaceRemaining < byteThreshold) {
+        dispatch(notifyStorageWarning(formatFileSize(spaceRemaining), `${value} ${unit}`))
+    }
+}
+
+/** 
 *   Summary:
 *   Delete a user account and sign out of the application
 */
@@ -174,7 +244,6 @@ export const deleteUser = (
 ): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
-    console.log(userId);
     try {
         await UserController.deleteUser(userId);
         dispatch(clearUser());

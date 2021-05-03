@@ -18,6 +18,9 @@ export const cloneUser = (user: User): User => ({
             }
         },
         storage: {
+            persistence: {
+                ...user.settings.storage.persistence
+            },
             threshold: {
                 ...user.settings.storage.threshold
             }

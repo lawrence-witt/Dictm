@@ -15,6 +15,7 @@ import CustomSelect from '../../../../../../atoms/Inputs/CustomSelect';
 import useValidatedField from '../../../../../../../lib/hooks/useValidatedField';
 
 import { formatFileSize } from '../../../../../../../lib/utils/formatFileSize';
+import storageManagerSupported from '../../../../../../../lib/utils/storageManagerSupported';
 
 import * as types from './StorageSettings.types';
 
@@ -72,13 +73,6 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const storageManagerSupported = (
-    navigator.storage &&
-    Boolean(navigator.storage.estimate) &&
-    Boolean(navigator.storage.persist) &&
-    Boolean(navigator.storage.persisted)
-);
-
 const isValidInteger = (value: string) => {
     const wholeNumbers = /^\d+$/;
     if (!wholeNumbers.test(value)) throw "Threshold must be a whole number";
@@ -112,7 +106,7 @@ const StorageSettings: React.FC<types.StorageSettingsProps & ReduxProps> = (prop
                 availableSpace: "Sorry, StorageManager in not supported in this browser!"
             }))
 
-            if (!storageManagerSupported) { notSupported(); return; }
+            if (!storageManagerSupported()) { notSupported(); return; }
 
             const { usage, quota } = await navigator.storage.estimate();
             const persisted = await navigator.storage.persisted();
@@ -128,7 +122,7 @@ const StorageSettings: React.FC<types.StorageSettingsProps & ReduxProps> = (prop
     }, []);
 
     const handlePersistenceRequest = React.useCallback(async () => {
-        if (storageManagerSupported) {
+        if (storageManagerSupported()) {
             const persisted = await navigator.storage.persist();
             setManager(m => ({ ...m, persisted }));
         }

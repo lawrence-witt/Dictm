@@ -30,6 +30,9 @@ class User implements UserModel {
                 }
             },
             storage: {
+                persistence: {
+                    prompted: false
+                },
                 threshold: {
                     value: 500,
                     unit: "MB"

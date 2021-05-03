@@ -1,5 +1,5 @@
 const sortOrders = ["createdDesc", "createdAsc", "modifiedDesc", "modifiedAsc", "alphaDesc", "alphaAsc"] as const;
-const byteUnits = ["Bytes", "MB", "GB"] as const;
+const byteUnits = ["Bytes", "KB", "MB", "GB"] as const;
 
 export type SortOrderKeys = typeof sortOrders[number];
 export type ByteUnitKeys = typeof byteUnits[number];
@@ -27,6 +27,9 @@ export interface UserModel {
             }
         };
         storage: {
+            persistence: {
+                prompted: boolean;
+            };
             threshold: {
                 value: number;
                 unit: ByteUnitKeys;
