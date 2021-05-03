@@ -5,8 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { RootState } from '../redux/store';
 import { historyOperations } from '../redux/ducks/history';
-import { authOperations } from '../redux/ducks/auth';
-import { userSelectors } from '../redux/ducks/user';
+import { authOperations, authSelectors } from '../redux/ducks/auth';
 
 import PublicRouter from './routers/PublicRouter';
 import PrivateRouter from './routers/PrivateRouter';
@@ -18,9 +17,9 @@ import Notifier from '../components/organisms/Notifier/Notifier';
 */
 
 const mapState = (state: RootState) => ({
-    appInitialised: state.auth.init.isInitialised,
-    userLoaded: userSelectors.getUserLoaded(state.user)
-})
+    appInitialised: state.auth.app.isInitialised,
+    appLoaded: authSelectors.getAppLoaded(state.auth.app, state.user.profile)
+});
 
 const mapDispatch = {
     changeLocation: historyOperations.changeLocation,
@@ -40,7 +39,7 @@ const Root: React.FC<ReduxProps> = (props) => {
         changeLocation,
         initialiseApp,
         appInitialised,
-        userLoaded
+        appLoaded
     } = props;
 
     // Persist route changes to state for derived data
@@ -70,7 +69,7 @@ const Root: React.FC<ReduxProps> = (props) => {
     return (
         <>
             <Notifier/>
-            {userLoaded ? <PrivateRouter/> : <PublicRouter />}
+            {appLoaded ? <PrivateRouter/> : <PublicRouter />}
         </>
     );
 }

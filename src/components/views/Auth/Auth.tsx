@@ -20,11 +20,15 @@ import AuthNew from './frames/New/AuthNew';
 
 const mapState = (state: RootState) => ({
     location: state.history.current,
-    transition: authSelectors.getAuthAnimation(state.history)
+    frameTransition: authSelectors.getAuthAnimation(state.history),
+    userLoaded: Boolean(state.user.profile)
 });
 
 const mapDispatch = {
-    loadLocalUsers: authOperations.loadLocalUsers
+    loadLocalUsers: authOperations.loadLocalUsers,
+    setAppTransition: authOperations.setAppTransition,
+    clearLocalUsers: authOperations.clearLocalUsers,
+    clearNewUser: authOperations.clearNewUser
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -62,8 +66,12 @@ const useStyles = makeStyles(theme => ({
 const Auth: React.FC<ReduxProps> = (props) => {
     const {
         location,
-        transition,
-        loadLocalUsers
+        frameTransition,
+        userLoaded,
+        loadLocalUsers,
+        setAppTransition,
+        clearLocalUsers,
+        clearNewUser
     } = props;
 
     const classes = useStyles();
@@ -79,9 +87,16 @@ const Auth: React.FC<ReduxProps> = (props) => {
         }
     }, [location]);
 
+    const onUserLoaded = React.useCallback(() => {
+        setAppTransition("greet");
+        clearLocalUsers();
+        clearNewUser();
+    }, [setAppTransition, clearLocalUsers, clearNewUser]);
+
     return (
         <Dialog
-            open={true}
+            open={!userLoaded}
+            onExited={onUserLoaded}
             classes={{
                 paper: classes.paper
             }}
@@ -92,9 +107,9 @@ const Auth: React.FC<ReduxProps> = (props) => {
         >
             <Slider 
                 item={item}
-                enter={transition.dir}
-                exit={transition.dir}
-                disabled={!transition.active}
+                enter={frameTransition.dir}
+                exit={frameTransition.dir}
+                disabled={!frameTransition.active}
                 classes={{
                     root: classes.sliderRoot,
                     frame: classes.sliderFrame

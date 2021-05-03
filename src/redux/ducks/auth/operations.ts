@@ -14,7 +14,7 @@ import { notificationsOperations } from '../notifications';
 const { notifyDatabaseError, notifyGenericError } = notificationsOperations;
 
 /* 
-*   Init App Operations
+*   Initial App Operations
 */
 
 export const initialiseApp = (): ThunkResult<Promise<void>> => async (
@@ -49,6 +49,15 @@ export const initialiseApp = (): ThunkResult<Promise<void>> => async (
     }
 
     lastly();
+}
+
+export const setAppTransition = (
+    transition: types.AppTransitions
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    dispatch(actions.setAppTransition(transition));
 }
 
 /* 
@@ -115,6 +124,7 @@ export const loadSelectedUser = (): ThunkResult<void> => (
 
     const user = byId[selectedId];
 
+    dispatch(setAppTransition("authenticate"));
     dispatch(userOperations.loadUser(user));
 }
 
@@ -183,6 +193,6 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
 
     if (!insertedUser) return;
 
+    dispatch(setAppTransition("authenticate"));
     dispatch(userOperations.loadUser(insertedUser));
-    dispatch(clearNewUser());
 }

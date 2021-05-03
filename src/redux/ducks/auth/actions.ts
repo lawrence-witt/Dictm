@@ -2,10 +2,24 @@ import * as types from './types';
 
 import User from '../../../db/models/User';
 
-// Init App Actions
+// Initial App Actions
 
-export const initialiseApp = (): types.AppInitalisedAction => ({
-    type: types.APP_INITIALISED
+export const initialiseApp = (
+    transition?: types.AppTransitions
+): types.AppInitalisedAction => ({
+    type: types.APP_INITIALISED,
+    payload: {
+        transition
+    }
+});
+
+export const setAppTransition = (
+    transition: types.AppTransitions
+): types.AppTransitionSetAction => ({
+    type: types.APP_TRANSITION_SET,
+    payload: {
+        transition
+    }
 });
 
 // Local Users Actions

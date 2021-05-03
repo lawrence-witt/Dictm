@@ -2,17 +2,38 @@ import User from '../../../db/models/User';
 
 // Init Application Types
 
-export const APP_INITIALISED            = "dictm/auth/init/INITIALISED";
+export type AppTransitions = 
+|   'authenticate' 
+|   'greet'
+|   'load'
+|   'unload'
+|   undefined;
+
+export const APP_INITIALISED            = "dictm/auth/app/INITIALISED";
+export const APP_TRANSITION_SET         = "dictm/auth/app/TRANSITION_SET"
 
 export interface InitialAppState {
     isInitialised: boolean;
+    transition: AppTransitions;
 }
 
 export interface AppInitalisedAction {
     type: typeof APP_INITIALISED;
+    payload: {
+        transition: AppTransitions;
+    }
 }
 
-export type InitialAppActions = AppInitalisedAction;
+export interface AppTransitionSetAction {
+    type: typeof APP_TRANSITION_SET;
+    payload: {
+        transition: AppTransitions;
+    }
+}
+
+export type InitialAppActions = 
+|   AppInitalisedAction
+|   AppTransitionSetAction;
 
 // Local Users Types
 

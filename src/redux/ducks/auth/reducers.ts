@@ -5,7 +5,8 @@ import * as types from './types';
 // Init App Reducer
 
 const initialAppState: types.InitialAppState = {
-    isInitialised: false
+    isInitialised: false,
+    transition: undefined
 }
 
 const initialAppReducer = (
@@ -15,7 +16,13 @@ const initialAppReducer = (
     switch(actions.type) {
         case types.APP_INITIALISED:
             return {
-                isInitialised: true
+                isInitialised: true,
+                transition: actions.payload.transition
+            }
+        case types.APP_TRANSITION_SET:
+            return {
+                ...state,
+                transition: actions.payload.transition
             }
         default:
             return state;
@@ -37,11 +44,17 @@ const localUsersReducer = (
 ): types.LocalUsersState => {
     switch(actions.type) {
         case types.LOCAL_USERS_LOADED:
+            const clonedState = {
+                ...state,
+                byId: {...state.byId},
+                allIds: [...state.allIds]
+            }
+
             return actions.payload.users.reduce((out: types.LocalUsersState, user) => {
                 out.byId[user.id] = user;
                 out.allIds = [...out.allIds, user.id];
                 return out;
-            }, { ...initialLocalUsersState, isLoaded: true });
+            }, { ...clonedState, isLoaded: true });
         case types.LOCAL_USER_SELECTED:
             return {
                 ...state,
@@ -84,7 +97,7 @@ const newUserReducer = (
 }
 
 const reducer = combineReducers({
-    init: initialAppReducer,
+    app: initialAppReducer,
     local: localUsersReducer,
     new: newUserReducer
 });
