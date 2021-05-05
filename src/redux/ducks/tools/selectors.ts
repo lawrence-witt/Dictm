@@ -5,7 +5,6 @@ import * as helpers from './helpers';
 import * as types from './types';
 
 import { RootState } from '../../store';
-import { userOperations } from '../user';
 
 /* 
 *  Page Selectors
@@ -17,6 +16,17 @@ export const getPageTitle = createSelector((
 ) => {
     return helpers.extractPageTitle(location, categories);
 }, title => title);
+
+export const getToolVisibility = createSelector((
+    location: RootState["history"]["current"]
+) => {
+    const { stem, categoryId } = helpers.extractParams(location.pathname);
+    return {
+        replay: stem === "categories" && categoryId || stem === "recordings" || stem === "notes",
+        search: stem !== "settings",
+        delete: stem !== "settings"
+    }
+}, visibility => visibility);
 
 /* 
 *   Animation Selectors

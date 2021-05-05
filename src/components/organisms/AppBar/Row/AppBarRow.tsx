@@ -27,6 +27,9 @@ const mapState = (state: RootState) => ({
     pageTitle: toolSelectors.getPageTitle(
         state.history.current, state.content.categories
     ),
+    toolVisibility: toolSelectors.getToolVisibility(
+        state.history.current
+    ),
     searchIsOpen: state.tools.search.isOpen,
     deleteIsOpen: state.tools.delete.isOpen
 });
@@ -85,6 +88,7 @@ const useDefaultRowStyles = makeStyles<Theme, {
 const AppBarRow: React.FC<ReduxProps> = (props) => {
     const {
         pageTitle,
+        toolVisibility,
         searchIsOpen,
         deleteIsOpen,
         onToggleSearch,
@@ -131,37 +135,43 @@ const AppBarRow: React.FC<ReduxProps> = (props) => {
             <FlexSpace flex={titleHidden ? 0 : 1} />
             {children}
             <FlexSpace flex={1} />
-            <ToolTip
-                title="Playlists coming soon!"
-                arrow
-                enterTouchDelay={0}
-            >
+            {toolVisibility.replay && (
+                <ToolTip
+                    title="Playlists coming soon!"
+                    arrow
+                    enterTouchDelay={0}
+                >
+                    <IconButton
+                        color="inherit"
+                        className={classes.leftMostButton}
+                    >
+                        <Repeat 
+                            className={classes.toolIcon}
+                        />
+                    </IconButton>
+                </ToolTip>
+            )}
+            {toolVisibility.search && (
                 <IconButton
                     color="inherit"
-                    className={classes.leftMostButton}
+                    onClick={onToggleSearch}
                 >
-                    <Repeat 
-                        className={classes.toolIcon}
+                    <Search 
+                        className={searchClass}
                     />
                 </IconButton>
-            </ToolTip>
-            <IconButton
-                color="inherit"
-                onClick={onToggleSearch}
-            >
-                <Search 
-                    className={searchClass}
-                />
-            </IconButton>
-            <IconButton
-                edge="end"
-                color="inherit"
-                onClick={onToggleDelete}
-            >
-                <Delete 
-                    className={deleteClass}
-                />
-            </IconButton>
+            )}
+            {toolVisibility.delete && (
+                <IconButton
+                    edge="end"
+                    color="inherit"
+                    onClick={onToggleDelete}
+                >
+                    <Delete 
+                        className={deleteClass}
+                    />
+                </IconButton>
+            )}
         </Toolbar>
         </AppBar>
     )
