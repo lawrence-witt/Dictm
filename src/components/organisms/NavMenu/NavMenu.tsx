@@ -6,7 +6,7 @@ import { RootState } from '../../../redux/store';
 import { toolSelectors, toolOperations, NavMenuLists } from '../../../redux/ducks/tools';
 import { userOperations } from '../../../redux/ducks/user';
 
-import { useBreakContext } from '../../../lib/hooks/useBreakpoints';
+import { useBreakpointsContext } from '../../../lib/providers/BreakpointsProvider';
 
 import HybridDrawer from '../../molecules/HybridDrawer/HybridDrawer';
 
@@ -128,7 +128,7 @@ const NavMenu: React.FC<ReduxProps> = (props) => {
         onToggleMenu
     } = props;
 
-    const breakpoints = useBreakContext();
+    const breakpoints = useBreakpointsContext();
 
     const [menu, setMenu] = React.useState<types.NavMenuState>(() => createMenu(navLists));
 

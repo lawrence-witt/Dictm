@@ -17,7 +17,7 @@ import { makeStyles, createStyles, Theme, fade } from '@material-ui/core/styles'
 import MenuButton from '../../../atoms/Buttons/MenuButton'
 import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 
-import { useBreakContext } from '../../../../lib/hooks/useBreakpoints';
+import { useBreakpointsContext } from '../../../../lib/providers/BreakpointsProvider';
 
 /* 
 *   Redux
@@ -97,7 +97,7 @@ const AppBarRow: React.FC<ReduxProps> = (props) => {
         children
     } = props;
 
-    const breakpoint = useBreakContext();
+    const breakpoint = useBreakpointsContext();
 
     const titleHidden = React.Children.count(children) > 0 && breakpoint.index < 2;
 

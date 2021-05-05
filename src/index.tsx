@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 
 import ThemeProvider from './lib/providers/ThemeProvider';
-import BreakpointsProvider from './lib/providers/BreakpointsProvider';
+import { BreakpointsProvider } from './lib/providers/BreakpointsProvider';
 
 import store from './redux/store';
 
