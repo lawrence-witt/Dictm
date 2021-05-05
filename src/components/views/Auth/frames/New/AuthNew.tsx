@@ -15,6 +15,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 import DirectionButton from '../../../../atoms/Buttons/DirectionButton';
 
+import * as types from './AuthNew.types';
+
 /* 
 *   Redux
 */
@@ -27,7 +29,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     updateNewUser: authOperations.updateNewUser,
-    createUser: authOperations.createNewUser
+    clearNewUser: authOperations.clearNewUser
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -50,13 +52,14 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const AuthNew: React.FC<ReduxProps> = (props) => {
+const AuthNew: React.FC<ReduxProps & types.AuthNewProps> = (props) => {
     const {
         name,
         greeting,
         canCreateUser,
         updateNewUser,
-        createUser
+        setCreateMethod,
+        clearNewUser
     } = props;
 
     const history = useHistory();
@@ -71,6 +74,10 @@ const AuthNew: React.FC<ReduxProps> = (props) => {
         if (ev.target.name !== "name" && ev.target.name !== "greeting") return;
         updateNewUser(ev.target.name, ev.target.value);
     }, [updateNewUser]);
+
+    React.useEffect(() => {
+        return () => clearNewUser();
+    }, [clearNewUser]);
 
     return (
         <>
@@ -114,7 +121,7 @@ const AuthNew: React.FC<ReduxProps> = (props) => {
                 <FlexSpace />
                 <Button
                     variant="outlined"
-                    onClick={createUser}
+                    onClick={setCreateMethod}
                     disabled={!canCreateUser}
                 >
                     Get Started

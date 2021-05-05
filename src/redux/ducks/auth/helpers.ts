@@ -1,6 +1,6 @@
 import { matchPath } from 'react-router-dom';
 
-export const extractAuthSlide = (pathname: string) => {
+export const extractAuthSlide = (pathname: string): "local" | "new" | undefined => {
     const match = matchPath<{
         slide: 'local' | 'new';
     }>(pathname, {

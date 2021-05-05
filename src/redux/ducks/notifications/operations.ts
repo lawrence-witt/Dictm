@@ -2,6 +2,8 @@ import { ThunkResult } from '../../store';
 
 import StorageService from '../../services/StorageService';
 
+import { userOperations } from '../user';
+
 import * as actions from './actions';
 import * as types from './types';
 import * as helpers from './helpers';
@@ -27,9 +29,8 @@ export const notifyDatabaseError = (message: string): ThunkResult<void> => (
 ) => {
     const header = `A critical error has occured: ${message}`;
     const sub = "Reload the application to repair the database.";
-
-    StorageService.setSessionFlag("hasError", true);
-
+    
+    dispatch(userOperations.updateUserSessionFlags("hasError", true));
     dispatch(addNotification(true, "error", [header, sub], "RELOAD"));
 }
 

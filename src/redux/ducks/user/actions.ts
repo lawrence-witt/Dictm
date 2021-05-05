@@ -2,21 +2,43 @@ import * as types from './types';
 
 import User from '../../../db/models/User';
 
+import { UserSession } from '../../services/StorageService';
+
 export const loadUser = (
-    user: User
+    session: types.UserSessionWithContext,
+    profile: User
 ): types.UserLoadedAction => ({
     type: types.USER_LOADED,
     payload: {
-        user
+        session,
+        profile
     }
 });
 
 export const updateUser = (
-    user: User
+    profile: User
 ): types.UserUpdatedAction => ({
-    type: types.USER_UPDATED,
+    type: types.USER_PROFILE_UPDATED,
     payload: {
-        user
+        profile
+    }
+});
+
+export const updateUserSessionContext = (
+    context: types.UserSessionWithContext["context"]
+): types.UserSessionContextUpdatedAction => ({
+    type: types.USER_SESSION_CONTEXT_UPDATED,
+    payload: {
+        context
+    }
+});
+
+export const updateUserSessionFlags = (
+    session: UserSession
+): types.UserSessionFlagsUpdatedAction => ({
+    type: types.USER_SESSION_FLAGS_UPDATED,
+    payload: {
+        session
     }
 });
 

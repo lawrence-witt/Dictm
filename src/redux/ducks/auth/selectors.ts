@@ -66,17 +66,3 @@ export const getAuthAnimation = createSelector((
 
     return noAnimate;
 }, animation => animation);
-
-/** 
-*  Summary:
-*  Detemines when the application can switch between Public and Private routing 
-*/
-
-export const getAppLoaded = createSelector((
-    app: RootState["auth"]["app"],
-    profile: RootState["user"]["profile"]
-) => {
-    if (!profile) return false;
-
-    return app.transition !== "authenticate";
-},  appLoaded => appLoaded);

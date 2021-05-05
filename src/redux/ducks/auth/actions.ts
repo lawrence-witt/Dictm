@@ -4,22 +4,8 @@ import User from '../../../db/models/User';
 
 // Initial App Actions
 
-export const initialiseApp = (
-    transition?: types.AppTransitions
-): types.AppInitalisedAction => ({
-    type: types.APP_INITIALISED,
-    payload: {
-        transition
-    }
-});
-
-export const setAppTransition = (
-    transition: types.AppTransitions
-): types.AppTransitionSetAction => ({
-    type: types.APP_TRANSITION_SET,
-    payload: {
-        transition
-    }
+export const initialiseApp = (): types.AppInitalisedAction => ({
+    type: types.APP_INITIALISED
 });
 
 // Local Users Actions

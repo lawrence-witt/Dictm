@@ -41,7 +41,7 @@ export const initialiseApp = (): ThunkResult<Promise<void>> => async (
 
         try {
             const user = await UserController.selectUser(userId);
-            dispatch(userOperations.loadUser(user)).then(lastly);
+            dispatch(userOperations.loadUser(user, "returning")).then(lastly);
             return;
         } catch {
             StorageService.clearSession();
@@ -49,15 +49,6 @@ export const initialiseApp = (): ThunkResult<Promise<void>> => async (
     }
 
     lastly();
-}
-
-export const setAppTransition = (
-    transition: types.AppTransitions
-): ThunkResult<void> => (
-    dispatch,
-    getState
-) => {
-    dispatch(actions.setAppTransition(transition));
 }
 
 /* 
@@ -124,8 +115,7 @@ export const loadSelectedUser = (): ThunkResult<void> => (
 
     const user = byId[selectedId];
 
-    dispatch(setAppTransition("authenticate"));
-    dispatch(userOperations.loadUser(user));
+    dispatch(userOperations.loadUser(user, "returning"));
 }
 
 /** 
@@ -173,10 +163,10 @@ export const clearNewUser = (): ThunkResult<void> => (
 *  Create a new user and begin loading application
 */
 
-export const createNewUser = (): ThunkResult<Promise<void>> => async (
+export const createNewUser = (): ThunkResult<void> => async (
     dispatch,
     getState
-): Promise<void> => {
+) => {
     const { name, greeting } = getState().auth.new;
 
     if (!name || name.length === 0) return;
@@ -193,6 +183,5 @@ export const createNewUser = (): ThunkResult<Promise<void>> => async (
 
     if (!insertedUser) return;
 
-    dispatch(setAppTransition("authenticate"));
-    dispatch(userOperations.loadUser(insertedUser));
+    dispatch(userOperations.loadUser(insertedUser, "new"));
 }

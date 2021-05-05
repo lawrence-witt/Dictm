@@ -3,10 +3,11 @@ import { ThunkResult } from '../../store';
 import User from '../../../db/models/User';
 import UserController from '../../../db/controllers/User';
 
-import StorageService from '../../services/StorageService';
+import StorageService, { UserSession } from '../../services/StorageService';
 
 import * as actions from './actions';
 import * as helpers from './helpers';
+import * as types from './types';
 
 import { recordingOperations } from '../content/recordings';
 import { noteOperations } from '../content/notes';
@@ -31,7 +32,8 @@ const {
 */
 
 export const loadUser = (
-    user: User
+    user: User,
+    context: "returning" | "new"
 ): ThunkResult<Promise<void>> => async (
     dispatch
 ) => {
@@ -45,15 +47,56 @@ export const loadUser = (
 
     if (!userData) return;
 
+    const session = StorageService.persistSession(user.id);
+    const validatedContext = (() => {
+        if (context === "new") return context;
+        const oneDay = 24 * 60 * 60 * 1000;
+        if (StorageService.sessionOlderThan(oneDay, session)) return "returning";
+        return undefined;
+    })();
+    const sessionWithContext: types.UserSessionWithContext = {
+        ...session,
+        context: validatedContext
+    }
+
     dispatch(recordingOperations.loadRecordings(userData.recordings));
     dispatch(noteOperations.loadNotes(userData.notes));
     dispatch(categoryOperations.loadCategories(userData.categories));
-    dispatch(actions.loadUser(user));
-
-    StorageService.persistSession(user.id);
+    dispatch(actions.loadUser(sessionWithContext, user));
 }
 
-/* 
+/** 
+*   Summary:
+*   Update a user session's context in redux store.
+*/
+
+export const updateUserSessionContext = (
+    context: types.UserSessionWithContext["context"]
+): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(actions.updateUserSessionContext(context));
+}
+
+/**
+*   Summary:
+*   Update a user session's flags in localStorage and redux store.
+*/
+
+export const updateUserSessionFlags = (
+    flag: keyof UserSession["flags"], 
+    value: boolean
+): ThunkResult<void> => (
+    dispatch
+) => {
+    const session = StorageService.setSessionFlag(flag, value);
+
+    if (!session) return;
+
+    dispatch(actions.updateUserSessionFlags(session))
+}
+
+/**
 *   Summary:
 *   Update a user model in db and redux store.
 */
@@ -252,7 +295,7 @@ export const deleteUser = (
     }
 }
 
-/* 
+/** 
 *   Summary:
 *   Delete user or user data of a particular type
 */

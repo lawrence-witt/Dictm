@@ -5,8 +5,7 @@ import * as types from './types';
 // Init App Reducer
 
 const initialAppState: types.InitialAppState = {
-    isInitialised: false,
-    transition: undefined
+    isInitialised: false
 }
 
 const initialAppReducer = (
@@ -16,13 +15,7 @@ const initialAppReducer = (
     switch(actions.type) {
         case types.APP_INITIALISED:
             return {
-                isInitialised: true,
-                transition: actions.payload.transition
-            }
-        case types.APP_TRANSITION_SET:
-            return {
-                ...state,
-                transition: actions.payload.transition
+                isInitialised: true
             }
         default:
             return state;

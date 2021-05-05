@@ -3,22 +3,24 @@ import { connect, ConnectedProps } from 'react-redux';
 import { a, useSpring } from 'react-spring';
 
 import { RootState } from '../../../redux/store';
-import { authOperations } from '../../../redux/ducks/auth';
+import { userOperations } from '../../../redux/ducks/user';
 
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+
+import { formatLongTimestamp } from '../../../lib/utils/formatTime';
 
 /* 
 *   Redux
 */
 
 const mapState = (state: RootState) => ({
-    profile: state.user.profile,
-    appTransition: state.auth.app.transition
+    session: state.user.session,
+    profile: state.user.profile
 });
 
 const mapDispatch = {
-    setAppTransition: authOperations.setAppTransition
+    updateSessionContext: userOperations.updateUserSessionContext
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -51,25 +53,30 @@ const useStyles = makeStyles(theme => ({
 
 const Greeter: React.FC<ReduxProps> = (props) => {
     const {
+        session,
         profile,
-        appTransition,
-        setAppTransition
+        updateSessionContext
     } = props;
 
-    const [display, setDisplay] = React.useState(appTransition === "greet");
+    const context = session?.context;
+
+    const [display, setDisplay] = React.useState(context === "returning");
 
     const classes = useStyles();
 
     const { opacity } = useSpring({
-        opacity: appTransition === "greet" ? 0.8 : 0,
+        opacity: context === "returning" ? 0.8 : 0,
         onRest: () => setDisplay(false)
     });
 
     const onDismiss = React.useCallback(() => {
-        setAppTransition(undefined);
-    }, [setAppTransition]);
+        updateSessionContext(undefined);
+    }, [updateSessionContext]);
 
-    if (!profile || !display) return null;
+    if (!session || !profile || !display) return null;
+
+    const greeting = profile.settings.preferences.greeting || `Welcome back, ${profile.attributes.name}!`;
+    const lastVisited = `You last visited on ${formatLongTimestamp(session.timestamps.previous)}.`;
 
     return (
         <a.div 
@@ -78,7 +85,10 @@ const Greeter: React.FC<ReduxProps> = (props) => {
             onClick={onDismiss}
         >
             <Typography variant="h4">
-                {profile.settings.preferences.greeting}
+                {greeting}
+            </Typography>
+            <Typography variant="h6">
+                {lastVisited}
             </Typography>
             <Typography>
                 Click anywhere to dismiss.

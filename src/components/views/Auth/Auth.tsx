@@ -26,7 +26,8 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     loadLocalUsers: authOperations.loadLocalUsers,
-    setAppTransition: authOperations.setAppTransition,
+    loadSelectedUser: authOperations.loadSelectedUser,
+    createNewUser: authOperations.createNewUser,
     clearLocalUsers: authOperations.clearLocalUsers,
     clearNewUser: authOperations.clearNewUser
 }
@@ -67,18 +68,28 @@ const Auth: React.FC<ReduxProps> = (props) => {
     const {
         location,
         frameTransition,
-        userLoaded,
         loadLocalUsers,
-        setAppTransition,
-        clearLocalUsers,
-        clearNewUser
+        loadSelectedUser,
+        createNewUser,
+        clearLocalUsers
     } = props;
 
     const classes = useStyles();
 
     React.useEffect(() => {
-        loadLocalUsers()
-    }, [loadLocalUsers]);
+        loadLocalUsers();
+        return () => clearLocalUsers();
+    }, [loadLocalUsers, clearLocalUsers]);
+
+    const [authMethod, setAuthMethod] = React.useState<"load" | "create" | null>(null);
+
+    const setLoadMethod = React.useCallback(() => setAuthMethod("load"), []);
+    const setCreateMethod = React.useCallback(() => setAuthMethod("create"), []);
+
+    const onDialogExited = React.useCallback(() => {
+        if (!authMethod) return;
+        ({load: loadSelectedUser, create: createNewUser}[authMethod])();
+    }, [authMethod, loadSelectedUser, createNewUser]);
 
     const item = React.useMemo(() => {
         return {
@@ -87,16 +98,10 @@ const Auth: React.FC<ReduxProps> = (props) => {
         }
     }, [location]);
 
-    const onUserLoaded = React.useCallback(() => {
-        setAppTransition("greet");
-        clearLocalUsers();
-        clearNewUser();
-    }, [setAppTransition, clearLocalUsers, clearNewUser]);
-
     return (
         <Dialog
-            open={!userLoaded}
-            onExited={onUserLoaded}
+            open={!authMethod}
+            onExited={onDialogExited}
             classes={{
                 paper: classes.paper
             }}
@@ -118,8 +123,8 @@ const Auth: React.FC<ReduxProps> = (props) => {
                 {(location) => (
                     <Switch location={location}>
                         <Route exact path="/auth" component={AuthHome} />
-                        <Route exact path="/auth/local" component={AuthLocal} />
-                        <Route exact path="/auth/new" component={AuthNew} />
+                        <Route exact path="/auth/local" render={() => <AuthLocal setLoadMethod={setLoadMethod}/>} />
+                        <Route exact path="/auth/new" render={() => <AuthNew setCreateMethod={setCreateMethod}/>} />
                         <Redirect to="/auth" />
                     </Switch>
                 )}

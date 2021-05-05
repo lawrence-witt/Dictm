@@ -1,20 +1,26 @@
 import * as types from './StorageService.types';
 
 class StorageService {
+
     // Type guards
 
     private _isObject(value: unknown): value is {[key in string | number | symbol]: any} {
         return Boolean(value && Object.getPrototypeOf(value) === Object.prototype);
     }
 
+    private _isNumber(value: unknown): value is number {
+        return typeof value === "number";
+    }
+
     private _isSession(value: unknown): value is types.UserSession {
         if (!this._isObject(value)) return false;
         if (!value.user || !value.user.id) return false;
         if (!value.flags || !value.flags.hasOwnProperty("hasError")) return false;
+        if (!value.timestamps || !this._isNumber(value.timestamps.previous) || !this._isNumber(value.timestamps.current)) return false;
         return true;
     }
 
-    // Utility methods
+    // Private utility methods
 
     private _createSession(userId: string) {
         return {
@@ -23,6 +29,20 @@ class StorageService {
             },
             flags: {
                 hasError: false
+            },
+            timestamps: {
+                previous: Date.now(),
+                current: Date.now()
+            }
+        }
+    }
+
+    private _incrementSession(session: types.UserSession) {
+        return {
+            ...session,
+            timestamps: {
+                previous: session.timestamps.current,
+                current: Date.now()
             }
         }
     }
@@ -45,30 +65,44 @@ class StorageService {
 
     // Public methods
 
-    public persistSession(userId: string): void {
+    public persistSession(userId: string): types.UserSession {
         const sessionRecord = this._getUserSession(userId);
 
-        if (sessionRecord) return;
+        if (sessionRecord) return sessionRecord;
 
-        this._setSession(this._createSession(userId));
+        const created = this._createSession(userId);
+        this._setSession(created);
+
+        return created;
     }
 
     public retrieveSession(): types.UserSession | null {
-        return this._getSession();
+        const sessionRecord = this._getSession();
+        if (!sessionRecord) return null;
+
+        const incremented = this._incrementSession(sessionRecord);
+        this._setSession(incremented);
+
+        return incremented;
     }
 
     public clearSession(): void {
         localStorage.removeItem("session");
     }
 
-    public setSessionFlag(flag: keyof types.UserSession["flags"], value: boolean): void {
+    public sessionOlderThan(ms: number, session: types.UserSession): boolean {
+        return session.timestamps.current - session.timestamps.previous > ms;
+    }
+
+    public setSessionFlag(flag: keyof types.UserSession["flags"], value: boolean): types.UserSession | null {
         const sessionRecord = this._getSession();
 
-        if (!sessionRecord) return;
+        if (!sessionRecord) return null;
 
         sessionRecord.flags[flag] = value;
-
         this._setSession(sessionRecord);
+
+        return sessionRecord;
     }
 }
 

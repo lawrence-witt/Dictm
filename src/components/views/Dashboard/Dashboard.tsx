@@ -7,7 +7,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { RootState } from '../../../redux/store';
 import { toolSelectors } from '../../../redux/ducks/tools';
 import { userOperations } from '../../../redux/ducks/user';
-import { authOperations } from '../../../redux/ducks/auth';
 
 import AppBar from '../../organisms/AppBar/AppBar';
 import NavBar from '../../organisms/NavBar/NavBar';
@@ -26,15 +25,13 @@ import Settings from './frames/Settings/Settings';
 
 const mapState = (state: RootState) => ({
     location: state.history.current,
-    appTransition: state.auth.app.transition,
     frameTransition: toolSelectors.getDashboardAnimation(
         state.content.categories, state.history
     )
 });
 
 const mapDispatch = {
-    signOut: userOperations.clearUser,
-    setAppTransition: authOperations.setAppTransition
+    signOut: userOperations.clearUser
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -64,9 +61,7 @@ const useStyles = makeStyles(() => ({
 const Dashboard: React.FC<ReduxProps> = (props) => {
     const {
         location,
-        appTransition,
         frameTransition,
-        setAppTransition,
         signOut
     } = props;
 

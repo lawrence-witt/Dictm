@@ -5,4 +5,8 @@ export interface UserSession {
     flags: {
         hasError: boolean;
     };
+    timestamps: {
+        previous: number;
+        current: number;
+    }
 }

@@ -17,6 +17,8 @@ import { makeStyles, Typography } from '@material-ui/core';
 import FlexSpace from '../../../../atoms/FlexSpace/FlexSpace';
 import DirectionButton from '../../../../atoms/Buttons/DirectionButton';
 
+import * as types from './AuthLocal.types';
+
 /* 
 *   Redux
 */
@@ -58,11 +60,12 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const AuthLocal: React.FC<ReduxProps> = (props) => {
+const AuthLocal: React.FC<ReduxProps & types.AuthLocalProps> = (props) => {
     const {
         selectedUser = "",
         usersByName,
         selectLocalUser,
+        setLoadMethod,
         loadUser
     } = props;
 
@@ -122,7 +125,7 @@ const AuthLocal: React.FC<ReduxProps> = (props) => {
                 <FlexSpace />
                 <Button
                     variant="outlined"
-                    onClick={loadUser}
+                    onClick={setLoadMethod}
                     disabled={!selectedUser}
                 >
                     Load
