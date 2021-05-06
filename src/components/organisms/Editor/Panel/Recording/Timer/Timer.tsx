@@ -33,7 +33,7 @@ const Timer: React.FC<TimerProps> = (props) => {
     const secRef = React.useRef() as React.MutableRefObject<HTMLSpanElement>;
     const csRef = React.useRef() as React.MutableRefObject<HTMLSpanElement>;
 
-    const increment = React.useCallback((progress: number) => {
+    const draw = React.useCallback((progress: number) => {
         const { m, s, cs } = formatDuration(progress);
 
         minRef.current.innerHTML = m;
@@ -42,8 +42,8 @@ const Timer: React.FC<TimerProps> = (props) => {
     }, []);
 
     React.useImperativeHandle(timerHandle, () => ({
-        increment
-    }), [increment]);
+        draw
+    }), [draw]);
 
     return (
         <div className={classes.timerContainer}>

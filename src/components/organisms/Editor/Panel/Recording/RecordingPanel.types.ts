@@ -12,12 +12,13 @@ export interface RecordingPanelProps {
 }
 
 export interface TimerHandle {
-    increment: CassetteProgressCallback;
+    draw: CassetteProgressCallback;
 }
 
 export interface WaveHandle {
     init: (frequencies: number[][]) => void;
-    increment: CassetteProgressCallback;
+    buffer: CassetteProgressCallback;
+    draw: CassetteProgressCallback;
     flush: () => void;
     frequencies: () => number[][];
 }

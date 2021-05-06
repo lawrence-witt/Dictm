@@ -2,7 +2,6 @@ import React from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { CassetteProgressCallback } from 'cassette-js';
-import { demandAnimationFrame, cancelAnimationFrame } from 'demandanimationframe';
 
 import { RootState } from '../../../../../redux/store';
 import { editorSelectors, editorOperations } from '../../../../../redux/ducks/editor';
@@ -18,6 +17,7 @@ import Form from './Form/Form';
 import Controls from './Controls/Controls';
 
 import useCassette from '../../../../../lib/hooks/useCassette';
+import useThrottledFunction from '../../../../../lib/hooks/useThrottledFunction';
 
 /* 
 *   Redux
@@ -58,7 +58,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     */
 
     const nextFrame = React.useRef() as React.MutableRefObject<(() => void) | undefined>;
-    const frameLoop = React.useRef() as React.MutableRefObject<ReturnType<typeof demandAnimationFrame>>;
+    const frameLoop = React.useRef() as React.MutableRefObject<ReturnType<typeof requestAnimationFrame>>;
 
     /* 
     *   Imperative handle refs
@@ -71,13 +71,19 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     *   Cassette callbacks
     */
 
+    const bufferWaveForm = useThrottledFunction((p: number, d: number) => {
+        waveHandle.current?.buffer(p, d);
+    }, 35);
+
     const onProgress = React.useCallback<CassetteProgressCallback>((progress, duration) => {
+        bufferWaveForm(progress, duration);
+
         nextFrame.current = () => {
-            (handle => handle?.increment(progress, duration))(timerHandle.current);
-            (handle => handle?.increment(progress, duration))(waveHandle.current);
+            timerHandle.current?.draw(progress, duration);
+            waveHandle.current?.draw(progress, duration);
             nextFrame.current = undefined;
         }
-    }, []);
+    }, [bufferWaveForm]);
 
     /* 
     *   Cassette and audio refs
@@ -110,10 +116,10 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
 
         const commitFrame = () => {
             if (nextFrame.current) nextFrame.current();
-            frameLoop.current = demandAnimationFrame(commitFrame);
+            frameLoop.current = requestAnimationFrame(commitFrame);
         }
 
-        frameLoop.current = demandAnimationFrame(commitFrame);
+        frameLoop.current = requestAnimationFrame(commitFrame);
     }, [cassette.get, cassette.controls]);
 
     // Stop recording or playing and persist new data to store
@@ -140,7 +146,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (type === "to") await cassette.controls.scanTo(secs);
         if (type === "by") await cassette.controls.scanBy(secs);
 
-        if (nextFrame.current) demandAnimationFrame(nextFrame.current, true);
+        if (nextFrame.current) requestAnimationFrame(nextFrame.current);
     }, [cassette.controls]);
 
     // Commit the Recording model
@@ -205,7 +211,7 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         if (mode !== "play" || !cassette.flags.canInsert || insertFailed.current) return;
         handleInsert(model.data.audio);
         waveHandle.current.init(model.data.frequencies);
-        waveHandle.current.increment(0, model.data.audio.attributes.duration);
+        waveHandle.current.draw(0, model.data.audio.attributes.duration);
     }, [mode, model.data, cassette.flags, handleInsert]);
 
     /* 

@@ -1,4 +1,4 @@
-import { WaveFormOptions, BufferMap } from './WaveForm.types';
+import * as types from './WaveForm.types';
 
 class WaveForm {
     private _canvas: HTMLCanvasElement;
@@ -13,7 +13,7 @@ class WaveForm {
     public offsetWidth = 15;
     public tapeHeight = 25;
     public waveHeight = 225;
-    public nullHeight = 0;
+    public nullHeight = 200;
 
     public secondBuffer = 0;
 
@@ -27,13 +27,23 @@ class WaveForm {
 
     // Draw Data
     private _drawLen = 0;
-    private _bufferMap: BufferMap = new Map();
+    private _drawBuffer: types.DrawBuffer = new Map();
+    private _drawFrame: types.DrawFrame = {
+        rescale: false,
+        clear: {
+            deciseconds: []
+        },
+        add: {
+            seconds: [],
+            deciseconds: []
+        }
+    }
 
     // Freq Data
     private _freqData: number[][] = [];
 
     // Validate and Construct
-    constructor(canvas: HTMLCanvasElement, options?: Partial<WaveFormOptions>) {
+    constructor(canvas: HTMLCanvasElement, options?: Partial<types.WaveFormOptions>) {
         this._canvas = canvas;
         const context = canvas.getContext("2d");
         if (!context) throw new Error('WaveForm supplied with Canvas already using a different context.');
@@ -64,7 +74,6 @@ class WaveForm {
         } else {
             return array.reduce((p, c) => p + c, 0)/array.length; // Thanks TypeScript...
         }
-        
     }
 
     /* * * * * * * * * * *\
@@ -156,29 +165,29 @@ class WaveForm {
         this._canvasCtx.clearRect(x, y, w, h);
     }
 
-    /* * * * * * * * * * * * * * *\
-    *   Data Management Methods  *
-    *\ * * * * * * * * * * * * * */ 
+    /* * * * * * * * * * * * *\
+    *   Draw Frame Methods   *
+    *\ * * * * * * * * * * * */ 
 
     private _commitBuffer(predicate: (secs: number, decis: number) => boolean) {
-        for (const [key, buffer] of this._bufferMap) {
-            if (!predicate(buffer.secs, buffer.decis)) break;
+        for (const [key, buffer] of this._drawBuffer) {
+            if (!predicate(buffer.secs, buffer.decis)) continue;
 
             const secSlot = this._freqData[buffer.secs];
-            if (!secSlot) break;
+            if (!secSlot) continue;
             
             const deciSlot = this._freqData[buffer.secs][buffer.decis];
             const value = this._getMean(buffer.buffer);
 
             if (deciSlot) {
                 secSlot[buffer.decis] = value;
-                this._clearDecisecond(buffer.secs, buffer.decis);
+                this._queueClearDecisecond(buffer.secs, buffer.decis);
             } else {
                 secSlot.push(value);
             }
 
-            this._drawDecisecond(buffer.secs, buffer.decis, value);
-            this._bufferMap.delete(key);
+            this._queueAddDecisecond(buffer.secs, buffer.decis, value);
+            this._drawBuffer.delete(key);
         }
     }
 
@@ -194,7 +203,7 @@ class WaveForm {
         this._freqData[second] = filled;
 
         for (let i=0; i<fillRange; i++) {
-            this._drawDecisecond(second, fillStart + i, this.nullHeight);
+            this._queueAddDecisecond(second, fillStart + i, this.nullHeight);
         }
     }
 
@@ -202,20 +211,20 @@ class WaveForm {
         const secondLen = this._freqData.length;
         const missingSeconds = second - secondLen;
 
-        // Fill and draw any missing deciseconds in last second
+        // Fill and queue any missing deciseconds in last second
         this._fillSecond(secondLen-1);
 
-        // Fill and draw any missing seconds up to this second
+        // Fill and queue any missing seconds up to this second
         for (let i=0; i<missingSeconds; i++) {
             this._freqData.push([]);
             this._fillSecond(secondLen+i);
         }
 
-        // Commit the new second
+        // Queue the new second
         this._drawLen += 1;
         this._freqData.push([]);
-        this._rescaleCanvas(this._drawLen);
-        this._drawSecond(this._drawLen - 1);
+        this._queueRescale();
+        this._queueAddSecond(this._drawLen - 1);
     }
 
     private _handleNewDecisecond(second: number, decisecond: number) {
@@ -225,7 +234,36 @@ class WaveForm {
         // Fill and draw any missing deciseconds in this second
         for (let i=0; i<missingDeciseconds; i++) {
             this._freqData[second].push(this.nullHeight);
-            this._drawDecisecond(second, decisecondLen + i, this.nullHeight);
+            this._queueAddDecisecond(second, decisecondLen + i, this.nullHeight);
+        }
+    }
+
+    private _queueRescale() {
+        this._drawFrame.rescale = true;
+    }
+
+    private _queueClearDecisecond(secs: number, decis: number) {
+        this._drawFrame.clear.deciseconds.push({secs, decis});
+    }
+
+    private _queueAddSecond(secs: number) {
+        this._drawFrame.add.seconds.push(secs);
+    }
+
+    private _queueAddDecisecond(secs: number, decis: number, freq: number) {
+        this._drawFrame.add.deciseconds.push({secs, decis, freq});
+    }
+
+    private _resetDrawFrame() {
+        this._drawFrame = {
+            rescale: false,
+            clear: {
+                deciseconds: []
+            },
+            add: {
+                seconds: [],
+                deciseconds: []
+            }
         }
     }
 
@@ -262,17 +300,17 @@ class WaveForm {
         // Average the data
         const freqMean = this._getMean(data);
 
-        // Try to empty the buffer map up to this decisecond
+        // Try to empty the draw buffer up to this decisecond
         this._commitBuffer((secs, decis) => secs < second || secs === second && decis < decisecond);
 
         // Handle new second
         if (!this._freqData[second]) this._handleNewSecond(second);
 
         // Handle new decisecond
-        if (!this._bufferMap.has(bufferKey)) {
+        if (!this._drawBuffer.has(bufferKey)) {
             this._handleNewDecisecond(second, decisecond);
 
-            this._bufferMap.set(bufferKey, {
+            this._drawBuffer.set(bufferKey, {
                 secs: second,
                 decis: decisecond,
                 buffer: []
@@ -280,11 +318,23 @@ class WaveForm {
         } 
 
         // Add new data point to buffer
-        const record = this._bufferMap.get(bufferKey);
-        if (record) this._bufferMap.set(bufferKey, {
+        const record = this._drawBuffer.get(bufferKey);
+        if (record) this._drawBuffer.set(bufferKey, {
             ...record,
             buffer: record.buffer.concat(freqMean)
         });
+    }
+
+    public draw(): void {
+        const { rescale, clear, add } = this._drawFrame;
+
+        if (rescale) this._rescaleCanvas(this._drawLen);
+
+        clear.deciseconds.forEach(d => this._clearDecisecond(d.secs, d.decis));
+        add.seconds.forEach(s => this._drawSecond(s));
+        add.deciseconds.forEach(d => this._drawDecisecond(d.secs, d.decis, d.freq));
+
+        this._resetDrawFrame();
     }
 
     public flush(hint?: number): void {
@@ -301,7 +351,8 @@ class WaveForm {
         }
 
         this._commitBuffer(() => true);
-        this._bufferMap.clear();
+        this._drawBuffer.clear();
+        this.draw();
     }
 
     /* * * * * * * * * * * * * * *\
@@ -309,11 +360,11 @@ class WaveForm {
     *\ * * * * * * * * * * * * * */ 
 
     get frequencyData(): number[][] {
-        return this._freqData.slice(0).map(deci => deci.slice(0));
+        return this._freqData;
     }
 
     set frequencyData(data: number[][]) {
-        this._freqData = data.slice(0).map(deci => deci.slice(0));
+        this._freqData = data;
     }
 }
 

@@ -19,7 +19,7 @@ export interface WaveFormProps {
 
 // Class
 
-export interface WaveFormOptions {
+export type WaveFormOptions = {
     textStyle: string;
     markStyle: string;
     waveStyle: string;
@@ -27,17 +27,35 @@ export interface WaveFormOptions {
     offsetWidth: number;
     tapeHeight: number;
     waveHeight: number;
-    markWidth: number;
+    nullHeight: number;
     secondBuffer: number;
     secondWidth: number;
     secondMarkHeight: number;
     deciSecondMarkHeight: number;
+    markWidth: number;
 }
 
 export interface Buffer {
     secs: number;
     decis: number;
     buffer: number[];
+}
+
+export type DrawBuffer = Map<string, {
+    secs: number;
+    decis: number;
+    buffer: number[];
+}>
+
+export interface DrawFrame {
+    rescale: boolean;
+    clear: {
+        deciseconds: { secs: number, decis: number }[];
+    };
+    add: {
+        seconds: number[];
+        deciseconds: { secs: number; decis: number; freq: number }[]
+    }
 }
 
 export type BufferMap = Map<string, Buffer>;
