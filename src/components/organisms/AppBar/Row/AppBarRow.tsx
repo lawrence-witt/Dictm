@@ -63,6 +63,7 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
         onToggleSearch,
         onToggleDelete,
         onToggleMenu,
+        inert,
         children
     } = props;
 
@@ -77,6 +78,11 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
 
     const searchClass = searchIsOpen ? classes.toolIconSelected : classes.toolIcon;
     const deleteClass = deleteIsOpen ? classes.toolIconSelected : classes.toolIcon;
+
+    const inertAttributes = React.useMemo(() => ({
+        tabIndex: inert ? -1 : 0,
+        ...(inert ? {"aria-hidden": true} : {})
+    }), [inert]);
 
     return (
         <AppBar
@@ -94,6 +100,7 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
                 color="inherit"
                 className={classes.menuButton}
                 onClick={onToggleMenu}
+                {...inertAttributes}
             />
             <Typography 
                 variant="h6"
@@ -113,6 +120,7 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
                     <IconButton
                         color="inherit"
                         className={classes.leftMostButton}
+                        {...inertAttributes}
                     >
                         <Repeat 
                             className={classes.toolIcon}
@@ -124,6 +132,7 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
                 <IconButton
                     color="inherit"
                     onClick={onToggleSearch}
+                    {...inertAttributes}
                 >
                     <Search 
                         className={searchClass}
@@ -135,6 +144,7 @@ const AppBarRow: React.FC<AppBarRowProps> = (props) => {
                     edge="end"
                     color="inherit"
                     onClick={onToggleDelete}
+                    {...inertAttributes}
                 >
                     <Delete 
                         className={deleteClass}

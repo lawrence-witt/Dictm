@@ -3,6 +3,11 @@ import { connect, ConnectedProps } from 'react-redux';
 import { RootState } from '../../../../redux/store';
 import { toolOperations, toolSelectors } from '../../../../redux/ducks/tools';
 
+interface InjectedAppBarRowProps {
+    inert?: boolean;
+    children?: any;
+}
+
 const mapState = (state: RootState) => ({
     pageTitle: toolSelectors.getPageTitle(
         state.history.current, state.content.categories
@@ -22,4 +27,6 @@ const mapDispatch = {
 
 export const connector = connect(mapState, mapDispatch);
 
-export type AppBarRowProps = ConnectedProps<typeof connector>;
+type ConnectedAppBarRowProps = ConnectedProps<typeof connector>;
+
+export type AppBarRowProps = ConnectedAppBarRowProps & InjectedAppBarRowProps;

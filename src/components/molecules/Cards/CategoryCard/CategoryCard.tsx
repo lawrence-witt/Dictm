@@ -13,6 +13,7 @@ const CategoryCard: React.FC<types.CategoryCardProps> = (props) => {
         title,
         isSecondaryActive,
         isSecondarySelected,
+        inert,
         onToggleDelete,
         openEditor
     } = props;
@@ -35,6 +36,7 @@ const CategoryCard: React.FC<types.CategoryCardProps> = (props) => {
         <CardBase
             onCardClick={onCardClick}
             isSecondaryActive={isSecondaryActive}
+            inert={inert}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -45,6 +47,7 @@ const CategoryCard: React.FC<types.CategoryCardProps> = (props) => {
                     onSecondaryAction={onSecondaryAction}
                     isSecondaryActive={isSecondaryActive}
                     isSecondarySelected={isSecondarySelected}
+                    inert={inert}
                 />
             </CardBasePrimaryRow>
         </CardBase>

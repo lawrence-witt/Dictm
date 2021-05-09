@@ -162,7 +162,7 @@ const SplashFacade: React.FC = () => {
     const classes = useStyles();
 
     return (
-        <div className={classes.facadeRoot}>
+        <div aria-hidden={true} className={classes.facadeRoot}>
             <div className={classes.nav}>
                 <NavMenuHeader
                     flow={1}
@@ -170,9 +170,10 @@ const SplashFacade: React.FC = () => {
                     names={["Tracey"]}
                     onUnNest={voidPlaceholder}
                     onReset={voidPlaceholder}
+                    inert
                 />
                 {navItemList.map(item => (
-                    <NavMenuItem key={item.id} {...item} />
+                    <NavMenuItem key={item.id} {...item} inert/>
                 ))}
             </div>
             <div className={classes.content}>
@@ -184,6 +185,7 @@ const SplashFacade: React.FC = () => {
                     onToggleMenu={voidPlaceholder}
                     onToggleDelete={voidPlaceholder}
                     onToggleSearch={voidPlaceholder}
+                    inert
                 />
                 <MasonryGrid
                     gridClass="card-grid"
@@ -193,11 +195,11 @@ const SplashFacade: React.FC = () => {
                         switch(item.type) {
                             case "recording": {
                                 const { type, ...rest } = item;
-                                return <RecordingCard key={item.id} {...rest} />;
+                                return <RecordingCard key={item.id} {...rest} inert/>;
                             }
                             case "note": {
                                 const { type, ...rest } = item;
-                                return <NoteCard key={item.id} {...rest}/>
+                                return <NoteCard key={item.id} {...rest} inert/>
                             }
                         }
                     })}

@@ -16,4 +16,5 @@ export interface NavMenuHeaderProps {
     names: string[];
     onUnNest: (levels: number) => void;
     onReset: () => void;
+    inert?: boolean;
 }

@@ -46,19 +46,34 @@ const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
         to,
         divider,
         onClick,
-        onNest
+        onNest,
+        inert
     } = props;
 
     const classes = useStyles({ icon: icon ? true : false });
 
+    const inertAttributes = React.useMemo(() => ({
+        tabIndex: inert ? -1 : 0,
+        ...(inert ? {"aria-hidden": true} : {})
+    }), [inert]);
+
     return (
-        <ListItem button disableGutters onClick={onClick}>
+        <ListItem  
+            button 
+            disableGutters 
+            onClick={onClick}
+            {...inertAttributes}
+        >
             {icon && <ListItemIcon className={classes.icon}>{iconMap[icon]}</ListItemIcon>}
             <ListItemText className={classes.primary} primary={primary}/>
             {divider && <Divider className={classes.divider}/>}
             {to && (
                 <ListItemSecondaryAction>
-                    <DirectionButton onClick={() => onNest && onNest(to)} direction="right" edge="end"/>
+                    <DirectionButton 
+                        onClick={() => onNest && onNest(to)} 
+                        direction="right" edge="end"
+                        {...inertAttributes}
+                    />
                 </ListItemSecondaryAction>
             )}
         </ListItem>

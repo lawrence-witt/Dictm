@@ -10,6 +10,7 @@ interface InjectedRecordingCardProps {
     title: string;
     duration: number;
     created: number;
+    inert?: boolean;
 }
 
 const mapState = (state: RootState, props: InjectedRecordingCardProps) => ({

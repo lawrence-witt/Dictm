@@ -7,6 +7,7 @@ import { toolOperations, toolSelectors } from '../../../../redux/ducks/tools';
 interface InjectedCategoryCardProps {
     title: string;
     id: string;
+    inert?: boolean;
 }
 
 const mapState = (state: RootState, props: InjectedCategoryCardProps) => ({

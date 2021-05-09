@@ -14,6 +14,7 @@ interface InjectedNoteCardProps {
         charCount: number;
     }
     created: number;
+    inert?: boolean;
 }
 
 const mapState = (state: RootState, props: InjectedNoteCardProps) => ({

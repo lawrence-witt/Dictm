@@ -58,7 +58,8 @@ const NavMenuHeader: React.FC<NavMenuHeaderProps> = (props) => {
         open = false,
         names,
         onUnNest,
-        onReset
+        onReset,
+        inert = false
     } = props;
 
     const [toggleState, setToggleState] = React.useState(() => getToggleState(flow, flow, open));
@@ -79,17 +80,32 @@ const NavMenuHeader: React.FC<NavMenuHeaderProps> = (props) => {
 
     const onBackButtonClick = React.useCallback(() => onUnNest(1), [onUnNest]);
 
+    const inertAttributes = React.useMemo(() => ({
+        tabIndex: inert ? -1 : 0,
+        ...(inert ? {"aria-hidden": true} : {})
+    }), [inert]);
+
     return (
         <Box component="header" className={classes.header}>
             <Divider className={classes.divider}/>
-            <MenuButton onClick={onReset} className={classes.menuButton} edge="start"/>
+            <MenuButton
+                onClick={onReset} 
+                className={classes.menuButton} 
+                edge="start"
+                {...inertAttributes}
+            />
             <ListItemText disableTypography>
                 <Typography variant="h6" className={classes.title}>
                     {names[names.length-1]}
                 </Typography>
             </ListItemText>
             <ListItemSecondaryAction className={classes.backButton}>
-                <DirectionButton direction="left" edge="end" onClick={onBackButtonClick}/>
+                <DirectionButton 
+                    direction="left" 
+                    edge="end" 
+                    onClick={onBackButtonClick}
+                    {...inertAttributes}
+                />
             </ListItemSecondaryAction>
         </Box>
     )

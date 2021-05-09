@@ -14,6 +14,7 @@ const RecordingCard: React.FC<types.RecordingCardProps> = (props) => {
         createdFormatted,
         isSecondaryActive,
         isSecondarySelected,
+        inert,
         onToggleDelete,
         openEditor
     } = props;
@@ -30,6 +31,7 @@ const RecordingCard: React.FC<types.RecordingCardProps> = (props) => {
         <CardBase
             onCardClick={onCardClick}
             isSecondaryActive={isSecondaryActive}
+            inert={inert}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -43,6 +45,7 @@ const RecordingCard: React.FC<types.RecordingCardProps> = (props) => {
                     onSecondaryAction={onSecondaryAction}
                     isSecondaryActive={isSecondaryActive}
                     isSecondarySelected={isSecondarySelected}
+                    inert={inert}
                 />
             </CardBasePrimaryRow>
         </CardBase>

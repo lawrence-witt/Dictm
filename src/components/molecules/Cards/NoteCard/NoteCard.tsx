@@ -26,6 +26,7 @@ const NoteCard: React.FC<types.NoteCardProps> = (props) => {
         createdFormatted,
         isSecondaryActive,
         isSecondarySelected,
+        inert,
         onToggleDelete,
         openEditor
     } = props;
@@ -50,6 +51,7 @@ const NoteCard: React.FC<types.NoteCardProps> = (props) => {
         <CardBase
             onCardClick={onCardClick}
             isSecondaryActive={isSecondaryActive}
+            inert={inert}
         >
             <CardBasePrimaryRow
                 title={title}
@@ -63,6 +65,7 @@ const NoteCard: React.FC<types.NoteCardProps> = (props) => {
                     onSecondaryAction={onSecondaryAction}
                     isSecondaryActive={isSecondaryActive}
                     isSecondarySelected={isSecondarySelected}
+                    inert={inert}
                 />
             </CardBasePrimaryRow>
             <CardBaseSecondaryRow>

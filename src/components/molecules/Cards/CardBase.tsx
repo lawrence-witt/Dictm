@@ -17,6 +17,7 @@ interface CardBaseProps {
     onCardClick: () => void;
     isSecondaryActive?: boolean;
     isCardFocussed?: boolean;
+    inert?: boolean;
 }
 
 interface CardBasePrimaryRowProps {
@@ -33,6 +34,7 @@ interface CardBaseActionSwitchProps {
     onSecondaryAction?: () => void;
     isSecondaryActive?: boolean;
     isSecondarySelected?: boolean;
+    inert?: boolean;
 }
 
 /* CARD BASE */
@@ -71,10 +73,16 @@ const CardBase: React.FC<CardBaseProps> = (props) => {
         onCardClick,
         isCardFocussed = false,
         isSecondaryActive = false,
+        inert,
         children
     } = props;
 
     const classes = useBaseStyles({isCardFocussed});
+
+    const inertAttributes = React.useMemo(() => ({
+        tabIndex: inert ? -1 : 0,
+        ...(inert ? {"aria-hidden": true} : {})
+    }), [inert]);
 
     return (
         <Card className={classes.cardRoot}>
@@ -82,6 +90,7 @@ const CardBase: React.FC<CardBaseProps> = (props) => {
                 className={classes.buttonBase} 
                 disabled={isSecondaryActive} 
                 onClick={onCardClick}
+                {...inertAttributes}
             />
             {children}
         </Card>
@@ -216,12 +225,18 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
         isPrimaryPlaceholder,
         onSecondaryAction,
         isSecondaryActive,
-        isSecondarySelected
+        isSecondarySelected,
+        inert
     } = props;
 
     const classes = useActionSwitchStyles();
 
     const IconButtonType = contained ? ContainedIconButton : IconButton;
+
+    const inertAttributes = React.useMemo(() => ({
+        tabIndex: inert ? -1 : 0,
+        ...(inert ? {"aria-hidden": true} : {})
+    }), [inert]);
 
     const primaryButton = (
         <IconButtonType 
@@ -230,7 +245,9 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
             classes={{
                 root: classes.actionRoot, 
                 label: classes.iconButtonLabel
-            }}>
+            }}
+            {...inertAttributes}
+        >
             {PrimaryIcon && <PrimaryIcon />}
         </IconButtonType>
     );
@@ -253,6 +270,7 @@ const CardBaseActionSwitch: React.FC<CardBaseActionSwitchProps> = (props) => {
             checked={isSecondarySelected}
             onChange={onSecondaryAction}
             edge="start"
+            {...inertAttributes}
         />
     );
 
