@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const SplashHero: React.FC = () => {
+const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
     const classes = useStyles();
 
     const history = useHistory();
@@ -128,7 +128,10 @@ const SplashHero: React.FC = () => {
                 <polygon points="0,10 10,3 10,10" className="solid"/>
                 <polygon points="1,10 10,0 10,10" className="transparent"/>
             </svg>
-            <IconButton className={classes.moreButton}>
+            <IconButton 
+                className={classes.moreButton}
+                onClick={onExpandClick}
+            >
                 <More/>
             </IconButton>
         </div>

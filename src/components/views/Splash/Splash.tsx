@@ -6,9 +6,16 @@ import SplashReleases from './sections/Releases/SplashReleases';
 import Footer from '../../organisms/Footer/Footer';
 
 const Splash: React.FC = () => {
+    const expandAnchor = React.useRef<HTMLSpanElement>(null);
+
+    const onExpandClick = React.useCallback(() => {
+        if (expandAnchor.current) expandAnchor.current.scrollIntoView({behavior: 'smooth'});
+    }, []);
+
     return (
         <div style={{width: '100%'}}>
-            <SplashHero/>
+            <SplashHero onExpandClick={onExpandClick}/>
+            <span ref={expandAnchor}></span>
             <SplashFeatures />
             <SplashReleases />
             <Footer/>
