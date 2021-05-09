@@ -25,8 +25,19 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(4)
     },
     featuresTopSectionContent: {
-        "& > *:not(:last-child)": {
-            marginBottom: theme.spacing(8)
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginRight: -theme.spacing(8),
+        marginBottom: -theme.spacing(8)
+    },
+    featuresSubSectionRoot: {
+        paddingRight: theme.spacing(8),
+        marginBottom: theme.spacing(8),
+
+        [theme.breakpoints.up("sm")]: {
+            flex: "1 1 33%",
+            minWidth: 400
         }
     },
     featuresSubSectionHeader: {
@@ -48,6 +59,7 @@ const SplashFeatures: React.FC = () => {
     }), [classes]);
 
     const subSectionClasses = React.useMemo(() => ({
+        root: classes.featuresSubSectionRoot,
         header: classes.featuresSubSectionHeader,
         content: classes.featuresSubSectionContent
     }), [classes]);
