@@ -22,7 +22,7 @@ export const getToolVisibility = createSelector((
 ) => {
     const { stem, categoryId } = helpers.extractParams(location.pathname);
     return {
-        replay: stem === "categories" && categoryId || stem === "recordings" || stem === "notes",
+        replay: Boolean(stem === "categories" && categoryId || stem === "recordings" || stem === "notes"),
         search: stem !== "settings",
         delete: stem !== "settings"
     }

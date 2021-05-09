@@ -1,10 +1,6 @@
 import React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { connect, ConnectedProps } from 'react-redux';
 
-import { RootState } from '../../../redux/store';
-import { toolSelectors, toolOperations, NavMenuLists } from '../../../redux/ducks/tools';
-import { userOperations } from '../../../redux/ducks/user';
+import { NavMenuLists } from '../../../redux/ducks/tools';
 
 import { useBreakpointsContext } from '../../../lib/providers/BreakpointsProvider';
 
@@ -14,29 +10,6 @@ import NavMenuSwitch from './Switch/NavMenuSwitch';
 import NavMenuHeader from './Header/NavMenuHeader';
 
 import * as types from './NavMenu.types';
-
-/* 
-*   Redux
-*/
-
-const mapState = (state: RootState, props: RouteComponentProps & types.NavMenuProps) => ({
-    isMenuOpen: state.tools.menu.isOpen,
-    navLists: toolSelectors.getNavLists(
-        state.user.profile, 
-        state.content.categories,
-        props.history.push,
-        props.signOut
-    )
-});
-
-const mapDispatch = {
-    clearUser: userOperations.clearUser,
-    onToggleMenu: toolOperations.toggleNavMenu
-}
-
-const connector = connect(mapState, mapDispatch);
-
-type ReduxProps = ConnectedProps<typeof connector>;
 
 /* 
 *   Local
@@ -121,7 +94,7 @@ const resetMenu = (
     }
 });
 
-const NavMenu: React.FC<ReduxProps> = (props) => {
+const NavMenu: React.FC<types.NavMenuProps> = (props) => {
     const {
         isMenuOpen,
         navLists,
@@ -174,4 +147,4 @@ const NavMenu: React.FC<ReduxProps> = (props) => {
     )
 }
 
-export default withRouter(connector(NavMenu));
+export default NavMenu;

@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 
 import { RootState } from '../../../redux/store';
 
-import AppBarRow from './Row/AppBarRow';
+import AppBarRow from './Row';
 import SearchTool from './Tools/Search/SearchTool';
 import DeleteTool from './Tools/Delete/DeleteTool';
 

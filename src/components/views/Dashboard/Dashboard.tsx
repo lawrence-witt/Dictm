@@ -8,16 +8,16 @@ import { RootState } from '../../../redux/store';
 import { toolSelectors } from '../../../redux/ducks/tools';
 import { userOperations } from '../../../redux/ducks/user';
 
+import Slider from '../../molecules/Slider/Slider';
+
 import AppBar from '../../organisms/AppBar/AppBar';
 import NavBar from '../../organisms/NavBar/NavBar';
-import NavMenu from '../../organisms/NavMenu/NavMenu';
+import NavMenu from '../../organisms/NavMenu';
+import ContentGrid from '../../organisms/ContentGrid';
 import Editor from '../../organisms/Editor/Editor';
 import Greeter from '../../organisms/Greeter/Greeter';
 
-import Slider from '../../molecules/Slider/Slider';
-
-import Content from './frames/Content/Content';
-import Settings from './frames/Settings/Settings';
+import Settings from './settings/Settings';
 
 /* 
 *   Redux
@@ -92,7 +92,7 @@ const Dashboard: React.FC<ReduxProps> = (props) => {
                                     exact 
                                     path="/recordings" 
                                     render={() => 
-                                        <Content 
+                                        <ContentGrid 
                                             context="recordings"
                                         />
                                     }
@@ -101,7 +101,7 @@ const Dashboard: React.FC<ReduxProps> = (props) => {
                                     exact 
                                     path="/notes" 
                                     render={() => 
-                                        <Content 
+                                        <ContentGrid 
                                             context="notes"
                                         />
                                     }
@@ -110,7 +110,7 @@ const Dashboard: React.FC<ReduxProps> = (props) => {
                                     exact 
                                     path="/categories/:categoryId?" 
                                     render={({match}) => 
-                                        <Content 
+                                        <ContentGrid 
                                             context="categories" 
                                             categoryId={match.params.categoryId} 
                                         />

@@ -1,8 +1,4 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
-
-import { RootState } from '../../../../redux/store';
-import { toolOperations, toolSelectors } from '../../../../redux/ducks/tools';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -19,34 +15,7 @@ import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
 
 import { useBreakpointsContext } from '../../../../lib/providers/BreakpointsProvider';
 
-/* 
-*   Redux
-*/
-
-const mapState = (state: RootState) => ({
-    pageTitle: toolSelectors.getPageTitle(
-        state.history.current, state.content.categories
-    ),
-    toolVisibility: toolSelectors.getToolVisibility(
-        state.history.current
-    ),
-    searchIsOpen: state.tools.search.isOpen,
-    deleteIsOpen: state.tools.delete.isOpen
-});
-
-const mapDispatch = {
-    onToggleMenu: toolOperations.toggleNavMenu,
-    onToggleSearch: toolOperations.toggleSearchTool,
-    onToggleDelete: toolOperations.toggleDeleteTool
-}
-
-const connector = connect(mapState, mapDispatch);
-
-type ReduxProps = ConnectedProps<typeof connector>;
-
-/* 
-*   Local
-*/
+import { AppBarRowProps } from './AppBarRow.types';
 
 const useDefaultRowStyles = makeStyles<Theme, {
     titleHidden: boolean; 
@@ -85,7 +54,7 @@ const useDefaultRowStyles = makeStyles<Theme, {
     })
 ));
 
-const AppBarRow: React.FC<ReduxProps> = (props) => {
+const AppBarRow: React.FC<AppBarRowProps> = (props) => {
     const {
         pageTitle,
         toolVisibility,
@@ -177,4 +146,4 @@ const AppBarRow: React.FC<ReduxProps> = (props) => {
     )
 }
 
-export default connector(AppBarRow);
+export default AppBarRow;

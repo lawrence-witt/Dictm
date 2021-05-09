@@ -1,15 +1,18 @@
 import React from 'react';
 
-import { useHistory } from 'react-router-dom';
+import SplashHero from './sections/Hero/SplashHero';
+import SplashFeatures from './sections/Features/SplashFeatures';
+import SplashReleases from './sections/Releases/SplashReleases';
+import Footer from '../../organisms/Footer/Footer';
 
 const Splash: React.FC = () => {
-    const history = useHistory();
-
     return (
-        <>
-            Splash View
-            <button onClick={() => history.push('/auth')}>Go to Auth</button>
-        </>
+        <div style={{width: '100%'}}>
+            <SplashHero/>
+            <SplashFeatures />
+            <SplashReleases />
+            <Footer/>
+        </div>
     )
 }
 
