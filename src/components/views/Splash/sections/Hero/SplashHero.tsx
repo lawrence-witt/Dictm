@@ -15,22 +15,32 @@ const useStyles = makeStyles(theme => ({
         position: 'relative',
         height: '100vh',
         width: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        padding: theme.spacing(4, 2, 0, 2),
+
+        [theme.breakpoints.up("sm")]: {
+            padding: theme.spacing(4, 4, 0, 4)
+        },
+
+        [theme.breakpoints.up("md")]: {
+            padding: theme.spacing(6, 6, 0, 6)
+        }
+    },
+    heroLogo: {
+        marginBottom: theme.spacing(3)
     },
     heroGrid: {
         height: '100%',
         width: '100%',
-        padding: theme.spacing(4, 2, 0, 2),
         display: 'grid',
         gridTemplateColumns: '1fr',
-        gridTemplateRows: '1fr 1fr',
+        gridTemplateRows: '2fr 3fr',
         gridTemplateAreas: `
             "text"
             "facade"
         `,
 
         [theme.breakpoints.up("sm")]: {
-            padding: theme.spacing(4, 4, 0, 4),
             gridTemplateColumns: 'minmax(0, 30vw) 1fr',
             gridTemplateAreas: `
                 "text text"
@@ -39,7 +49,6 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.up("md")]: {
-            padding: theme.spacing(6, 6, 0, 6),
             gridTemplateColumns: "auto 12vw 1fr",
             gridTemplateRows: "1fr",
             gridTemplateAreas: `
@@ -74,6 +83,7 @@ const useStyles = makeStyles(theme => ({
     slashSvg: {
         position: 'absolute',
         bottom: 0,
+        left: 0,
         width: '100%',
         height: 125,
 
@@ -99,13 +109,14 @@ const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
 
     return (
         <div className={classes.heroRoot}>
+            <Typography 
+                className={classes.heroLogo}
+                variant="h3"
+            >
+                Dictm
+            </Typography>
             <div className={classes.heroGrid}>
                 <div className={classes.heroText}>
-                    <Typography 
-                        variant="h3"
-                    >
-                        Dictm
-                    </Typography>
                     <Typography 
                         variant="h4"
                     >

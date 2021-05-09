@@ -13,10 +13,10 @@ const futureReleases = [
     {title: "Theming", desc: "dark mode and custom palettes."},
     {title: "Playlists", desc: "enabling looped file playback in the card view."},
     {title: "Local installation", desc: "save Dictm to your home-screen or desktop."},
-    {title: "Account migration", desc: "export an import data a zipped file."},
+    {title: "Account migration", desc: "export and import data as a zipped file."},
     {title: "Cloud storage", desc: "private accounts with data synced between devices."},
     {title: "Tooling", desc: "more editing tools for both audio and text content."},
-    {title: "Encoding", desc: "MP3 encoding to suppot storage-restricted browsers."}
+    {title: "Encoding", desc: "MP3 encoding to support storage-restricted browsers."}
 ];
 
 const useStyles = makeStyles(theme => ({
