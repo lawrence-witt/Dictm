@@ -72,7 +72,7 @@ const EditorBar: React.FC<ReduxProps> = (props) => {
 
         switch(context.type) {
             case "recording":
-                return <RecordingEditorButtons mode={context.mode} />
+                return <RecordingEditorButtons mode={context.mode} model={context.model}/>
             case "note":
                 return <NoteEditorButtons />
             case "category":

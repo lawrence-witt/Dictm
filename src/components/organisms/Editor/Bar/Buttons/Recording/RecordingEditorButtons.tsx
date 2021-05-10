@@ -32,6 +32,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> = (props) => {
     const {
         mode,
+        model,
         updateMode,
         openDetailsDialog
     } = props;
@@ -47,9 +48,16 @@ const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> 
 
     const onDownloadClick = React.useCallback((closeMenu: () => void) => {
         return () => {
+            const file = new Blob([model.data.audio.data.bytes], { type: 'audio/wav' });
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = model.attributes.title;
+            a.click();
+            URL.revokeObjectURL(url);
             closeMenu();
         }
-    }, []);
+    }, [model]);
 
     const playButtons = (
         <>
