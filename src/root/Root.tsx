@@ -1,16 +1,18 @@
 import React from 'react';
 import { hot } from 'react-hot-loader';
 import { connect, ConnectedProps } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+
+import { Switch, Route, Redirect, useHistory } from 'react-router-dom';
 
 import { RootState } from '../redux/store';
 import { historyOperations } from '../redux/ducks/history';
 import { authOperations } from '../redux/ducks/auth';
 
-import PublicRouter from './routers/PublicRouter';
-import PrivateRouter from './routers/PrivateRouter';
-
+import OnMount from '../components/atoms/OnMount/OnMount';
 import Notifier from '../components/organisms/Notifier/Notifier';
+import Splash from '../components/views/Splash/Splash';
+import Auth from '../components/views/Auth/Auth';
+import Dashboard from '../components/views/Dashboard/Dashboard';
 
 /* 
 *   Redux
@@ -56,20 +58,42 @@ const Root: React.FC<ReduxProps> = (props) => {
         return () => unlisten();
     }, [history, changeLocation]);
 
-    // Initialise the application on page load
+    // Control shared route
+
+    const [privateContext, setPrivateContext] = React.useState(userLoaded);
+    const [redirect, setRedirect] = React.useState<JSX.Element | undefined>(undefined);
 
     React.useEffect(() => {
-        initialiseApp()
-    }, [initialiseApp]);
+        if (userLoaded === privateContext) return;
+
+        if (!userLoaded && privateContext) {
+            setRedirect(<Redirect to="/auth" />);
+        }
+
+        setPrivateContext(userLoaded);
+    }, [userLoaded, privateContext]);
+
+    // Initialise the application on page load
+
+    React.useEffect(() => { initialiseApp() }, [initialiseApp]);
     
     if (!appInitialised) return null;
-
-    // Choose which routes to activate
 
     return (
         <>
             <Notifier/>
-            {userLoaded ? <PrivateRouter/> : <PublicRouter />}
+                <Switch>
+                    <Route path="/" exact={!privateContext}>
+                        {redirect && (
+                            <OnMount onMount={() => setRedirect(undefined)}>
+                                {redirect}
+                            </OnMount>
+                        )}
+                        {privateContext ? <Dashboard /> : <Splash />}
+                    </Route>
+                    <Route path="/auth" component={Auth}/>
+                    <Redirect to="/"/>
+                </Switch>
         </>
     );
 }
