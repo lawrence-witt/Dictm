@@ -10,6 +10,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import SplashFacade from '../Facade/SplashFacade';
 
+import SlashSVG from '../../../../atoms/SlashSVG/SlashSVG';
+
 const useStyles = makeStyles(theme => ({
     heroRoot: {
         position: 'relative',
@@ -79,22 +81,6 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         bottom: theme.spacing(4),
         left: theme.spacing(4)
-    },
-    slashSvg: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '100%',
-        height: 125,
-
-        "& .solid": {
-            fill: theme.palette.primary.main
-        },
-
-        "& .transparent": {
-            fill: theme.palette.primary.main,
-            fillOpacity: 0.2
-        }
     }
 }))
 
@@ -135,10 +121,7 @@ const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
                 </div>
                 <SplashFacade />
             </div>
-            <svg viewBox="0 0 10 10" className={classes.slashSvg} preserveAspectRatio="none">
-                <polygon points="0,10 10,3 10,10" className="solid"/>
-                <polygon points="1,10 10,0 10,10" className="transparent"/>
-            </svg>
+            <SlashSVG />
             <IconButton 
                 className={classes.moreButton}
                 onClick={onExpandClick}

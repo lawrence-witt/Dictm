@@ -8,6 +8,8 @@ import { fade, makeStyles } from '@material-ui/core/styles'
 import { RootState } from '../../../redux/store';
 import { authOperations, authSelectors } from '../../../redux/ducks/auth';
 
+import SlashSVG from '../../atoms/SlashSVG/SlashSVG';
+
 import Slider from '../../molecules/Slider/Slider';
 
 import AuthHome from './frames/Home/AuthHome';
@@ -99,37 +101,40 @@ const Auth: React.FC<ReduxProps> = (props) => {
     }, [location]);
 
     return (
-        <Dialog
-            open={!authMethod}
-            onExited={onDialogExited}
-            classes={{
-                paper: classes.paper
-            }}
-            maxWidth="xs"
-            BackdropProps={{
-                className: classes.backdrop
-            }}
-        >
-            <Slider 
-                item={item}
-                enter={frameTransition.dir}
-                exit={frameTransition.dir}
-                disabled={!frameTransition.active}
+        <>
+            <Dialog
+                open={!authMethod}
+                onExited={onDialogExited}
                 classes={{
-                    root: classes.sliderRoot,
-                    frame: classes.sliderFrame
+                    paper: classes.paper
+                }}
+                maxWidth="xs"
+                BackdropProps={{
+                    className: classes.backdrop
                 }}
             >
-                {(location) => (
-                    <Switch location={location}>
-                        <Route exact path="/auth" component={AuthHome} />
-                        <Route exact path="/auth/local" render={() => <AuthLocal setLoadMethod={setLoadMethod}/>} />
-                        <Route exact path="/auth/new" render={() => <AuthNew setCreateMethod={setCreateMethod}/>} />
-                        <Redirect to="/auth" />
-                    </Switch>
-                )}
-            </Slider>
-        </Dialog>
+                <Slider 
+                    item={item}
+                    enter={frameTransition.dir}
+                    exit={frameTransition.dir}
+                    disabled={!frameTransition.active}
+                    classes={{
+                        root: classes.sliderRoot,
+                        frame: classes.sliderFrame
+                    }}
+                >
+                    {(location) => (
+                        <Switch location={location}>
+                            <Route exact path="/auth" component={AuthHome} />
+                            <Route exact path="/auth/local" render={() => <AuthLocal setLoadMethod={setLoadMethod}/>} />
+                            <Route exact path="/auth/new" render={() => <AuthNew setCreateMethod={setCreateMethod}/>} />
+                            <Redirect to="/auth" />
+                        </Switch>
+                    )}
+                </Slider>
+            </Dialog>
+            <SlashSVG />
+        </>
     )
 }
 
