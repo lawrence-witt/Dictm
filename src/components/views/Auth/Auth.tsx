@@ -3,12 +3,12 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect, ConnectedProps } from 'react-redux';
 
 import Dialog from '@material-ui/core/Dialog';
-import { fade, makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 
 import { RootState } from '../../../redux/store';
 import { authOperations, authSelectors } from '../../../redux/ducks/auth';
 
-import SlashSVG from '../../atoms/SlashSVG/SlashSVG';
+import Blade from '../../atoms/Blade/Blade';
 
 import Slider from '../../molecules/Slider/Slider';
 
@@ -44,7 +44,7 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const useStyles = makeStyles(theme => ({
     backdrop: {
-        backgroundColor: fade(theme.palette.common.white, 0.7)
+        backgroundColor: "unset"
     },
     paper: {
         width: '100%',
@@ -63,6 +63,9 @@ const useStyles = makeStyles(theme => ({
             paddingLeft: theme.spacing(3),
             paddingRight: theme.spacing(3),
         }
+    },
+    authBlade: {
+        opacity: 0.3
     }
 }));
 
@@ -133,7 +136,7 @@ const Auth: React.FC<ReduxProps> = (props) => {
                     )}
                 </Slider>
             </Dialog>
-            <SlashSVG />
+            <Blade className={classes.authBlade}/>
         </>
     )
 }

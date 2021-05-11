@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import SplashFacade from '../Facade/SplashFacade';
 
-import SlashSVG from '../../../../atoms/SlashSVG/SlashSVG';
+import Blade from '../../../../atoms/Blade/Blade';
 
 const useStyles = makeStyles(theme => ({
     heroRoot: {
@@ -121,7 +121,7 @@ const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
                 </div>
                 <SplashFacade />
             </div>
-            <SlashSVG />
+            <Blade />
             <IconButton 
                 className={classes.moreButton}
                 onClick={onExpandClick}
