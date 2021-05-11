@@ -25,7 +25,13 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         height: '100%',
         width: '100%',
-        margin: 0
+        margin: 0,
+
+        "&:after": {
+            content: "''",
+            flexShrink: 0,
+            height: theme.spacing(3)
+        }
     },
     choose: {
         padding: 0
@@ -38,13 +44,13 @@ const useStyles = makeStyles(theme => ({
     note: {
         display: 'flex',
         flexDirection: 'column',
-        "& > *:not(:last-child)": {
+        "& > *": {
             marginBottom: theme.spacing(2)
         },
         padding: `0px ${theme.spacing(2)}px`
     },
     category: {
-        "& > *:not(:last-child)": {
+        "& > *": {
             marginBottom: theme.spacing(2)
         },
         padding: `0px ${theme.spacing(2)}px`

@@ -19,10 +19,7 @@ const useStyles = makeStyles<Theme, {addPseudo: boolean}>(theme =>
     createStyles({
         controlsContainer: {
             width: '100%',
-            margin: `
-                ${theme.spacing(6)}px 
-                0px
-                ${theme.spacing(3)}px`,
+            marginTop: theme.spacing(6),
             padding: `0px ${theme.spacing(1)}px`,
             display: 'flex',
             justifyContent: 'space-between',

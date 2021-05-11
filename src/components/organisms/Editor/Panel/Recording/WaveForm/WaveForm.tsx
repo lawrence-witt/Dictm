@@ -10,8 +10,10 @@ import WaveClass from './WaveForm.class';
 
 const useStyles = makeStyles(theme => ({
     container: {
+        flexShrink: 0,
         width: '100%',
         height: 250,
+        marginBottom: theme.spacing(2),
         position: 'relative',
         overflow: 'hidden'
     },
@@ -106,10 +108,15 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     *   Handle scanning with scroll grab
     */
 
-    const startScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const startScrollGrab = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (!flags.canScan) return;
 
         handleTimeout("clear");
+
+        const clientX = 
+            e.nativeEvent instanceof MouseEvent ? 
+            e.nativeEvent.clientX : 
+            e.nativeEvent.touches[0].clientX;
 
         if (isPlaying) {
             handleStop();
@@ -118,17 +125,22 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
         scrollCoords.current = {
             left: tapeRef.current.scrollLeft,
-            x: e.clientX
+            x: clientX
         }
 
         e.currentTarget.style.cursor = "grabbing";
         document.body.style.userSelect = "none";
     }
 
-    const moveScrollGrab = (e: React.MouseEvent) => {
+    const moveScrollGrab = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (!scrollCoords.current) return;
 
-        const dx = e.clientX - scrollCoords.current.x;
+        const clientX = 
+            e.nativeEvent instanceof MouseEvent ? 
+            e.nativeEvent.clientX : 
+            e.nativeEvent.touches[0].clientX;
+
+        const dx = clientX - scrollCoords.current.x;
         const rawScroll = scrollCoords.current.left - dx;
         const maxScroll = durationRef.current * waveFormOptions.secondWidth;
 
@@ -139,7 +151,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         tapeRef.current.scrollLeft = clamped;
     }
 
-    const stopScrollGrab = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const stopScrollGrab = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if (!scrollCoords.current) return;
 
         if (shouldResume.current) {
@@ -164,24 +176,6 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         waveClass.current.frequencyData = frequencies;
         waveClass.current.init();
     }, []);
-
-    const increment = React.useCallback<CassetteProgressCallback>((p: number, d: number) => {
-        progressRef.current = p;
-        durationRef.current = d;
-
-        if (scrollCoords.current) return;
-
-        tapeRef.current.scrollLeft = p * waveFormOptions.secondWidth;
-
-        if (isRecording) {
-            if (!(analyser instanceof AnalyserNode)) throw new Error('AnalyserNode not found.');
-
-            freqArray.current = freqArray.current || new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(freqArray.current);
-
-            waveClass.current.buffer(p, freqArray.current);
-        }
-    }, [isRecording, analyser]);
 
     const buffer = React.useCallback<CassetteProgressCallback>((p: number) => {
         if (isRecording) {
@@ -218,7 +212,7 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
         draw,
         flush,
         frequencies
-    }), [init, increment, flush, frequencies]);
+    }), [init, buffer, draw, flush, frequencies]);
 
     React.useEffect(() => {
         if (isListening) waveClass.current.flush(progressRef.current);
@@ -237,6 +231,10 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
                 onMouseMove={moveScrollGrab}
                 onMouseUp={stopScrollGrab}
                 onMouseLeave={stopScrollGrab}
+                onTouchStart={startScrollGrab}
+                onTouchMove={moveScrollGrab}
+                onTouchEnd={stopScrollGrab}
+                onTouchCancel={stopScrollGrab}
             ></div>
         </div>
     )
