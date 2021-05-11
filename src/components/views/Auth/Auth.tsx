@@ -49,7 +49,13 @@ const useStyles = makeStyles(theme => ({
     paper: {
         width: '100%',
         height: '100%',
-        maxHeight: 600
+        maxHeight: 600,
+        margin: 'unset',
+
+        [theme.breakpoints.down("xs")]: {
+            maxWidth: 'unset',
+            maxHeight: 'unset'
+        }
     },
     sliderRoot: {
         overflowX: 'hidden'

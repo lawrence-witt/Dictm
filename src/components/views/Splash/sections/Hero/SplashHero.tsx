@@ -6,16 +6,18 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import More from '@material-ui/icons/More'
-import { makeStyles } from '@material-ui/core/styles';
-
-import SplashFacade from '../Facade/SplashFacade';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import Blade from '../../../../atoms/Blade/Blade';
 
-const useStyles = makeStyles(theme => ({
+import { useSafeVh } from '../../../../../lib/providers/SafeVh/SafeVh';
+
+import SplashFacade from '../Facade/SplashFacade';
+
+const useStyles = makeStyles<Theme, {safeVh: string}>(theme => ({
     heroRoot: {
         position: 'relative',
-        height: '100vh',
+        height: ({safeVh}) => `calc(${safeVh} * 100)`,
         width: '100%',
         overflow: 'hidden',
         padding: theme.spacing(4, 2, 0, 2),
@@ -85,7 +87,9 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
-    const classes = useStyles();
+    const safeVh = useSafeVh();
+
+    const classes = useStyles({safeVh});
 
     const history = useHistory();
 
