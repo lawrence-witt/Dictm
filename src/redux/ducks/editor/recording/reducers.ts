@@ -68,6 +68,11 @@ const recordingEditorReducer = (
                     data: action.payload.data
                 }
             }
+        case types.RECORDING_EDITOR_SAVING_UPDATED:
+            return {
+                ...state,
+                isSaveRequested: action.payload.saving
+            }
         default:
             return state;
     }

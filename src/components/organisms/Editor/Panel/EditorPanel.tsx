@@ -82,6 +82,7 @@ const EditorPanelSwitch = React.memo(function EditorPanelSwitch(
             return (
                 <RecordingPanel 
                     mode={context.mode}
+                    isSaveRequested={context.isSaveRequested}
                     model={context.model} 
                 />
             );

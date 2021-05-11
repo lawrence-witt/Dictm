@@ -72,6 +72,7 @@ const generateRecordingContext = (
 ): EditorContexts["recording"] => ({
     type: "recording",
     mode: isNew ? "edit" : "play",
+    isSaveRequested: false,
     model
 });
 

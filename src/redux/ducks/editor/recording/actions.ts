@@ -46,3 +46,12 @@ export const updateRecordingEditorData = (
         data
     }
 });
+
+export const updateRecordingEditorSaving = (
+    saving: boolean
+): types.RecordingEditorSavingUpdatedAction => ({
+    type: types.RECORDING_EDITOR_SAVING_UPDATED,
+    payload: {
+        saving
+    }
+});

@@ -8,6 +8,7 @@ export interface RecordingPanelButtonsProps {
 
 export interface RecordingPanelProps {
     mode: "edit" | "play";
+    isSaveRequested: boolean;
     model: EditorContexts["recording"]["model"];
 }
 

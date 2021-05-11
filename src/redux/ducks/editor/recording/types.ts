@@ -2,14 +2,16 @@ import Recording from '../../../../db/models/Recording';
 
 import { EditorContext, EditorOpenedAction } from '../types';
 
-export const RECORDING_EDITOR_MODE_UPDATED          = "dictm/editor/recording/RECORDING_MODE_UPDATED";
-export const RECORDING_EDITOR_TITLE_UPDATED         = "dictm/editor/recording/RECORDING_TITLE_UPDATED";
-export const RECORDING_EDITOR_CATEGORY_UPDATED      = "dictm/editor/recording/RECORDING_CATEGORY_UPDATED";
-export const RECORDING_EDITOR_ATTRIBUTES_UPDATED    = "dictm/editor/recording/RECORDING_ATTRIBUTES_UPDATED";
-export const RECORDING_EDITOR_DATA_UPDATED          = "dictm/editor/recording/RECORDING_DATA_UPDATED";
+export const RECORDING_EDITOR_MODE_UPDATED          = "dictm/editor/recording/MODE_UPDATED";
+export const RECORDING_EDITOR_TITLE_UPDATED         = "dictm/editor/recording/TITLE_UPDATED";
+export const RECORDING_EDITOR_CATEGORY_UPDATED      = "dictm/editor/recording/CATEGORY_UPDATED";
+export const RECORDING_EDITOR_ATTRIBUTES_UPDATED    = "dictm/editor/recording/ATTRIBUTES_UPDATED";
+export const RECORDING_EDITOR_DATA_UPDATED          = "dictm/editor/recording/DATA_UPDATED";
+export const RECORDING_EDITOR_SAVING_UPDATED        = "dictm/editor/recording/SAVING_UPDATED";
 
 export interface RecordingEditorContext extends EditorContext<Recording> {
     mode: "edit" | "play";
+    isSaveRequested: boolean;
 }
 
 export interface RecordingEditorModeUpdatedAction {
@@ -47,10 +49,18 @@ export interface RecordingEditorDataUpdatedAction {
     }
 }
 
+export interface RecordingEditorSavingUpdatedAction {
+    type: typeof RECORDING_EDITOR_SAVING_UPDATED;
+    payload: {
+        saving: boolean;
+    }
+}
+
 export type RecordingEditorActionTypes =
     EditorOpenedAction |
     RecordingEditorModeUpdatedAction |
     RecordingEditorTitleUpdatedAction |
     RecordingEditorCategoryUpdatedAction |
     RecordingEditorAttributesUpdatedAction |
-    RecordingEditorDataUpdatedAction;
+    RecordingEditorDataUpdatedAction |
+    RecordingEditorSavingUpdatedAction;

@@ -30,6 +30,7 @@ const mapState = (state: RootState) => ({
 const mapDispatch = {
     updateAttributes: recordingEditorOperations.updateRecordingEditorAttributes,
     updateData: recordingEditorOperations.updateRecordingEditorData,
+    updateSaving: recordingEditorOperations.updateRecordingEditorSaving,
     saveEditor: editorOperations.saveEditor,
     notifyError: notificationsOperations.notifyRecordingError
 }
@@ -44,11 +45,13 @@ type ReduxProps = ConnectedProps<typeof connector>;
 
 const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
     const {
-        mode, 
+        mode,
+        isSaveRequested,
         model,
         saveAvailability,
         updateAttributes,
         updateData,
+        updateSaving,
         saveEditor,
         notifyError
     } = props;
@@ -151,7 +154,9 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
 
     // Commit the Recording model
 
-    const handleSave = React.useCallback(async () => {
+    /* useCallback cannot automatically infer from literal type for some reason */
+    /* eslint-disable-next-line */
+    const handleSave = React.useCallback(async (reset: boolean = true) => {
         const audio = cassette.get.track()?.copy;
         const frequencies = waveHandle.current.frequencies();
 
@@ -159,8 +164,14 @@ const RecordingPanel: React.FC<RecordingPanelProps & ReduxProps> = (props) => {
         
         updateData({ audio, frequencies });
         saveEditor();
-        handleScan("to", 0);
+        if (reset) handleScan("to", 0);
     }, [cassette.get, updateData, saveEditor, handleScan]);
+
+    React.useEffect(() => {
+        if (!isSaveRequested) return;
+        updateSaving(false);
+        handleSave(false);
+    }, [updateSaving, isSaveRequested, handleSave]);
 
     /* 
     *   Handle play resume after scan control

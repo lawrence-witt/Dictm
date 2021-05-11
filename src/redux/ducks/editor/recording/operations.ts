@@ -67,3 +67,16 @@ export const updateRecordingEditorData = (
 ) => {
     dispatch(actions.updateRecordingEditorData(data));
 }
+
+/** 
+*  Summary:
+*  Updates the isSaveRequested flag.
+*/
+
+export const updateRecordingEditorSaving = (
+    saving: boolean
+): ThunkResult<void> => (
+    dispatch
+) => {
+    dispatch(actions.updateRecordingEditorSaving(saving));
+}
