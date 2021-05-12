@@ -1,37 +1,13 @@
 import React from 'react';
 
-import { connect, ConnectedProps } from 'react-redux';
-
-import { RootState } from '../../../../../../redux/store';
-import { editorOperations, editorSelectors } from '../../../../../../redux/ducks/editor';
-
 import DropdownMenu from '../../../../../molecules/DropdownMenu/DropdownMenu';
 
 import SaveButton from '../../../../../atoms/Buttons/SaveButton';
 import { MenuItem } from '@material-ui/core';
 
-/* 
-*   Redux
-*/
+import * as types from './NoteEditorButtons.types';
 
-const mapState = (state: RootState) => ({
-    saveAvailability: editorSelectors.getSaveAvailability(state.content, state.editor)
-});
-
-const mapDispatch = {
-    saveEditor: editorOperations.saveEditor,
-    openDetailsDialog: editorOperations.openDetailsDialog
-};
-
-const connector = connect(mapState, mapDispatch);
-
-type ReduxProps = ConnectedProps<typeof connector>;
-
-/* 
-*   Local
-*/
-
-const NotePanelButtons: React.FC<ReduxProps> = (props) => {
+const NotePanelButtons: React.FC<types.NoteEditorButtonProps> = (props) => {
     const {
         saveAvailability,
         saveEditor,
@@ -65,4 +41,4 @@ const NotePanelButtons: React.FC<ReduxProps> = (props) => {
     )
 };
 
-export default connector(NotePanelButtons);
+export default NotePanelButtons;

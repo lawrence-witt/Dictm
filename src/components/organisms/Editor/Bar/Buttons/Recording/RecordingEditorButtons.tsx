@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
@@ -7,31 +6,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import DropdownMenu from '../../../../../molecules/DropdownMenu/DropdownMenu';
 
-import { editorOperations } from '../../../../../../redux/ducks/editor';
-import { recordingEditorOperations } from '../../../../../../redux/ducks/editor/recording';
-
 import { RecordingEditorButtonsProps } from './RecordingEditorButtons.types';
 
-/* 
-*   Redux
-*/
-
-const mapDispatch = {
-    updateMode: recordingEditorOperations.updateRecordingEditorMode,
-    openDetailsDialog: editorOperations.openDetailsDialog
-}
-
-const connector = connect(null, mapDispatch);
-
-type ReduxProps = ConnectedProps<typeof connector>;
-
-/* 
-*   Local
-*/
-
-const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> = (props) => {
+const RecordingEditorButtons: React.FC<RecordingEditorButtonsProps> = (props) => {
     const {
-        mode,
         model,
         updateMode,
         openDetailsDialog
@@ -41,8 +19,8 @@ const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> 
 
     const onDetailsClick = React.useCallback((closeMenu: () => void) => {
         return () => {
-            closeMenu();
             openDetailsDialog();
+            closeMenu();
         }
     }, [openDetailsDialog]);
 
@@ -59,7 +37,7 @@ const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> 
         }
     }, [model]);
 
-    const playButtons = (
+    return (
         <>
             <IconButton
                 color="inherit"
@@ -87,8 +65,6 @@ const RecordingPanelButtons: React.FC<RecordingEditorButtonsProps & ReduxProps> 
             </DropdownMenu>
         </>
     );
-
-    return mode === 'play' ? playButtons : null;
 };
 
-export default connector(RecordingPanelButtons);
+export default RecordingEditorButtons;

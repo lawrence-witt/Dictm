@@ -8,9 +8,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { RootState } from '../../../../redux/store';
 import { editorSelectors, editorOperations } from '../../../../redux/ducks/editor';
 
-import RecordingEditorButtons from './Buttons/Recording/RecordingEditorButtons';
-import NoteEditorButtons from './Buttons/Note/NoteEditorButtons';
-import CategoryEditorButtons from './Buttons/Category/CategoryEditorButtons';
+import RecordingEditorButtons from './Buttons/Recording';
+import NoteEditorButtons from './Buttons/Note';
+import CategoryEditorButtons from './Buttons/Category';
 
 import DirectionButton from '../../../atoms/Buttons/DirectionButton';
 import FlexSpace from '../../../atoms/FlexSpace/FlexSpace';
@@ -72,7 +72,9 @@ const EditorBar: React.FC<ReduxProps> = (props) => {
 
         switch(context.type) {
             case "recording":
-                return <RecordingEditorButtons mode={context.mode} model={context.model}/>
+                return context.mode === "play" ? (
+                    <RecordingEditorButtons model={context.model}/>
+                ) : null;
             case "note":
                 return <NoteEditorButtons />
             case "category":
