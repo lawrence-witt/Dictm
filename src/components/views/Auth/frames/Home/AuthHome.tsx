@@ -7,6 +7,7 @@ import { RootState } from '../../../../../redux/store';
 import { authSelectors } from '../../../../../redux/ducks/auth';
 
 import Toolbar from '@material-ui/core/Toolbar';
+import ToolTip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import Home from '@material-ui/icons/Home';
 import Button from '@material-ui/core/Button';
@@ -70,14 +71,21 @@ const AuthHome: React.FC<ReduxProps> = (props) => {
     return (
         <>
             <div className={classes.content}>
-                <Button
-                    color="primary"
-                    variant="contained"
-                    disableElevation
-                    className={classes.button}
+                <ToolTip
+                    title="Cloud storage coming soon!"
+                    placement="top"
+                    arrow
+                    enterTouchDelay={0}
                 >
-                    Sign In
-                </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        disableElevation
+                        className={classes.button}
+                    >
+                        Sign In
+                    </Button>
+                </ToolTip>
                 <Button
                     variant="outlined"
                     onClick={handleLocalUsers}
