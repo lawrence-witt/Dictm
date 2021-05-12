@@ -31,7 +31,7 @@ const mapState = (state: RootState, props: RouteComponentProps & InjectedNavMenu
 
 const mapDispatch = {
     clearUser: userOperations.clearUser,
-    onToggleMenu: toolOperations.toggleNavMenu
+    setNavMenu: toolOperations.setNavMenu
 }
 
 export const connector = connect(mapState, mapDispatch);

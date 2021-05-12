@@ -98,7 +98,7 @@ const NavMenu: React.FC<types.NavMenuProps> = (props) => {
     const {
         isMenuOpen,
         navLists,
-        onToggleMenu
+        setNavMenu
     } = props;
 
     const breakpoints = useBreakpointsContext();
@@ -113,13 +113,22 @@ const NavMenu: React.FC<types.NavMenuProps> = (props) => {
         setMenu(m => unNestMenu(m, navLists, levels))
     }, [navLists]);
 
-    const onReset = React.useCallback(() => {
-        onToggleMenu();
+    const onSelect = React.useCallback(() => {
+        const isOneOf = (val: unknown, ...args: unknown[]) => args.some(arg => arg === val);
+        if (isOneOf(breakpoints.index, 0, 1) && isMenuOpen) setNavMenu('closed');
         setMenu(m => {
             if (!isMenuOpen || m.ids.length === 1) return m;
             return resetMenu(m, navLists);
         });
-    }, [isMenuOpen, navLists, onToggleMenu]);
+    }, [breakpoints.index, isMenuOpen, setNavMenu, navLists]);
+
+    const onReset = React.useCallback(() => {
+        setNavMenu(isMenuOpen ? 'closed' : 'open');
+        setMenu(m => {
+            if (!isMenuOpen || m.ids.length === 1) return m;
+            return resetMenu(m, navLists);
+        });
+    }, [isMenuOpen, navLists, setNavMenu]);
 
     React.useEffect(() => {
         setMenu(m => refreshMenu(m, navLists));
@@ -141,7 +150,8 @@ const NavMenu: React.FC<types.NavMenuProps> = (props) => {
             <NavMenuSwitch 
                 list={menu.list}
                 animation={menu.animation}
-                onNest={onNest}  
+                onNest={onNest}
+                onSelect={onSelect}
             />
         </HybridDrawer>
     )

@@ -47,6 +47,7 @@ const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
         divider,
         onClick,
         onNest,
+        onSelect,
         inert
     } = props;
 
@@ -57,11 +58,20 @@ const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
         ...(inert ? {"aria-hidden": true} : {})
     }), [inert]);
 
+    const handlePrimaryClick = React.useCallback(() => {
+        onClick && onClick();
+        onSelect && onSelect();
+    }, [onClick, onSelect]);
+
+    const handleNestClick = React.useCallback(() => {
+        onNest && to && onNest(to);
+    }, [onNest, to]);
+
     return (
         <ListItem  
             button 
             disableGutters 
-            onClick={onClick}
+            onClick={handlePrimaryClick}
             {...inertAttributes}
         >
             {icon && <ListItemIcon className={classes.icon}>{iconMap[icon]}</ListItemIcon>}
@@ -70,7 +80,7 @@ const NavMenuItem: React.FC<NavMenuItemProps> = (props) => {
             {to && (
                 <ListItemSecondaryAction>
                     <DirectionButton 
-                        onClick={() => onNest && onNest(to)} 
+                        onClick={handleNestClick} 
                         direction="right" edge="end"
                         {...inertAttributes}
                     />

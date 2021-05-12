@@ -46,8 +46,9 @@ const useHeaderStyles = makeStyles<Theme, MenuHeaderStyleProps>(theme =>
 );
 
 const getToggleState = (prevFlow: Flows, nextFlow: Flows, open: boolean) => {
-    const isToggleVisible = (nextFlow === Flows.HYBRID && !open) || 
-    (nextFlow === Flows.TEMP && prevFlow === Flows.HYBRID);
+    const isToggleVisible = 
+        (nextFlow === Flows.HYBRID && !open) || 
+        (nextFlow === Flows.TEMP && prevFlow === Flows.HYBRID);
 
     return { flow: nextFlow, isToggleVisible };
 }

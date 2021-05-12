@@ -12,6 +12,26 @@ import { categoryOperations } from '../content/categories';
 
 /** 
 *  Summary:
+*  Directly Set the open state of the navigation menu.
+*/
+
+export const setNavMenu = (
+    value: 'open' | 'closed'
+): ThunkResult<void> => (
+    dispatch,
+    getState
+) => {
+    const { isOpen } = getState().tools.menu;
+
+    if (isOpen && value === "closed") {
+        dispatch(actions.closeNavMenu());
+    } else if (!isOpen && value === "open") {
+        dispatch(actions.openNavMenu());
+    }
+}
+
+/** 
+*  Summary:
 *  Toggle the open state of the navigation menu.
 */
 

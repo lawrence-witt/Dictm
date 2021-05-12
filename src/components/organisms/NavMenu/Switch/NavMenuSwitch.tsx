@@ -6,7 +6,7 @@ import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 
-import NavMenuItem from '../Item/NavMenuItem';
+import NavMenuItem from '../Item';
 
 import { NavMenuSwitchProps } from './NavMenuSwitch.types';
 
@@ -31,7 +31,8 @@ const NavMenuSwitch: React.FC<NavMenuSwitchProps> = (props) => {
     const {
         list,
         animation,
-        onNest
+        onNest,
+        onSelect
     } = props;
 
     const classes = useNestedMenuStyles();
@@ -56,6 +57,7 @@ const NavMenuSwitch: React.FC<NavMenuSwitchProps> = (props) => {
                             key={`${i}${item.primary}`}
                             {...item}
                             onNest={onNest}
+                            onSelect={onSelect}
                         />
                     ))}
                 </AnimatedList>

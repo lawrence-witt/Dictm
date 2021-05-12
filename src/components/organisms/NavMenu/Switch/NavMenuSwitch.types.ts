@@ -7,4 +7,5 @@ export interface NavMenuSwitchProps {
         active: boolean;
     }
     onNest: (to: string) => void;
+    onSelect: () => void;
 }
