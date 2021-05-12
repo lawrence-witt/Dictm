@@ -1,14 +1,21 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require('eslint-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const htmlPlugin = new HtmlWebPackPlugin({
-  template: "./src/index.html"
+    template: "./src/index.html"
 });
 
 const lintPlugin = new ESLintPlugin({
     files: 'src/**/*',
     extensions: ['.ts', '.tsx']
 });
+
+const copyPlugin = new CopyWebpackPlugin({
+    patterns: [
+        { from: 'public' }
+    ]
+})
 
 const config = {
     mode: "development",
@@ -41,7 +48,7 @@ const config = {
         historyApiFallback: true
     },
     devtool: 'inline-source-map',
-    plugins: [htmlPlugin, lintPlugin]
+    plugins: [htmlPlugin, lintPlugin, copyPlugin]
 }
 
 module.exports = config;

@@ -1,10 +1,17 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const htmlPlugin = new HtmlWebPackPlugin({
     template: "./src/index.html",
     filename: "./index.html"
 });
+
+const copyPlugin = new CopyWebpackPlugin({
+    patterns: [
+        { from: 'public' }
+    ]
+})
 
 const config = {
     mode: "production",
@@ -47,7 +54,7 @@ const config = {
         ]
     },
     devtool: 'source-map',
-    plugins: [htmlPlugin]
+    plugins: [htmlPlugin, copyPlugin]
 }
 
 module.exports = config;
