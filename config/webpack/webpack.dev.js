@@ -7,7 +7,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 });
 
 const lintPlugin = new ESLintPlugin({
-    files: 'src/**/*',
+    files: './src/**/*',
     extensions: ['.ts', '.tsx']
 });
 

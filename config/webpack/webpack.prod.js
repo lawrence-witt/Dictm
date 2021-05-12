@@ -1,6 +1,14 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+// Paths
+
+const outputPath = path.resolve(__dirname, "../../build");
+const tsConfigPath = path.resolve(__dirname, "../typescript/tsconfig.prod.json");
+
+// Plugins
 
 const htmlPlugin = new HtmlWebPackPlugin({
     template: "./src/index.html",
@@ -11,14 +19,20 @@ const copyPlugin = new CopyWebpackPlugin({
     patterns: [
         { from: 'public' }
     ]
-})
+});
+
+const analyserPlugin = new BundleAnalyzerPlugin();
+
+// Config
 
 const config = {
     mode: "production",
-    entry: "./src/index.tsx",
+    entry: {
+        main: "./src/index.tsx"
+    },
     output: {
-        path: path.resolve(__dirname, "build"),
-        filename: "bundle.js"
+        path: outputPath,
+        filename: "[name].[contenthash].js"
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"]
@@ -28,6 +42,9 @@ const config = {
             {
                 test: /\.tsx?$/,
                 loader: "awesome-typescript-loader",
+                options: {
+                    configFileName: tsConfigPath
+                }
             },
             {
                 test: /\.css?$/,
@@ -54,7 +71,7 @@ const config = {
         ]
     },
     devtool: 'source-map',
-    plugins: [htmlPlugin, copyPlugin]
+    plugins: [htmlPlugin, copyPlugin, analyserPlugin]
 }
 
 module.exports = config;
