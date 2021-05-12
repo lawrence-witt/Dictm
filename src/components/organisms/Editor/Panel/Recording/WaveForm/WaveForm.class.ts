@@ -76,9 +76,9 @@ class WaveForm {
         }
     }
 
-    /* * * * * * * * * * *\
-    *   Canvas Methods   *
-    *\ * * * * * * * * * */ 
+    /* * * * * * * * * *\
+    *   Draw Methods   *
+    *\ * * * * * * * * */ 
 
     private _rescaleCanvas(stamps: number) {
         // Save the previous canvas
@@ -165,9 +165,9 @@ class WaveForm {
         this._canvasCtx.clearRect(x, y, w, h);
     }
 
-    /* * * * * * * * * * * * *\
-    *   Draw Frame Methods   *
-    *\ * * * * * * * * * * * */ 
+    /* * * * * * * * * *\
+    *   Queue Methods  *
+    *\ * * * * * * * * */ 
 
     private _commitBuffer(predicate: (secs: number, decis: number) => boolean) {
         for (const [key, buffer] of this._drawBuffer) {
@@ -179,7 +179,7 @@ class WaveForm {
             const deciSlot = this._freqData[buffer.secs][buffer.decis];
             const value = this._getMean(buffer.buffer);
 
-            if (deciSlot) {
+            if (typeof deciSlot === "number") {
                 secSlot[buffer.decis] = value;
                 this._queueClearDecisecond(buffer.secs, buffer.decis);
             } else {

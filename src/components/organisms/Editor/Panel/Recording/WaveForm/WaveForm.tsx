@@ -172,7 +172,6 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
     */
 
     const init = React.useCallback((frequencies: number[][]) => {
-        console.log('init frequencies: ', frequencies);
         waveClass.current = new WaveClass(canvasRef.current, waveFormOptions);
         waveClass.current.frequencyData = frequencies;
         waveClass.current.init();
@@ -205,7 +204,6 @@ const WaveForm: React.FC<WaveFormProps> = (props) => {
 
     const frequencies = React.useCallback(() => {
         const data = waveClass.current.frequencyData;
-        console.log('save frequencies', data);
         return data;
     }, []);
 
