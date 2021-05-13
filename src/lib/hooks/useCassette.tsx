@@ -8,11 +8,6 @@ import Cassette, {
     WavEncoder
 } from 'cassette-js';
 
-/*  
-*   REMEMBER TO UNLINK CASSETTE-JS **HERE FIRST** 
-*   BEFORE MAKING DEP/PATH CHANGES TO EITHER 
-*/
-
 export interface CassetteGetters {
     context: () => AudioContext;
     status: () => CassetteStatus;
