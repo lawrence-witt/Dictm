@@ -43,9 +43,9 @@ const NavMenuSwitch: React.FC<NavMenuSwitchProps> = (props) => {
 
     const transition = useTransition(list, {
         initial: {transform: 'translateX(0%)'},
-        from: active && { transform: `translateX(${left ? '' : '-'}100%)`},
+        from: { transform: `translateX(${!active ? '0%' : left ? '100%' : '-100%'})`},
         enter: { transform: 'translateX(0%)'},
-        leave: active && { transform: `translateX(${left ? '-' : ''}100%)`}
+        leave: { transform: `translateX(${!active ? '0%' : left ? '-100%' : '100%'})`}
     });
 
     return (

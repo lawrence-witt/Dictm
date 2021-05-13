@@ -41,9 +41,9 @@ const config = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: "awesome-typescript-loader",
+                loader: "ts-loader",
                 options: {
-                    configFileName: tsConfigPath
+                    configFile: tsConfigPath
                 }
             },
             {
