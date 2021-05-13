@@ -3,6 +3,8 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const buildEnv = (process.env.BUILD_ENV || "").trim();
+
 // Paths
 
 const outputPath = path.resolve(__dirname, "../../build");
@@ -22,6 +24,8 @@ const copyPlugin = new CopyWebpackPlugin({
 });
 
 const analyserPlugin = new BundleAnalyzerPlugin();
+
+const plugins = [htmlPlugin, copyPlugin, ...(buildEnv === "analysis" ? [analyserPlugin]: [])];
 
 // Config
 
@@ -71,7 +75,7 @@ const config = {
         ]
     },
     devtool: 'source-map',
-    plugins: [htmlPlugin, copyPlugin, analyserPlugin]
+    plugins
 }
 
 module.exports = config;

@@ -7,8 +7,9 @@
   "scripts": {
     "start": "webpack serve --config config/webpack/webpack.dev.js --hot",
     "clean": "rimraf build",
-    "build:prod": "webpack --mode production --config config/webpack/webpack.prod.js",
     "build": "npm run clean && npm run build:prod",
+    "build:prod": "webpack --mode production --config config/webpack/webpack.prod.js",
+    "build:analysis": "set BUILD_ENV=analysis && npm run build:prod",
     "test": "jest --config config/jest/jest.config.ts",
     "test:db": "jest --config config/jest/jest.db.config.ts",
     "reset": "rimraf node_modules && rm package-lock.json"
