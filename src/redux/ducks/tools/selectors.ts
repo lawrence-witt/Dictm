@@ -52,6 +52,7 @@ export const getDashboardAnimation = createSelector((
     } = helpers;
 
     const leftAnimate = { dir: 'left' as const, active: true };
+    const rightAnimate = { dir: 'right' as const, active: true };
     const noAnimate = { dir: 'left' as const, active: false};
 
     const { previous, current } = history;
@@ -91,6 +92,8 @@ export const getDashboardAnimation = createSelector((
 
                 return categoryComparison(prevId, currId);
             } else {
+                if (prevId) return rightAnimate;
+
                 return stemComparison(prevStem, currStem);
             }
         }

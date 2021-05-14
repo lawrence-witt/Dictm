@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Typography from '@material-ui/core/Typography';
+import ToolTip from '@material-ui/core/Tooltip';
 import Link from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 import GitHubIcon from '@material-ui/icons/GitHub';
@@ -106,6 +107,22 @@ const SplashReleases: React.FC = () => {
         content: classes.futureSubSectionContent
     }), [classes]);
 
+    const changelogLink = (
+        <ToolTip
+            title="Changelog coming soon!"
+            placement="bottom"
+            arrow
+            enterTouchDelay={0}
+        >
+            <Link
+                component="button"
+                variant="body1"
+            >
+                changelog
+            </Link>
+        </ToolTip>
+    )
+
     return (
         <div className={classes.releasesRoot}>
             <Section
@@ -124,7 +141,7 @@ const SplashReleases: React.FC = () => {
                         improvements={[]}
                         fixes={[]}
                     />
-                    <Typography>View the changelog for details of previous releases.</Typography>
+                    <Typography style={{display: 'flex', alignItems: 'center'}}>View the&nbsp;{changelogLink}&nbsp;for details of previous releases.</Typography>
                 </Section>
                 <Section
                     title="Future &#x1F52E;"
@@ -144,7 +161,7 @@ const SplashReleases: React.FC = () => {
                 <GitHubIcon/>
                 <div>
                     <Typography variant="h5">Dictm is currently open source.</Typography>
-                    <Typography>To view the source code, make feature requests, and report bugs, visit the <Link href="#">GitHub repository</Link>.</Typography>
+                    <Typography>To view the source code, make feature requests, and report bugs, visit the <Link href="https://github.com/lawrence-witt/Dictm" target="_blank">GitHub repository</Link>.</Typography>
                 </div>
             </div>
         </div>

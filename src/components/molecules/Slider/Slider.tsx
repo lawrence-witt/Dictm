@@ -52,10 +52,6 @@ const Slider = <T extends {[key: string]: any}>(
         right: '100%, 0%'
     }[exit];
 
-    React.useEffect(() => {
-        console.log(item);
-    }, [item]);
-
     const frameTransition = useUniqueTransition(item.key, item.object, {
         initial: { transform: 'translate(0%, 0%)' },
         from: { transform: `translate(${disabled ? '0%, 0%' : enterValue})` },
