@@ -1,16 +1,12 @@
 import React from 'react';
 
-import { useHistory } from 'react-router-dom';
-
 import Typography from '@material-ui/core/Typography';
 import ToolTip from '@material-ui/core/Tooltip';
-import Link, { LinkProps } from '@material-ui/core/Link';
 import Button from '@material-ui/core/Button';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ButtonLink from '../../atoms/Links/ButtonLink';
-import AnchorLink from '../../atoms/Links/AnchorLink';
+import StyledLink from '../../atoms/StyledLink/StyledLink';
 
 const useStyles = makeStyles(theme => ({
     footerRoot: {
@@ -52,25 +48,8 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FooterLink = React.forwardRef<
-    HTMLButtonElement, LinkProps
->(function FooterLink({children, ...rest}, ref) {
-    return (
-        <Link
-            ref={ref}
-            color="inherit"
-            variant="body1"
-            {...rest}
-        >
-            {children}
-        </Link>
-    )
-});
-
 const Footer: React.FC = () => {
     const classes = useStyles();
-
-    const history = useHistory();
 
     const handleReturnClick = React.useCallback(() => {
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -79,34 +58,38 @@ const Footer: React.FC = () => {
     return (
         <div className={classes.footerRoot}>
             <div className={classes.footerLinks}>
-                <ButtonLink
+                <StyledLink 
+                    to="/auth"
                     color="inherit"
-                    onClick={() => history.push('/auth')}
                 >
                     Try Online
-                </ButtonLink>
+                </StyledLink>
                 <ToolTip
                     title="Changelog coming soon!"
                     placement="right"
                     arrow
                     enterTouchDelay={0}
                 >
-                    <ButtonLink
+                    <StyledLink
+                        to="/"
+                        onClick={(e: React.MouseEvent) => e.preventDefault()}
                         color="inherit"
                     >
                         Changelog
-                    </ButtonLink>
+                    </StyledLink>
                 </ToolTip>
                 
             </div>
             <div className={classes.footerEnd}>
-                <AnchorLink
-                    href="https://www.itt.dev"
+                <StyledLink
+                    to="https://www.itt.dev"
+                    external
                     target="_blank"
+                    rel="noopener"
                     color="inherit"
                 >
                     © w.itt.dev
-                </AnchorLink>
+                </StyledLink>
                 <Button
                     color="inherit"
                     className={classes.returnButton}

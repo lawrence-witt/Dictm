@@ -2,11 +2,11 @@ import React from 'react';
 
 import Typography from '@material-ui/core/Typography';
 import ToolTip from '@material-ui/core/Tooltip';
-import Link from '@material-ui/core/Link';
 import Divider from '@material-ui/core/Divider';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import { makeStyles } from '@material-ui/core/styles';
 
+import StyledLink from '../../../../atoms/StyledLink/StyledLink';
 import Section from '../../../../molecules/Section/Section';
 import ReleaseAccordion from '../../../../molecules/ReleaseAccordion/ReleaseAccordion';
 
@@ -114,12 +114,12 @@ const SplashReleases: React.FC = () => {
             arrow
             enterTouchDelay={0}
         >
-            <Link
-                component="button"
-                variant="body1"
+            <StyledLink
+                to="/"
+                onClick={(e: React.MouseEvent) => e.preventDefault()}
             >
                 changelog
-            </Link>
+            </StyledLink>
         </ToolTip>
     )
 
@@ -141,7 +141,7 @@ const SplashReleases: React.FC = () => {
                         improvements={[]}
                         fixes={[]}
                     />
-                    <Typography style={{display: 'flex', alignItems: 'center'}}>View the&nbsp;{changelogLink}&nbsp;for details of previous releases.</Typography>
+                    <Typography>View the {changelogLink} for details of previous releases.</Typography>
                 </Section>
                 <Section
                     title="Future &#x1F52E;"
@@ -161,7 +161,7 @@ const SplashReleases: React.FC = () => {
                 <GitHubIcon/>
                 <div>
                     <Typography variant="h5">Dictm is currently open source.</Typography>
-                    <Typography>To view the source code, make feature requests, and report bugs, visit the <Link href="https://github.com/lawrence-witt/Dictm" target="_blank">GitHub repository</Link>.</Typography>
+                    <Typography>To view the source code, make feature requests, and report bugs, visit the <StyledLink to="https://github.com/lawrence-witt/Dictm" external target="_blank" rel="noopener">GitHub repository</StyledLink>.</Typography>
                 </div>
             </div>
         </div>

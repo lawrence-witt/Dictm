@@ -1,13 +1,12 @@
 import React from 'react';
 
-import { useHistory } from 'react-router-dom';
-
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import More from '@material-ui/icons/More'
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
+import StyledLink from '../../../../atoms/StyledLink/StyledLink';
 import Blade from '../../../../atoms/Blade/Blade';
 
 import { useSafeVh } from '../../../../../lib/providers/SafeVh/SafeVh';
@@ -91,12 +90,6 @@ const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
 
     const classes = useStyles({safeVh});
 
-    const history = useHistory();
-
-    const onNavClick = React.useCallback(() => {
-        history.push('/auth');
-    }, [history]);
-
     return (
         <div className={classes.heroRoot}>
             <Typography 
@@ -113,14 +106,17 @@ const SplashHero: React.FC<{onExpandClick: () => void}> = ({onExpandClick}) => {
                         The integrated note-taking app you can use anywhere
                     </Typography>
                     <div className={classes.heroTextActions}>
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            disableElevation
-                            onClick={onNavClick}
+                        <StyledLink
+                            to="/auth"
                         >
-                            Try Online
-                        </Button>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                disableElevation
+                            >
+                                Try Online
+                            </Button>
+                        </StyledLink>
                     </div>
                 </div>
                 <SplashFacade />
