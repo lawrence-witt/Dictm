@@ -1,7 +1,5 @@
 import { ThunkResult } from '../../store';
 
-import StorageService from '../../services/StorageService';
-
 import { userOperations } from '../user';
 
 import * as actions from './actions';

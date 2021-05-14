@@ -32,8 +32,7 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = {
-    selectLocalUser: authOperations.selectLocalUser,
-    loadUser: authOperations.loadSelectedUser
+    selectLocalUser: authOperations.selectLocalUser
 }
 
 const connector = connect(mapState, mapDispatch);
@@ -65,8 +64,7 @@ const AuthLocal: React.FC<ReduxProps & types.AuthLocalProps> = (props) => {
         selectedUser = "",
         usersByName,
         selectLocalUser,
-        setLoadMethod,
-        loadUser
+        setLoadMethod
     } = props;
 
     const classes = useStyles();

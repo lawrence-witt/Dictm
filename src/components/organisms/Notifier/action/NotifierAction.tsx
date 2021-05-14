@@ -16,11 +16,10 @@ const ReloadAction: React.FC = () => {
 
 const NotifierAction: React.FC<types.NotifierActionSwitchProps> = (props) => {
     const {
-        type,
-        dismiss: d
+        type
     } = props;
 
-    const dismiss = React.useCallback(() => d(), [d]);
+    //const dismiss = React.useCallback(() => d(), [d]);
 
     switch(type) {
         case "RELOAD": return <ReloadAction/>;

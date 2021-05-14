@@ -5,7 +5,7 @@ import * as types from './useBreakpoints.types';
 
 const getDocumentWidth = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
-const belowMedia = (val: number) => `(max-width: ${val}px)`;
+//const belowMedia = (val: number) => `(max-width: ${val}px)`;
 const betweenMedia = (min: number, max: number) => `(min-width: ${min}px) and (max-width: ${max}px)`;
 const aboveMedia = (val: number) => `(min-width: ${val}px)`;
 
